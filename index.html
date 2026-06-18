@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academia Principia — Talleres 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-bright: #F0C040;
+    --gold-dim: #8A6F2E;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --dark2: #1A1A1A;
+    --dark3: #222222;
+    --text: #E8E8E8;
+    --text-dim: #888;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── FONDO ANIMADO ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(201,168,76,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── GRID DE FONDO ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 28px 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 64px 0 48px;
+    text-align: center;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    margin-bottom: 64px;
+    position: relative;
+  }
+
+  .logo-line {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .logo-line::before,
+  .logo-line::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(32px, 6vw, 64px);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 0 60px rgba(201,168,76,0.3);
+    margin-bottom: 8px;
+  }
+
+  h1 span {
+    color: var(--gold);
+  }
+
+  .subtitle {
+    font-size: 15px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 16px;
+  }
+
+  /* ── BADGE CANTIDAD ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 99px;
+    padding: 6px 16px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-top: 24px;
+  }
+
+  .badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── GRID DE TALLERES ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── TARJETA ── */
+  .card {
+    background: var(--dark2);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 4px;
+    padding: 32px 28px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% -10%, rgba(201,168,76,0.06), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+
+  .card:hover {
+    border-color: rgba(201,168,76,0.45);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.15);
+  }
+
+  .card:hover::before,
+  .card:hover::after {
+    opacity: 1;
+  }
+
+  .card-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
+
+  .card-icon {
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1.4;
+  }
+
+  .card-title span {
+    color: var(--gold);
+  }
+
+  .card-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .card-cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 8px;
+  }
+
+  .card-cta svg {
+    transition: transform 0.2s;
+  }
+
+  .card:hover .card-cta svg {
+    transform: translateX(4px);
+  }
+
+  /* ── TARJETA ESPECIAL (Hoja de Ruta) ── */
+  .card.featured {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 32px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, var(--dark2) 50%);
+    border-color: rgba(201,168,76,0.3);
+  }
+
+  .card.featured .card-body {
+    flex: 1;
+  }
+
+  .card.featured .card-icon {
+    font-size: 48px;
+    flex-shrink: 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 80px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(201,168,76,0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .footer-meta {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 640px) {
+    .card.featured { flex-direction: column; }
+    header { padding: 40px 0 32px; }
+    h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo-line">Cripto Inversor Experto · Principia</div>
+    <h1>ACADEMIA <span>PRINCIPIA</span></h1>
+    <p class="subtitle">Talleres de Educación Cripto — 2026</p>
+    <div class="badge">
+      <span class="dot"></span>
+      6 talleres disponibles
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- DESTACADO: Hoja de Ruta -->
+    <a class="card featured" href="Hoja_de_Ruta_-_Standalone.html" target="_blank">
+      <div class="card-icon">🗺️</div>
+      <div class="card-body">
+        <div class="card-num">Documento Estratégico</div>
+        <div class="card-title">Hoja de <span>Ruta</span> · 2026–2028</div>
+        <div class="card-desc">Mapa macro del ciclo cripto para el inversor profesional. Tres años, tres fases y tres perfiles de ejecución: Ajedrecista, Ciclista y Paracaidista.</div>
+        <div class="card-cta">
+          Abrir documento
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    </a>
+
+    <!-- Taller 1 -->
+    <a class="card" href="TallerOperadorExperto_2026_v2__2___1_.html" target="_blank">
+      <div class="card-num">Taller 01</div>
+      <div class="card-icon">⚙️</div>
+      <div class="card-title">Taller <span>Operador Experto</span></div>
+      <div class="card-desc">Domina las operaciones en exchanges de forma profesional. Exchanges, órdenes avanzadas y ejecución eficiente.</div>
+      <div class="card-cta">
+        Acceder al taller
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+    </a>
+
+    <!-- Taller 2 -->
+    <a class="card" href="taller_portafolios_cripto__1___1_.html" target="_blank">
+      <div class="card-num">Taller 02</div>
+      <div class="card-icon">📊</div>
+      <div class="card-title">Diagnóstico y <span>Arquitectura de Portafolios</span></div>
+      <div class="card-desc">Aprende a construir y diagnosticar un portafolio cripto sólido. Distribución de activos, rebalanceo y gestión de riesgo.</div>
+      <div class="card-cta">
+        Acceder al taller
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+    </a>
+
+    <!-- Taller 3 -->
+    <a class="card" href="TallerTradingView_2026__1___1_.html" target="_blank">
+      <div class="card-num">Taller 03</div>
+      <div class="card-icon">📈</div>
+      <div class="card-title">Dominio Avanzado de <span>TradingView</span></div>
+      <div class="card-desc">Maneja TradingView como un profesional. Análisis técnico, alertas, scripts Pine y configuración avanzada de charts.</div>
+      <div class="card-cta">
+        Acceder al taller
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+    </a>
+
+    <!-- Taller 4 -->
+    <a class="card" href="TallerCeDeFi_2026__1___1_.html" target="_blank">
+      <div class="card-num">Taller 04</div>
+      <div class="card-icon">🔗</div>
+      <div class="card-title">Estrategias de <span>CeDeFi</span> desde el Exchange</div>
+      <div class="card-desc">Combina lo mejor del ecosistema centralizado y descentralizado. Earn, staking, yield y puentes entre mundos.</div>
+      <div class="card-cta">
+        Acceder al taller
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+    </a>
+
+    <!-- Taller 5 -->
+    <a class="card" href="CMC_OnChain_Dashboard_Educativo__1___1_.html" target="_blank">
+      <div class="card-num">Taller 05</div>
+      <div class="card-icon">🔍</div>
+      <div class="card-title">Inteligencia Financiera <span>On-Chain</span></div>
+      <div class="card-desc">CoinMarketCap y métricas on-chain para leer el mercado como los institucionales. Datos, señales y Dashboard CMC.</div>
+      <div class="card-cta">
+        Acceder al taller
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+    </a>
+
+  </div>
+
+  <footer>
+    <div class="footer-brand">Academia Principia</div>
+    <div class="footer-meta">Cripto Inversor Experto · 2026</div>
+  </footer>
+
+</div>
+</body>
+</html>
