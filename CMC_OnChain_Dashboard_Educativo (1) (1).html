@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taller CoinMarketCap & On-Chain — Academia Principia 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;--gold-b:#F0C040;--gold-dim:#8A6A20;--gold-glow:#FFD700;
+  --black:#000;--bcard:#0D0D0D;--bpanel:#111;--bpanel2:#161616;
+  --bg:rgba(201,168,76,0.28);--bgb:rgba(240,192,64,0.6);
+  --tgold:#C9A84C;--tgoldb:#F0C040;--tmuted:rgba(201,168,76,0.5);
+  --tw:rgba(255,255,255,0.93);--tdim:rgba(255,255,255,0.62);
+  --red:#E05050;--green:#50C878;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{width:100%;min-height:100vh;background:#000;overflow-x:hidden;font-family:'Rajdhani',sans-serif;color:var(--tw);line-height:1.65}
+#cvs{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.38}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(201,168,76,0.032) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.032) 1px,transparent 1px);
+  background-size:55px 55px}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ─ NAV ─ */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 2rem;
+  border-bottom:1px solid var(--bg);background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(18px);position:sticky;top:0;z-index:200;gap:1rem}
+.logo{display:flex;align-items:center;gap:0.8rem;cursor:pointer;flex-shrink:0}
+.logo-ring{width:40px;height:40px;border:1.5px solid var(--gold);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;animation:glow 4s ease infinite}
+@keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 14px rgba(201,168,76,0.38)}}
+.logo-txt{font-family:'Orbitron',sans-serif;font-size:0.68rem;color:var(--tgold);letter-spacing:0.12em;text-transform:uppercase;line-height:1.45}
+.logo-txt b{display:block;font-size:0.52rem;color:var(--tmuted);letter-spacing:0.18em;font-weight:400}
+.nav-mid{flex:1;max-width:320px;margin:0 1rem}
+.plbl{font-family:'Orbitron',sans-serif;font-size:0.55rem;letter-spacing:0.14em;color:var(--tmuted);text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:5px}
+.ptrack{height:2px;background:rgba(201,168,76,0.12);border-radius:2px}
+.pbar{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1);position:relative}
+.pbar::after{content:'';position:absolute;right:-1px;top:-3px;width:7px;height:7px;border-radius:50%;background:var(--gold-b);box-shadow:0 0 7px var(--gold-glow)}
+.nbadge{font-family:'Orbitron',sans-serif;font-size:0.56rem;letter-spacing:0.1em;padding:0.32rem 0.8rem;border:1px solid var(--bgb);color:var(--tgoldb);text-transform:uppercase;background:rgba(201,168,76,0.07);white-space:nowrap}
+
+/* ─ SCREENS ─ */
+.scr{display:none;flex-direction:column;flex:1;animation:fup .45s ease both}
+.scr.on{display:flex}
+@keyframes fup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─ HERO ─ */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:calc(100vh - 64px);padding:2.5rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+.hero-deco{position:absolute;inset:0;pointer-events:none}
+.hdline{position:absolute;top:50%;left:50%;width:600px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,0.12),transparent);
+  transform:translate(-50%,-50%) rotate(var(--r));animation:lf 7s ease infinite;animation-delay:var(--d)}
+@keyframes lf{0%,100%{opacity:0}50%{opacity:1}}
+.emblem{position:relative;width:210px;height:210px;margin:0 auto 2.2rem;flex-shrink:0}
+.er{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,0.18);animation:rp 4.5s ease infinite}
+.er:nth-child(1){inset:0}
+.er:nth-child(2){inset:-20px;animation-delay:.7s;border-color:rgba(201,168,76,0.1)}
+.er:nth-child(3){inset:-40px;animation-delay:1.4s;border-color:rgba(201,168,76,0.055)}
+@keyframes rp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.55}}
+.ecore{position:absolute;inset:12px;border-radius:50%;border:2px solid rgba(201,168,76,0.52);
+  background:radial-gradient(circle at 35% 30%,rgba(201,168,76,0.18),rgba(0,0,0,0.92));
+  display:flex;align-items:center;justify-content:center}
+.hero-tag{font-family:'Orbitron',sans-serif;font-size:0.6rem;letter-spacing:0.26em;color:var(--gold);
+  border:1px solid var(--bg);padding:.38rem 1.2rem;text-transform:uppercase;margin-bottom:1.8rem;
+  display:inline-block;animation:bp 3s ease infinite}
+@keyframes bp{0%,100%{border-color:rgba(201,168,76,0.28)}50%{border-color:rgba(240,192,64,0.7);box-shadow:0 0 16px rgba(201,168,76,0.2)}}
+.hero h1{font-family:'Cinzel',serif;font-size:clamp(2rem,5vw,3.6rem);color:#fff;line-height:1.05;font-weight:700;margin-bottom:.45rem}
+.hero h1 span{color:var(--gold-b);display:block}
+.hero-sub{font-size:1.1rem;color:var(--tdim);letter-spacing:.05em;margin-bottom:2.2rem;max-width:540px;line-height:1.75;font-weight:300}
+.hero-sub strong{color:var(--tgold);font-weight:600}
+.hero-kpis{display:flex;gap:2.2rem;margin-bottom:2.8rem;flex-wrap:wrap;justify-content:center}
+.kpi{text-align:center}
+.kpi-n{font-family:'Orbitron',sans-serif;font-size:1.9rem;font-weight:700;color:var(--gold-b);line-height:1}
+.kpi-l{font-size:.68rem;letter-spacing:.14em;color:var(--tmuted);text-transform:uppercase;margin-top:.25rem}
+.ksep{width:1px;background:var(--bg);align-self:stretch}
+.btn-go{font-family:'Orbitron',sans-serif;font-size:.76rem;letter-spacing:.2em;padding:1rem 2.6rem;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;
+  border:none;cursor:pointer;font-weight:700;transition:all .3s;position:relative;overflow:hidden}
+.btn-go::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);transform:translateX(-120%);transition:transform .55s}
+.btn-go:hover::after{transform:translateX(120%)}
+.btn-go:hover{box-shadow:0 0 30px rgba(201,168,76,0.45);transform:translateY(-2px)}
+
+/* ─ MENU ─ */
+.menu-wrap{padding:2.2rem 2rem 3rem;max-width:1080px;margin:0 auto;width:100%}
+.sec-hdr{border-left:3px solid var(--gold);padding-left:1.1rem;margin-bottom:2rem}
+.sec-hdr h2{font-family:'Cinzel',serif;font-size:1.55rem;color:#fff;font-weight:600}
+.sec-hdr p{font-size:.92rem;color:var(--tmuted);letter-spacing:.04em;margin-top:.28rem}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-bottom:1.6rem}
+@media(max-width:700px){.pgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.pgrid{grid-template-columns:1fr}}
+.pcard{background:var(--bcard);border:1px solid var(--bg);padding:1.4rem 1.2rem;
+  cursor:pointer;transition:all .3s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.65rem}
+.pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .4s}
+.pcard:hover::before,.pcard.done::before{transform:scaleX(1)}
+.pcard:hover{border-color:rgba(240,192,64,0.5);background:#0f0f0f;transform:translateY(-2px);
+  box-shadow:0 12px 32px rgba(0,0,0,.55),0 0 20px rgba(201,168,76,.08)}
+.pcard.done{border-color:rgba(201,168,76,.24)}
+.pn{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.2em;color:var(--tmuted);text-transform:uppercase}
+.pico{width:44px;height:44px;border:1px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.ptit{font-family:'Cinzel',serif;font-size:.96rem;color:var(--gold-b);font-weight:600;line-height:1.3}
+.pdesc{font-size:.84rem;color:var(--tdim);line-height:1.55}
+.ptag{font-size:.6rem;letter-spacing:.1em;padding:.2rem .6rem;border:1px solid var(--bg);color:var(--tmuted);text-transform:uppercase;font-family:'Orbitron',sans-serif;align-self:flex-start}
+.pchk{position:absolute;top:.75rem;right:.75rem;width:20px;height:20px;border-radius:50%;background:var(--gold);display:none;align-items:center;justify-content:center}
+.pchk svg{width:11px;height:11px}
+.pcard.done .pchk{display:flex}
+.menu-btns{display:flex;gap:.9rem;flex-wrap:wrap}
+.btn-s{font-family:'Orbitron',sans-serif;font-size:.62rem;letter-spacing:.11em;padding:.65rem 1.4rem;
+  border:1px solid var(--bg);color:var(--tmuted);text-transform:uppercase;background:none;cursor:pointer;transition:all .2s}
+.btn-s:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ─ CONTENT ─ */
+.cwrap{max-width:980px;margin:0 auto;padding:2.2rem 2rem;width:100%}
+.back{display:inline-flex;align-items:center;gap:.45rem;font-size:.65rem;letter-spacing:.11em;
+  color:var(--tmuted);text-transform:uppercase;cursor:pointer;border:none;background:none;
+  font-family:'Orbitron',sans-serif;transition:color .2s;margin-bottom:2rem;padding:0}
+.back:hover{color:var(--gold)}
+.back svg{width:14px;height:14px}
+.phdr{display:flex;align-items:flex-start;gap:1.4rem;margin-bottom:2.2rem;padding-bottom:2rem;border-bottom:1px solid var(--bg)}
+.pico2{width:68px;height:68px;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.9rem;background:rgba(201,168,76,0.06)}
+.phnum{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.22em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.4rem}
+.phtit{font-family:'Cinzel',serif;font-size:1.85rem;color:#fff;font-weight:700;line-height:1.1;margin-bottom:.3rem}
+.phtit em{font-style:normal;color:var(--gold-b)}
+.phsub{font-size:.95rem;color:var(--tdim);letter-spacing:.04em;line-height:1.5}
+
+/* ─ BLOCKS ─ */
+.blk{margin-bottom:2rem}
+.blk-lbl{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.18em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:.85rem;display:flex;align-items:center;gap:.5rem}
+.blk-lbl::after{content:'';flex:1;height:1px;background:var(--bg)}
+
+/* ─ HINT/TOOLTIP ─ */
+.hint-wrap{border:1px solid rgba(201,168,76,.28);background:rgba(201,168,76,.04);margin-bottom:1rem;overflow:hidden;transition:border-color .3s}
+.hint-wrap.active{border-color:rgba(201,168,76,.55);background:rgba(201,168,76,.07)}
+.hint-header{display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;cursor:pointer;user-select:none}
+.hint-header:hover{background:rgba(201,168,76,.06)}
+.hint-q{width:24px;height:24px;border-radius:50%;background:rgba(201,168,76,.2);border:1.5px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;
+  font-size:.72rem;font-weight:700;color:var(--gold-b);flex-shrink:0;animation:qpulse 2.5s ease infinite}
+@keyframes qpulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 10px rgba(201,168,76,0.4)}}
+.hint-title{flex:1;font-size:.9rem;color:var(--tgold);font-weight:500}
+.hint-arrow{font-family:'Orbitron',sans-serif;font-size:.7rem;color:var(--tmuted);transition:transform .3s}
+.hint-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1)}
+.hint-body.open{max-height:500px}
+.hint-section{padding:.75rem 1rem .75rem 3.2rem;border-top:1px solid rgba(201,168,76,.12)}
+.hint-section-lbl{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.14em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.4rem}
+.hint-section-txt{font-size:.9rem;color:var(--tdim);line-height:1.7}
+.hint-example{color:rgba(240,192,64,.82);font-style:italic;background:rgba(201,168,76,.06);padding:.6rem .8rem;border-left:2px solid var(--gold);margin-top:.5rem}
+
+/* ─ RULE BOX ─ */
+.rule-box{background:rgba(201,168,76,.05);border:1px solid var(--bg);border-left:4px solid var(--gold);padding:1.1rem 1.3rem}
+.rule-tag{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:.4rem}
+.rule-box p{font-size:1.0rem;color:var(--tgoldb);font-weight:500;line-height:1.65}
+
+/* ─ ERROR BOX ─ */
+.err-wrap{background:rgba(160,20,20,.1);border:1px solid rgba(200,60,60,.28);border-left:4px solid #C03030;margin-bottom:1rem}
+.err-top{padding:1.1rem 1.3rem;cursor:pointer;display:flex;align-items:flex-start;gap:1rem}
+.err-ico{font-size:1.5rem;flex-shrink:0;margin-top:.1rem}
+.err-head{flex:1}
+.err-tag{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.14em;color:#E05050;text-transform:uppercase;margin-bottom:.4rem}
+.err-title{font-size:1.05rem;color:rgba(255,210,210,.92);line-height:1.6;font-weight:500}
+.err-body{padding:0 1.3rem;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s}
+.err-body.open{max-height:600px;padding-bottom:1.2rem}
+.err-why-title{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.14em;color:#E07070;text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;margin-top:.9rem}
+.err-why-title::before{content:'?';width:18px;height:18px;border-radius:50%;background:rgba(200,60,60,.3);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#E05050;flex-shrink:0}
+.err-why p{font-size:.95rem;color:rgba(255,195,195,.78);line-height:1.7}
+
+/* ─ ALERT ─ */
+.alert{background:rgba(50,120,50,.08);border:1px solid rgba(80,180,80,.22);border-left:4px solid #50C050;padding:.95rem 1.1rem;font-size:.93rem;color:rgba(175,235,175,.8);line-height:1.6}
+.alert strong{color:#80D080}
+.alert-red{background:rgba(160,20,20,.1);border:1px solid rgba(200,60,60,.3);border-left:4px solid var(--red);padding:.95rem 1.1rem;font-size:.93rem;color:rgba(255,190,190,.85);line-height:1.6}
+.alert-red strong{color:#FF9090}
+
+/* ─ CHART BOX ─ */
+.cbox{background:var(--bcard);border:1px solid var(--bg);padding:1.3rem;position:relative;margin-bottom:.8rem}
+.ctit{font-family:'Orbitron',sans-serif;font-size:.62rem;letter-spacing:.15em;color:var(--tmuted);
+  text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.ctit span{color:var(--gold);font-size:.8rem}
+
+/* ─ GRID ─ */
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.1rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem}
+@media(max-width:680px){.g2,.g3{grid-template-columns:1fr}}
+
+/* ─ WIDGETS / SLIDERS ─ */
+.wbox{background:var(--bcard);border:1px solid var(--bg);padding:1.3rem;margin-bottom:.8rem}
+.wrow{display:flex;align-items:center;gap:1rem;margin-bottom:.9rem;flex-wrap:wrap}
+.wlbl{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;color:var(--tmuted);text-transform:uppercase;min-width:120px;line-height:1.4}
+.wslider{flex:1;min-width:120px;-webkit-appearance:none;appearance:none;height:4px;background:rgba(201,168,76,.18);outline:none;border-radius:2px;cursor:pointer}
+.wslider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold-b);cursor:pointer;box-shadow:0 0 8px rgba(240,192,64,.5)}
+.wval{font-family:'Orbitron',sans-serif;font-size:.78rem;color:var(--gold-b);min-width:72px;text-align:right;font-weight:700}
+.wres{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:1.1rem}
+.wr{background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);padding:.8rem;text-align:center}
+.wr-l{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.45rem}
+.wr-v{font-family:'Orbitron',sans-serif;font-size:1.15rem;font-weight:700;color:var(--gold-b)}
+.wr-v.g{color:var(--green)}
+.wr-v.r{color:var(--red)}
+
+/* ─ ACT LIST ─ */
+.act-list{list-style:none;display:flex;flex-direction:column;gap:.65rem}
+.act-list li{display:flex;align-items:flex-start;gap:.7rem;font-size:.95rem;color:var(--tdim);line-height:1.65;padding:.85rem 1rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.1)}
+.act-list li::before{content:'▸';color:var(--gold);font-size:.8rem;flex-shrink:0;margin-top:.18rem}
+.act-list li strong{color:var(--tgold);font-weight:600}
+
+/* ─ TABLE ─ */
+.mtbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.mtbl th{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.13em;color:var(--tmuted);text-transform:uppercase;padding:.6rem .8rem;border-bottom:1px solid var(--bg);text-align:left;font-weight:400}
+.mtbl td{padding:.7rem .8rem;border-bottom:1px solid rgba(201,168,76,.07);color:var(--tdim);vertical-align:top;line-height:1.55}
+.mtbl td:first-child{color:var(--gold-b);font-weight:500}
+.mtbl tr:hover td{background:rgba(201,168,76,.03)}
+
+/* ─ DONUT LEGEND ─ */
+.dnut-wrap{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.dnut-leg{display:flex;flex-direction:column;gap:.55rem;flex:1;min-width:120px}
+.leg-item{display:flex;align-items:center;gap:.5rem;font-size:.88rem;color:var(--tdim)}
+.leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+
+/* ─ STEP LIST ─ */
+.step-list{list-style:none;display:flex;flex-direction:column;gap:.5rem;counter-reset:steps}
+.step-item{display:flex;align-items:flex-start;gap:1rem;padding:.9rem 1rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.1);counter-increment:steps}
+.step-num{font-family:'Orbitron',sans-serif;font-size:.65rem;color:var(--gold-b);width:24px;text-align:center;flex-shrink:0;margin-top:.1rem;font-weight:700}
+.step-body{font-size:.93rem;color:var(--tdim);line-height:1.65}
+.step-body strong{color:var(--tgold)}
+
+/* ─ KPI CARDS ─ */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-bottom:1.1rem}
+@media(max-width:600px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--bcard);border:1px solid var(--bg);padding:1rem 1.1rem;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .4s}
+.kpi-card:hover::before{transform:scaleX(1)}
+.kpi-card-lbl{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.14em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.4rem}
+.kpi-card-val{font-family:'Orbitron',sans-serif;font-size:1.45rem;font-weight:700;color:var(--gold-b);line-height:1}
+.kpi-card-sub{font-size:.82rem;color:var(--tdim);margin-top:.3rem}
+
+/* ─ TAB BTNS ─ */
+.tab-row{display:flex;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.tbtn{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.1em;padding:.55rem 1.1rem;
+  border:1px solid var(--bg);color:var(--tmuted);text-transform:uppercase;background:none;cursor:pointer;transition:all .2s}
+.tbtn:hover{border-color:var(--gold);color:var(--gold)}
+.tbtn.on{border-color:var(--gold-b);color:var(--gold-b);background:rgba(201,168,76,.1)}
+
+/* ─ PORTFOLIO TABLE ─ */
+.ptbl{width:100%;border-collapse:collapse;font-size:.88rem}
+.ptbl th{font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase;padding:.55rem .8rem;border-bottom:1px solid var(--bg);text-align:left;font-weight:400}
+.ptbl td{padding:.65rem .8rem;border-bottom:1px solid rgba(201,168,76,.07);color:var(--tdim);line-height:1.4}
+.ptbl td.buy{color:var(--green)}
+.ptbl td.sell{color:var(--red)}
+.ptbl tr:hover td{background:rgba(201,168,76,.03)}
+
+/* ─ FORM ─ */
+.form-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:.8rem}
+@media(max-width:600px){.form-row{grid-template-columns:1fr 1fr}}
+.form-group label{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.11em;color:var(--tmuted);text-transform:uppercase;display:block;margin-bottom:.4rem}
+.form-group input,.form-group select{width:100%;padding:.6rem .8rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.25);color:var(--tw);font-family:'Rajdhani',sans-serif;font-size:.95rem;transition:border .2s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--gold-b)}
+.form-group select option{background:#111}
+.btn-primary{font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:.14em;padding:.75rem 1.8rem;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;
+  border:none;cursor:pointer;font-weight:700;transition:all .3s}
+.btn-primary:hover{box-shadow:0 0 22px rgba(201,168,76,.4);transform:translateY(-1px)}
+
+/* ─ QUIZ ─ */
+.q-wrap{background:var(--bcard);border:1px solid var(--bg);padding:1.3rem;margin-bottom:1rem}
+.q-num{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.16em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.5rem}
+.q-text{font-size:1rem;color:var(--tw);margin-bottom:1rem;line-height:1.6}
+.q-opts{display:flex;flex-direction:column;gap:.5rem}
+.q-opt{display:flex;align-items:center;gap:.8rem;padding:.65rem .9rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.12);cursor:pointer;transition:all .25s;font-size:.93rem;color:var(--tdim)}
+.q-opt:hover{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.05);color:var(--tw)}
+.q-opt input[type=radio]{accent-color:var(--gold-b);width:15px;height:15px;flex-shrink:0}
+.q-opt.correct{border-color:var(--green);background:rgba(80,200,120,.08);color:rgba(175,235,175,.9)}
+.q-opt.wrong{border-color:var(--red);background:rgba(224,80,80,.08);color:rgba(255,175,175,.9)}
+.q-feedback{margin-top:.7rem;padding:.7rem .9rem;background:rgba(201,168,76,.05);border-left:3px solid var(--gold);font-size:.88rem;color:var(--tdim);line-height:1.6;display:none}
+.q-feedback.show{display:block}
+
+/* ─ FOOTER ─ */
+.pfooter{display:flex;justify-content:space-between;align-items:center;margin-top:2.5rem;padding-top:1.4rem;border-top:1px solid var(--bg);flex-wrap:wrap;gap:.9rem}
+.btn-next{font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:.14em;padding:.8rem 1.9rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;border:none;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:.45rem;transition:all .3s}
+.btn-next:hover{box-shadow:0 0 24px rgba(201,168,76,.38);transform:translateY(-1px)}
+.btn-next svg{width:14px;height:14px}
+.hint-badge{display:flex;align-items:center;gap:.6rem;padding:.6rem .9rem;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.18);font-size:.85rem;color:var(--tdim);margin-bottom:1rem}
+
+/* ─ CERT ─ */
+.cert{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 64px);padding:2.5rem 1.5rem;text-align:center}
+.cert-badge{width:155px;height:155px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 2rem;position:relative;background:radial-gradient(circle,rgba(201,168,76,.1),transparent 70%)}
+.cert-badge::before,.cert-badge::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.18);animation:rp 3.5s ease infinite}
+.cert-badge::before{inset:-16px}
+.cert-badge::after{inset:-32px;animation-delay:.6s}
+
+/* ─ FLASH ALERT (parpadeante) ─ */
+.flash{border:1px solid rgba(224,80,80,.5);border-left:4px solid var(--red);padding:1rem 1.2rem;background:rgba(160,20,20,.12);animation:flashAnim 1.8s ease infinite;margin-bottom:1rem}
+@keyframes flashAnim{0%,100%{opacity:1;border-color:rgba(224,80,80,.5)}50%{opacity:.7;border-color:var(--red);box-shadow:0 0 18px rgba(224,80,80,.25)}}
+.flash-tag{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.14em;color:var(--red);text-transform:uppercase;margin-bottom:.4rem}
+.flash p{font-size:.93rem;color:rgba(255,190,190,.85);line-height:1.6}
+
+/* ══ MATRIZ DE CRITERIOS ══ */
+
+/* Barra de progreso de pasos */
+.mz-progress-wrap{background:var(--bcard);border:1px solid var(--bg);padding:1.2rem 1.4rem;margin-bottom:.5rem}
+.mz-steps{display:flex;align-items:center;gap:0;margin-bottom:1rem;flex-wrap:wrap;gap:.3rem}
+.mz-step{display:flex;flex-direction:column;align-items:center;gap:.25rem;flex-shrink:0}
+.mz-snum{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;
+  width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(201,168,76,.3);
+  display:flex;align-items:center;justify-content:center;color:var(--tmuted);
+  transition:all .4s;background:transparent}
+.mz-stxt{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;transition:color .4s}
+.mz-step.ok .mz-snum{background:rgba(80,200,120,.2);border-color:var(--green);color:var(--green)}
+.mz-step.ok .mz-stxt{color:var(--green)}
+.mz-step.fail .mz-snum{background:rgba(224,80,80,.2);border-color:var(--red);color:var(--red)}
+.mz-step.fail .mz-stxt{color:var(--red)}
+.mz-step.active .mz-snum{border-color:var(--gold-b);color:var(--gold-b);box-shadow:0 0 12px rgba(201,168,76,.35)}
+.mz-conn{flex:1;height:1px;background:rgba(201,168,76,.15);min-width:20px;margin-bottom:1.2rem}
+.mz-audit-msg{font-size:.88rem;color:var(--tdim);line-height:1.6;padding-top:.6rem;border-top:1px solid rgba(201,168,76,.1)}
+
+/* Tarjetas expandibles de criterio */
+.mz-card{background:var(--bcard);border:1px solid rgba(201,168,76,.18);margin-bottom:.85rem;
+  transition:border-color .3s;overflow:hidden}
+.mz-card.open{border-color:rgba(201,168,76,.45)}
+.mz-card.verdict-ok{border-left:3px solid var(--green)}
+.mz-card.verdict-fail{border-left:3px solid var(--red)}
+.mz-card-head{display:flex;align-items:center;gap:1.1rem;padding:1.1rem 1.3rem;
+  cursor:pointer;transition:background .2s;user-select:none}
+.mz-card-head:hover{background:rgba(201,168,76,.04)}
+.mz-card-num{font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;
+  color:rgba(201,168,76,.25);flex-shrink:0;min-width:32px;transition:color .3s}
+.mz-card.open .mz-card-num{color:var(--gold-b)}
+.mz-card-info{flex:1}
+.mz-card-tag{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.16em;
+  color:var(--tmuted);text-transform:uppercase;margin-bottom:.25rem}
+.mz-card-title{font-family:'Cinzel',serif;font-size:1.05rem;color:var(--gold-b);font-weight:600;line-height:1.2;margin-bottom:.2rem}
+.mz-card-sub{font-size:.84rem;color:var(--tdim);line-height:1.4}
+.mz-card-status{font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.12em;
+  text-transform:uppercase;padding:.28rem .7rem;border:1px solid rgba(201,168,76,.3);
+  color:var(--tmuted);flex-shrink:0;transition:all .3s}
+.mz-card.verdict-ok .mz-card-status{border-color:var(--green);color:var(--green);background:rgba(80,200,120,.1)}
+.mz-card.verdict-fail .mz-card-status{border-color:var(--red);color:var(--red);background:rgba(224,80,80,.1)}
+.mz-card-arrow{font-family:'Orbitron',sans-serif;font-size:.8rem;color:var(--tmuted);
+  transition:transform .35s;flex-shrink:0}
+.mz-card.open .mz-card-arrow{transform:rotate(180deg)}
+
+/* Cuerpo expandible */
+.mz-card-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1)}
+.mz-card-body.open{max-height:1600px}
+.mz-card-inner{padding:0 1.3rem 1.3rem;border-top:1px solid rgba(201,168,76,.1)}
+
+/* Fórmula */
+.mz-formula{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);
+  border-left:3px solid var(--gold);padding:1rem 1.1rem;margin-bottom:.9rem}
+.mz-formula-lbl{font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.15em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:.4rem}
+.mz-formula-eq{font-family:'Orbitron',sans-serif;font-size:.95rem;color:var(--gold-b);
+  font-weight:700;margin-bottom:.4rem}
+.mz-formula-note{font-size:.84rem;color:var(--tdim);line-height:1.55}
+
+/* Ruta de acceso */
+.mz-ruta{background:rgba(43,108,176,.08);border:1px solid rgba(43,108,176,.3);padding:.9rem 1rem;margin-bottom:.3rem}
+.mz-ruta-lbl{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.15em;
+  color:rgba(100,180,255,.7);text-transform:uppercase;margin-bottom:.55rem}
+.mz-ruta-steps{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.mz-ruta-step{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.07em;
+  color:rgba(255,255,255,.8);background:rgba(43,108,176,.2);border:1px solid rgba(43,108,176,.4);
+  padding:.25rem .55rem;white-space:nowrap}
+.mz-ruta-arr{color:rgba(100,180,255,.6);font-size:.75rem;flex-shrink:0}
+
+/* Simuladores internos */
+.mz-sim-wrap{background:rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.15);padding:1.1rem;margin-bottom:1rem}
+.mz-sim-title{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.14em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:.9rem}
+.mz-sim-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;margin-bottom:.9rem}
+.mz-sim-field label{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.1em;
+  color:var(--tmuted);text-transform:uppercase;display:block;margin-bottom:.35rem}
+.mz-sim-field input{width:100%;padding:.55rem .7rem;background:var(--bpanel2);
+  border:1px solid rgba(201,168,76,.25);color:var(--tw);font-family:'Rajdhani',sans-serif;font-size:.93rem}
+.mz-sim-field input:focus{outline:none;border-color:var(--gold-b)}
+.mz-sim-results{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
+.mz-sim-kpi{background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.12);padding:.7rem;text-align:center}
+.mz-sim-kpi-l{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.35rem}
+.mz-sim-kpi-v{font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:700;color:var(--gold-b)}
+.mz-sim-kpi-v.r{color:var(--red)}
+.mz-sim-kpi-v.g{color:var(--green)}
+.mz-sim-kpi-v.y{color:#F0C040}
+
+/* Barras de concentración */
+.mz-whale-bar-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem}
+.mz-whale-bar-lbl{font-size:.82rem;color:var(--tdim);min-width:130px}
+.mz-whale-bar-track{flex:1;height:24px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.12);position:relative;overflow:hidden}
+.mz-whale-bar-fill{height:100%;display:flex;align-items:center;padding-left:.6rem;
+  font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;color:#000;
+  transition:width .8s cubic-bezier(.4,0,.2,1);white-space:nowrap;overflow:hidden}
+.mz-whale-bar-pct{font-family:'Orbitron',sans-serif;font-size:.68rem;color:var(--gold-b);min-width:38px;text-align:right}
+
+/* Resultado divergencia */
+.mz-div-result{padding:1rem 1.1rem;border-left:4px solid var(--gold);background:rgba(201,168,76,.05);font-size:.92rem;color:var(--tdim);line-height:1.7;transition:all .3s}
+.mz-div-result.ok{border-left-color:var(--green);background:rgba(80,200,120,.07);color:rgba(175,235,175,.88)}
+.mz-div-result.warn{border-left-color:#F0A050;background:rgba(240,160,80,.07);color:rgba(255,210,160,.88)}
+.mz-div-result.fail{border-left-color:var(--red);background:rgba(224,80,80,.07);color:rgba(255,175,175,.88)}
+
+/* Botones de veredicto */
+.mz-verdict-row{padding-top:.9rem;border-top:1px solid rgba(201,168,76,.1);margin-top:.2rem}
+.mz-vbtn{font-family:'Orbitron',sans-serif;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.65rem 1.2rem;border:1px solid;cursor:pointer;transition:all .25s;background:none}
+.mz-vbtn-ok{border-color:rgba(80,200,120,.45);color:var(--green)}
+.mz-vbtn-ok:hover{background:rgba(80,200,120,.12);border-color:var(--green);box-shadow:0 0 14px rgba(80,200,120,.2)}
+.mz-vbtn-fail{border-color:rgba(224,80,80,.45);color:var(--red)}
+.mz-vbtn-fail:hover{background:rgba(224,80,80,.12);border-color:var(--red);box-shadow:0 0 14px rgba(224,80,80,.2)}
+
+/* Veredicto final */
+.mz-veredicto{padding:1.5rem;border:2px solid;text-align:center}
+.mz-veredicto-score{font-family:'Orbitron',sans-serif;font-size:2.8rem;font-weight:700;line-height:1;margin-bottom:.4rem}
+.mz-veredicto-label{font-family:'Orbitron',sans-serif;font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem}
+.mz-veredicto-breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:1rem}
+.mz-vb-item{padding:.6rem;border:1px solid rgba(255,255,255,.1);font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase}
+
+/* ─ MENU ACTION BUTTONS ─ */
+.menu-btns-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.6rem}
+@media(max-width:760px){.menu-btns-row{grid-template-columns:1fr}}
+.mbtn{display:flex;align-items:center;gap:1rem;padding:1.1rem 1.4rem;
+  border:none;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
+  font-family:'Rajdhani',sans-serif;text-align:left}
+.mbtn::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);
+  transform:translateX(-120%);transition:transform .5s}
+.mbtn:hover::after{transform:translateX(120%)}
+.mbtn:hover{transform:translateY(-2px)}
+.mbtn-ico{font-size:1.6rem;flex-shrink:0;line-height:1}
+.mbtn-body{display:flex;flex-direction:column;gap:.15rem}
+.mbtn-lbl{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.16em;
+  text-transform:uppercase;opacity:.75}
+.mbtn-title{font-family:'Orbitron',sans-serif;font-size:.72rem;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:700;line-height:1.3}
+
+/* Secundario — borde dorado, fondo oscuro */
+.mbtn-secondary{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.45);
+  color:var(--gold-b)}
+.mbtn-secondary .mbtn-lbl{color:rgba(201,168,76,0.65)}
+.mbtn-secondary:hover{background:rgba(201,168,76,0.15);border-color:var(--gold-b);
+  box-shadow:0 0 24px rgba(201,168,76,0.2)}
+
+/* Primario — degradado dorado sólido */
+.mbtn-primary{background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+  border:1px solid var(--gold-b);color:#000}
+.mbtn-primary .mbtn-lbl{color:rgba(0,0,0,0.6)}
+.mbtn-primary .mbtn-title{color:#000}
+.mbtn-primary:hover{box-shadow:0 0 32px rgba(201,168,76,0.5)}
+
+/* Acento — borde brillante, fondo con toque azul-dorado */
+.mbtn-accent{background:rgba(43,108,176,0.15);border:1px solid rgba(43,108,176,0.55);color:var(--tw)}
+.mbtn-accent .mbtn-lbl{color:rgba(255,255,255,0.5)}
+.mbtn-accent .mbtn-title{color:rgba(255,255,255,0.92)}
+.mbtn-accent:hover{background:rgba(43,108,176,0.28);border-color:rgba(100,180,255,0.7);
+  box-shadow:0 0 24px rgba(43,108,176,0.35)}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:#000}
+::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
+</style>
+</head>
+<body>
+<canvas id="cvs"></canvas>
+<div class="grid-bg"></div>
+<div class="app">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo" onclick="goScr('hero')">
+    <div class="logo-ring">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="#C9A84C" stroke-width="1.4"/>
+        <path d="M8 12L12 6L16 12L12 18Z" stroke="#C9A84C" stroke-width="1.4" fill="rgba(201,168,76,.12)"/>
+        <path d="M10 12L12 9L14 12L12 15Z" fill="#C9A84C"/>
+      </svg>
+    </div>
+    <div class="logo-txt">CMC On-Chain <b>Taller · 2026</b></div>
+  </div>
+  <div class="nav-mid">
+    <div class="plbl"><span>Tu Progreso</span><span id="pct">0%</span></div>
+    <div class="ptrack"><div class="pbar" id="pbar" style="width:0%"></div></div>
+  </div>
+  <div class="nbadge" id="nbadge">Bienvenido</div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div class="scr on" id="scr-hero">
+  <div class="hero">
+    <div class="hero-deco">
+      <div class="hdline" style="--r:-25deg;--d:0s"></div>
+      <div class="hdline" style="--r:25deg;--d:2.5s"></div>
+      <div class="hdline" style="--r:0deg;--d:5s"></div>
+    </div>
+    <div class="hero-tag">Taller Teórico-Práctico · Academia Principia 2026</div>
+    <div class="emblem">
+      <div class="er"></div><div class="er"></div><div class="er"></div>
+      <div class="ecore">
+        <svg width="85" height="85" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="30" stroke="#C9A84C" stroke-width="1" stroke-dasharray="5 3" opacity=".4"/>
+          <circle cx="40" cy="40" r="20" stroke="#C9A84C" stroke-width="1.5" opacity=".75"/>
+          <path d="M26 40L40 20L54 40L40 60Z" stroke="#C9A84C" stroke-width="1.5" fill="rgba(201,168,76,.1)"/>
+          <path d="M33 40L40 30L47 40L40 50Z" fill="#C9A84C" opacity=".9"/>
+          <circle cx="40" cy="40" r="4.5" fill="#F0C040"/>
+          <line x1="40" y1="8" x2="40" y2="72" stroke="#C9A84C" stroke-width=".5" opacity=".18"/>
+          <line x1="8" y1="40" x2="72" y2="40" stroke="#C9A84C" stroke-width=".5" opacity=".18"/>
+        </svg>
+      </div>
+    </div>
+    <h1>INTELIGENCIA <span>FINANCIERA ON-CHAIN</span></h1>
+    <p class="hero-sub">Aprende a auditar mercados cripto con <strong>CoinMarketCap y Análisis Blockchain</strong>: de la macroeconomía global al espionaje de ballenas, clic por clic.</p>
+    <div class="hero-kpis">
+      <div class="kpi"><div class="kpi-n" id="kn1">0</div><div class="kpi-l">Módulos</div></div>
+      <div class="ksep"></div>
+      <div class="kpi"><div class="kpi-n" id="kn2">0</div><div class="kpi-l">Simuladores</div></div>
+      <div class="ksep"></div>
+      <div class="kpi"><div class="kpi-n" id="kn3">0</div><div class="kpi-l">Gráficos</div></div>
+      <div class="ksep"></div>
+      <div class="kpi"><div class="kpi-n" id="kn4">0</div><div class="kpi-l">Preguntas</div></div>
+    </div>
+    <div style="width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 2.2rem"></div>
+    <button class="btn-go" onclick="goScr('menu');renderMenu()">▶ &nbsp; INICIAR TALLER</button>
+    <p style="margin-top:1.4rem;font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.22em;color:var(--tmuted);text-transform:uppercase">Academia Principia · Criptoinversor Experto 2026</p>
+  </div>
+</div>
+
+<!-- ══ MENU ══ -->
+<div class="scr" id="scr-menu">
+  <div class="menu-wrap">
+    <div class="sec-hdr">
+      <h2>Los 4 Módulos del Analista On-Chain</h2>
+      <p>Navega cada módulo con simuladores interactivos. Completa el taller para acceder a la evaluación final.</p>
+    </div>
+    <div class="pgrid" id="pgrid"></div>
+    <div class="menu-btns-row">
+      <button class="mbtn mbtn-secondary" onclick="openMatriz()">
+        <span class="mbtn-ico">◈</span>
+        <span class="mbtn-body"><span class="mbtn-lbl">Referencia Técnica</span><span class="mbtn-title">Matriz de Criterios</span></span>
+      </button>
+      <button class="mbtn mbtn-primary" onclick="openEval()">
+        <span class="mbtn-ico">📋</span>
+        <span class="mbtn-body"><span class="mbtn-lbl">Cierre del Taller</span><span class="mbtn-title">Evaluación Final · 15 Preguntas</span></span>
+      </button>
+      <button class="mbtn mbtn-accent" onclick="window.open('https://coinmarketcap.com','_blank')">
+        <span class="mbtn-ico">🔗</span>
+        <span class="mbtn-body"><span class="mbtn-lbl">Plataforma Oficial</span><span class="mbtn-title">Abrir CoinMarketCap Live</span></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTENT ══ -->
+<div class="scr" id="scr-content">
+  <div class="cwrap" id="ci"></div>
+</div>
+
+<!-- ══ MATRIZ ══ -->
+<div class="scr" id="scr-matriz">
+  <div class="cwrap" style="max-width:1040px">
+    <button class="back" onclick="goScr('menu');renderMenu()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver al menú
+    </button>
+
+    <div class="phdr">
+      <div class="pico2">◈</div>
+      <div>
+        <div class="phnum">Referencia Técnica del Taller</div>
+        <div class="phtit">Matriz de <em>Criterios</em></div>
+        <div class="phsub">El protocolo de auditoría de 4 variables que el analista On-Chain aplica antes de cada decisión. Toca cada criterio para desplegar su explicación completa, fórmula y simulador.</div>
+      </div>
+    </div>
+
+    <!-- ─ BARRA DE PROGRESO DE AUDITORÍA ─ -->
+    <div class="blk">
+      <div class="blk-lbl">Estado del Protocolo de Auditoría</div>
+      <div class="mz-progress-wrap">
+        <div class="mz-steps">
+          <div class="mz-step" id="mzs0"><span class="mz-snum">01</span><span class="mz-stxt">Dilución</span></div>
+          <div class="mz-conn"></div>
+          <div class="mz-step" id="mzs1"><span class="mz-snum">02</span><span class="mz-stxt">Liquidez</span></div>
+          <div class="mz-conn"></div>
+          <div class="mz-step" id="mzs2"><span class="mz-snum">03</span><span class="mz-stxt">Ballenas</span></div>
+          <div class="mz-conn"></div>
+          <div class="mz-step" id="mzs3"><span class="mz-snum">04</span><span class="mz-stxt">Tracción</span></div>
+          <div class="mz-conn"></div>
+          <div class="mz-step" id="mzs4"><span class="mz-snum">✓</span><span class="mz-stxt">Veredicto</span></div>
+        </div>
+        <div id="mz-audit-msg" class="mz-audit-msg">Completa los 4 criterios para generar el veredicto de auditoría.</div>
+      </div>
+    </div>
+
+    <!-- ─ CRITERIOS EXPANDIBLES ─ -->
+    <div class="blk">
+      <div class="blk-lbl">4 Criterios de Diagnóstico — Toca cada uno para expandirlo</div>
+
+      <!-- CRITERIO 1: DILUCIÓN -->
+      <div class="mz-card" id="mzc0">
+        <div class="mz-card-head" onclick="toggleMz(0)">
+          <div class="mz-card-num">01</div>
+          <div class="mz-card-info">
+            <div class="mz-card-tag">Suministro · Tokenomics</div>
+            <div class="mz-card-title">Dilución Masiva — Factor FDV</div>
+            <div class="mz-card-sub">¿Cuánto del suministro máximo ya existe? ¿Cuánto está por liberarse?</div>
+          </div>
+          <div class="mz-card-status" id="mzst0">PENDIENTE</div>
+          <div class="mz-card-arrow" id="mzarr0">▾</div>
+        </div>
+        <div class="mz-card-body" id="mzcb0">
+          <div class="mz-card-inner">
+            <div class="g2" style="margin-bottom:1.2rem">
+              <div>
+                <div class="blk-lbl" style="margin-bottom:.7rem">¿Qué mide?</div>
+                <p style="font-size:.93rem;color:var(--tdim);line-height:1.75;margin-bottom:.9rem">
+                  El <strong style="color:var(--gold-b)">Factor de Dilución</strong> responde una sola pregunta crítica: de todos los tokens que van a existir algún día, ¿cuántos existen hoy? Si la respuesta es "pocos", significa que cuando se liberen los demás, cada token tuyo valdrá proporcionalmente menos.
+                </p>
+                <div class="mz-formula">
+                  <div class="mz-formula-lbl">Fórmula exacta</div>
+                  <div class="mz-formula-eq">Factor = FDV ÷ Market Cap</div>
+                  <div class="mz-formula-note">Si Factor &lt; 1.3 → Riesgo bajo · Si Factor &gt; 3 → Riesgo alto · Si Factor &gt; 10 → Trampa para retail</div>
+                </div>
+                <div class="mz-ruta">
+                  <div class="mz-ruta-lbl">Ruta en CoinMarketCap</div>
+                  <div class="mz-ruta-steps">
+                    <span class="mz-ruta-step">Busca el token</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Panel lateral izquierdo</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">"Suministro en circulación"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">"Cap. totalmente diluida (FDV)"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Divide FDV ÷ Market Cap</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="blk-lbl" style="margin-bottom:.7rem">Señales de alerta inmediata</div>
+                <ul class="act-list" style="margin-bottom:.9rem">
+                  <li><strong>Circulante &lt; 20% del máximo:</strong> el 80% del token está en manos de fundadores y VCs esperando para vender. Cuando lo hagan, el precio colapsa.</li>
+                  <li><strong>Sin "cliff period":</strong> si los fundadores pueden vender desde el día 1 del listing, lo harán cuando el precio suba con tu compra.</li>
+                  <li><strong>Staking con APY &gt; 50%:</strong> si el rendimiento viene de emisión nueva y no de ingresos reales, es inflación disfrazada de recompensa.</li>
+                </ul>
+              </div>
+            </div>
+            <!-- SIMULADOR DILUCIÓN -->
+            <div class="mz-sim-wrap">
+              <div class="mz-sim-title">Simulador — Calcula el Factor de Dilución</div>
+              <div class="mz-sim-row">
+                <div class="mz-sim-field">
+                  <label>Market Cap actual (USD)</label>
+                  <input type="number" id="mz-mktcap" placeholder="100000000" value="100000000" oninput="calcDilucion()">
+                </div>
+                <div class="mz-sim-field">
+                  <label>FDV — Cap. Totalmente Diluida (USD)</label>
+                  <input type="number" id="mz-fdv" placeholder="800000000" value="800000000" oninput="calcDilucion()">
+                </div>
+                <div class="mz-sim-field">
+                  <label>% Circulante del Máximo</label>
+                  <input type="number" id="mz-pctcirc" placeholder="12.5" value="12.5" oninput="calcDilucion()">
+                </div>
+              </div>
+              <div class="mz-sim-results" id="mz-dil-result">
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Factor Dilución</div><div class="mz-sim-kpi-v" id="mz-factor">8.0x</div></div>
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Tokens Bloqueados</div><div class="mz-sim-kpi-v r" id="mz-locked">87.5%</div></div>
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Diagnóstico</div><div class="mz-sim-kpi-v r" id="mz-dil-diag">RIESGO ALTO</div></div>
+              </div>
+              <div id="mz-dil-alert" class="flash" style="margin-top:.8rem"><div class="flash-tag">⚠ ALERTA DE DILUCIÓN</div><p id="mz-dil-alert-txt">Factor 8.0x: el 87.5% del suministro máximo aún no existe en el mercado. Cuando se libere, cada token tuyo valdrá hasta 8 veces menos proporcionalmente.</p></div>
+            </div>
+            <!-- VEREDICTO CRITERIO 1 -->
+            <div class="mz-verdict-row">
+              <div style="font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase">¿Pasa el criterio de dilución?</div>
+              <div style="display:flex;gap:.7rem;margin-top:.6rem">
+                <button class="mz-vbtn mz-vbtn-ok" onclick="setMzVerdict(0,'ok')">✓ Pasa — Factor aceptable</button>
+                <button class="mz-vbtn mz-vbtn-fail" onclick="setMzVerdict(0,'fail')">✗ Falla — Alta dilución detectada</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRITERIO 2: LIQUIDEZ / WASH TRADING -->
+      <div class="mz-card" id="mzc1">
+        <div class="mz-card-head" onclick="toggleMz(1)">
+          <div class="mz-card-num">02</div>
+          <div class="mz-card-info">
+            <div class="mz-card-tag">Liquidez · Libro de Órdenes</div>
+            <div class="mz-card-title">Liquidez Real vs. Volumen Falso (Wash Trading)</div>
+            <div class="mz-card-sub">¿El volumen reportado tiene respaldo de liquidez real en el libro de órdenes?</div>
+          </div>
+          <div class="mz-card-status" id="mzst1">PENDIENTE</div>
+          <div class="mz-card-arrow" id="mzarr1">▾</div>
+        </div>
+        <div class="mz-card-body" id="mzcb1">
+          <div class="mz-card-inner">
+            <div class="g2" style="margin-bottom:1.2rem">
+              <div>
+                <div class="blk-lbl" style="margin-bottom:.7rem">¿Qué mide?</div>
+                <p style="font-size:.93rem;color:var(--tdim);line-height:1.75;margin-bottom:.9rem">
+                  El <strong style="color:var(--gold-b)">Ratio Liquidez/Volumen</strong> detecta si el volumen de un token es real o fabricado. El Wash Trading ocurre cuando los mismos actores se venden tokens entre sí para crear ilusión de actividad. El detector: si el volumen nominal es enorme pero la profundidad real de libro es mínima, el volumen es mentira.
+                </p>
+                <div class="mz-formula">
+                  <div class="mz-formula-lbl">Detector de Wash Trading</div>
+                  <div class="mz-formula-eq">Ratio = Profundidad ±2% ÷ Volumen 24h</div>
+                  <div class="mz-formula-note">Si Ratio &gt; 0.05 (5%) → Liquidez real suficiente · Si Ratio &lt; 0.01 (1%) → Señal crítica de Wash Trading</div>
+                </div>
+                <div class="mz-ruta">
+                  <div class="mz-ruta-lbl">Ruta en CoinMarketCap</div>
+                  <div class="mz-ruta-steps">
+                    <span class="mz-ruta-step">Perfil del token</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Pestaña "Mercados"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Columna "Volumen %"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Columna "Profundidad +2% / -2%"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Divide profundidad ÷ volumen</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="blk-lbl" style="margin-bottom:.7rem">Señales de alerta inmediata</div>
+                <ul class="act-list" style="margin-bottom:.9rem">
+                  <li><strong>Volumen 24h = $50M, Profundidad ±2% = $30K:</strong> ratio de 0.06%. Imposible. El 99.94% del volumen es artificial.</li>
+                  <li><strong>Exchange desconocido en top de volumen:</strong> exchanges sin regulación fabrican volumen para cobrar fees de listing a proyectos que los contratan.</li>
+                  <li><strong>Precio estable con volumen masivo:</strong> si el precio no se mueve ante gran volumen, es señal de que las mismas wallets se intercambian tokens circulares.</li>
+                </ul>
+              </div>
+            </div>
+            <!-- SIMULADOR WASH TRADING -->
+            <div class="mz-sim-wrap">
+              <div class="mz-sim-title">Simulador — Detector de Wash Trading</div>
+              <div class="mz-sim-row">
+                <div class="mz-sim-field">
+                  <label>Volumen 24h reportado (USD)</label>
+                  <input type="number" id="mz-vol" placeholder="50000000" value="50000000" oninput="calcWash()">
+                </div>
+                <div class="mz-sim-field">
+                  <label>Profundidad real ±2% (USD)</label>
+                  <input type="number" id="mz-depth" placeholder="30000" value="30000" oninput="calcWash()">
+                </div>
+              </div>
+              <div class="mz-sim-results">
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Ratio Liq/Vol</div><div class="mz-sim-kpi-v r" id="mz-wash-ratio">0.06%</div></div>
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Volumen Falso Est.</div><div class="mz-sim-kpi-v r" id="mz-wash-fake">99.94%</div></div>
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Diagnóstico</div><div class="mz-sim-kpi-v r" id="mz-wash-diag">WASH TRADING</div></div>
+              </div>
+              <div id="mz-wash-alert" class="flash" style="margin-top:.8rem"><div class="flash-tag">⚠ MANIPULACIÓN DE VOLUMEN DETECTADA</div><p id="mz-wash-txt">Ratio de 0.06%: por cada $1 de liquidez real hay $1,667 de volumen reportado. El mercado es una ilusión. Salida de posiciones imposible sin colapso de precio.</p></div>
+            </div>
+            <div class="mz-verdict-row">
+              <div style="font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase">¿Pasa el criterio de liquidez?</div>
+              <div style="display:flex;gap:.7rem;margin-top:.6rem">
+                <button class="mz-vbtn mz-vbtn-ok" onclick="setMzVerdict(1,'ok')">✓ Pasa — Liquidez real suficiente</button>
+                <button class="mz-vbtn mz-vbtn-fail" onclick="setMzVerdict(1,'fail')">✗ Falla — Wash Trading detectado</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRITERIO 3: BALLENAS -->
+      <div class="mz-card" id="mzc2">
+        <div class="mz-card-head" onclick="toggleMz(2)">
+          <div class="mz-card-num">03</div>
+          <div class="mz-card-info">
+            <div class="mz-card-tag">On-Chain · Concentración</div>
+            <div class="mz-card-title">Riesgo Exógeno — Concentración de Ballenas</div>
+            <div class="mz-card-sub">¿El suministro está en pocas manos que pueden colapsar el precio unilateralmente?</div>
+          </div>
+          <div class="mz-card-status" id="mzst2">PENDIENTE</div>
+          <div class="mz-card-arrow" id="mzarr2">▾</div>
+        </div>
+        <div class="mz-card-body" id="mzcb2">
+          <div class="mz-card-inner">
+            <div class="g2" style="margin-bottom:1.2rem">
+              <div>
+                <div class="blk-lbl" style="margin-bottom:.7rem">¿Qué mide?</div>
+                <p style="font-size:.93rem;color:var(--tdim);line-height:1.75;margin-bottom:.9rem">
+                  La <strong style="color:var(--gold-b)">Concentración de Ballenas</strong> mide qué porcentaje del suministro total está en las 10 wallets más grandes. A mayor concentración, menor independencia del precio: una sola decisión de venta por parte de una ballena puede liquidar todas las posiciones del mercado retail en segundos.
+                </p>
+                <div class="mz-formula">
+                  <div class="mz-formula-lbl">Escala de riesgo</div>
+                  <div class="mz-formula-eq">% Top 10 Wallets sobre Suministro Total</div>
+                  <div class="mz-formula-note">0–40% → Distribución saludable · 40–60% → Vigilancia · &gt;60% → Riesgo de liquidación exógena alto</div>
+                </div>
+                <div class="mz-ruta">
+                  <div class="mz-ruta-lbl">Ruta en CoinMarketCap</div>
+                  <div class="mz-ruta-steps">
+                    <span class="mz-ruta-step">Perfil del token</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Pestaña "Análisis"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Sección "Holders"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Gráfico circular de concentración</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Lee % "Whales" vs "Retail"</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="blk-lbl" style="margin-bottom:.7rem">Escalas de concentración</div>
+                <div id="mz-whale-bars" style="margin-bottom:.9rem"></div>
+              </div>
+            </div>
+            <!-- SIMULADOR BALLENAS -->
+            <div class="mz-sim-wrap">
+              <div class="mz-sim-title">Simulador — Mueve para ver el nivel de riesgo</div>
+              <div class="wrow" style="margin-bottom:.6rem">
+                <div class="wlbl">% en Top 10 Wallets</div>
+                <input type="range" class="wslider" min="5" max="95" value="35" oninput="calcWhaleRisk(this.value)" id="mz-whale-slider">
+                <div class="wval" id="mz-whale-val">35%</div>
+              </div>
+              <div class="mz-sim-results">
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Concentración</div><div class="mz-sim-kpi-v g" id="mz-whale-conc">35%</div></div>
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Nivel de Riesgo</div><div class="mz-sim-kpi-v g" id="mz-whale-risk">BAJO</div></div>
+                <div class="mz-sim-kpi"><div class="mz-sim-kpi-l">Retail disponible</div><div class="mz-sim-kpi-v g" id="mz-whale-retail">65%</div></div>
+              </div>
+              <div id="mz-whale-msg" style="margin-top:.8rem;padding:.75rem 1rem;background:rgba(201,168,76,.05);border-left:3px solid var(--gold);font-size:.9rem;color:var(--tdim);line-height:1.65">
+                Distribución saludable. Las ballenas tienen influencia pero el mercado retail domina la mayoría del suministro.
+              </div>
+            </div>
+            <div class="mz-verdict-row">
+              <div style="font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase">¿Pasa el criterio de concentración?</div>
+              <div style="display:flex;gap:.7rem;margin-top:.6rem">
+                <button class="mz-vbtn mz-vbtn-ok" onclick="setMzVerdict(2,'ok')">✓ Pasa — Distribución aceptable</button>
+                <button class="mz-vbtn mz-vbtn-fail" onclick="setMzVerdict(2,'fail')">✗ Falla — Concentración peligrosa</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRITERIO 4: TRACCIÓN ORGÁNICA -->
+      <div class="mz-card" id="mzc3">
+        <div class="mz-card-head" onclick="toggleMz(3)">
+          <div class="mz-card-num">04</div>
+          <div class="mz-card-info">
+            <div class="mz-card-tag">On-Chain · Actividad de Red</div>
+            <div class="mz-card-title">Tracción Orgánica — Divergencia Precio vs. Usuarios</div>
+            <div class="mz-card-sub">¿El movimiento del precio tiene respaldo de usuarios reales usando la red?</div>
+          </div>
+          <div class="mz-card-status" id="mzst3">PENDIENTE</div>
+          <div class="mz-card-arrow" id="mzarr3">▾</div>
+        </div>
+        <div class="mz-card-body" id="mzcb3">
+          <div class="mz-card-inner">
+            <div class="g2" style="margin-bottom:1.2rem">
+              <div>
+                <div class="blk-lbl" style="margin-bottom:.7rem">¿Qué mide?</div>
+                <p style="font-size:.93rem;color:var(--tdim);line-height:1.75;margin-bottom:.9rem">
+                  La <strong style="color:var(--gold-b)">Divergencia Precio/Direcciones</strong> es la señal más poderosa del análisis on-chain. Si el precio sube pero el número de wallets activas baja, la subida es especulativa pura: no hay usuarios reales usando la red. Cuando los especuladores vendan, no habrá demanda orgánica para sostener el precio y la corrección puede superar el 70%.
+                </p>
+                <div class="mz-formula">
+                  <div class="mz-formula-lbl">Regla de convergencia</div>
+                  <div class="mz-formula-eq">Tendencia Precio ≈ Tendencia Direcciones Activas</div>
+                  <div class="mz-formula-note">Ambas suben → Crecimiento orgánico · Precio sube, Direcciones bajan → Divergencia bajista · Precio baja, Direcciones suben → Acumulación silenciosa</div>
+                </div>
+                <div class="mz-ruta">
+                  <div class="mz-ruta-lbl">Ruta en CoinMarketCap</div>
+                  <div class="mz-ruta-steps">
+                    <span class="mz-ruta-step">Perfil del token</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Pestaña "Análisis"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">"Direcciones Activas Diarias"</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Selecciona escala 3M</span>
+                    <span class="mz-ruta-arr">→</span>
+                    <span class="mz-ruta-step">Compara visualmente con gráfico de precio</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="blk-lbl" style="margin-bottom:.7rem">Los 3 escenarios posibles</div>
+                <ul class="act-list">
+                  <li><strong style="color:var(--green)">Convergencia alcista:</strong> precio ↑ + direcciones ↑. Adopción real impulsa el precio. Tesis de inversión válida.</li>
+                  <li><strong style="color:var(--red)">Divergencia bajista:</strong> precio ↑ + direcciones ↓. TRAMPA. Sin usuarios reales, la corrección es inevitable.</li>
+                  <li><strong style="color:#F0A050">Acumulación silenciosa:</strong> precio → estable/baja + direcciones ↑. Los grandes acumulan mientras el retail ignora el activo.</li>
+                </ul>
+              </div>
+            </div>
+            <!-- SIMULADOR DIVERGENCIA INTERACTIVO -->
+            <div class="mz-sim-wrap">
+              <div class="mz-sim-title">Simulador — Elige los vectores de precio y actividad</div>
+              <div class="mz-sim-row" style="align-items:center;gap:1.5rem">
+                <div class="mz-sim-field" style="flex:1">
+                  <label>Tendencia del Precio (30d)</label>
+                  <select id="mz-price-trend" onchange="calcDivergencia()" style="width:100%;padding:.55rem .7rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.25);color:var(--tw);font-family:'Rajdhani',sans-serif;font-size:.95rem">
+                    <option value="up">↑ Sube fuerte (+40%)</option>
+                    <option value="flat">→ Lateral (±5%)</option>
+                    <option value="down">↓ Baja (-20%)</option>
+                  </select>
+                </div>
+                <div style="font-family:'Orbitron',sans-serif;font-size:1.5rem;color:var(--gold);flex-shrink:0">vs</div>
+                <div class="mz-sim-field" style="flex:1">
+                  <label>Tendencia Direcciones Activas (30d)</label>
+                  <select id="mz-addr-trend" onchange="calcDivergencia()" style="width:100%;padding:.55rem .7rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.25);color:var(--tw);font-family:'Rajdhani',sans-serif;font-size:.95rem">
+                    <option value="up">↑ Sube fuerte (+35%)</option>
+                    <option value="flat">→ Lateral (±3%)</option>
+                    <option value="down">↓ Baja (-40%)</option>
+                  </select>
+                </div>
+              </div>
+              <div id="mz-div-result" class="mz-div-result" style="margin-top:.9rem"></div>
+            </div>
+            <div class="mz-verdict-row">
+              <div style="font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase">¿Pasa el criterio de tracción orgánica?</div>
+              <div style="display:flex;gap:.7rem;margin-top:.6rem">
+                <button class="mz-vbtn mz-vbtn-ok" onclick="setMzVerdict(3,'ok')">✓ Pasa — Tracción orgánica confirmada</button>
+                <button class="mz-vbtn mz-vbtn-fail" onclick="setMzVerdict(3,'fail')">✗ Falla — Divergencia bajista detectada</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─ VEREDICTO FINAL ─ -->
+    <div class="blk" id="mz-veredicto-blk" style="display:none">
+      <div class="blk-lbl">Veredicto de Auditoría</div>
+      <div id="mz-veredicto-card"></div>
+    </div>
+
+    <div class="alert"><strong>Protocolo de uso:</strong> Aplica los 4 criterios en orden secuencial. Una sola señal de alerta es suficiente para descartar el activo — no compenses criterios fallidos con criterios aprobados.</div>
+  </div>
+</div>
+
+<!-- ══ EVALUACIÓN ══ -->
+<div class="scr" id="scr-eval">
+  <div class="cwrap">
+    <button class="back" onclick="goScr('menu');renderMenu()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver al menú
+    </button>
+    <div class="phdr">
+      <div class="pico2">📋</div>
+      <div>
+        <div class="phnum">Cierre del Taller</div>
+        <div class="phtit">Evaluación de <em>Alta Fidelidad</em></div>
+        <div class="phsub">15 preguntas de opción múltiple. Responde todas y presiona "Enviar" para ver tu puntaje y retroalimentación técnica detallada.</div>
+      </div>
+    </div>
+    <div id="quiz-container"></div>
+    <div id="quiz-footer" style="margin-top:1.5rem">
+      <button class="btn-primary" onclick="submitQuiz()">Enviar Evaluación</button>
+    </div>
+    <div id="quiz-result" style="display:none;margin-top:2rem"></div>
+  </div>
+</div>
+
+<!-- ══ CERT ══ -->
+<div class="scr" id="scr-cert">
+  <div class="cert">
+    <div class="cert-badge"><span style="font-size:3.2rem">🏆</span></div>
+    <div style="font-family:'Cinzel',serif;font-size:2rem;color:#fff;margin-bottom:.4rem">Taller <span style="color:var(--gold-b)">Completado</span></div>
+    <div style="font-size:.9rem;color:var(--tmuted);letter-spacing:.1em;margin-bottom:1.6rem">CoinMarketCap On-Chain · Academia Principia 2026</div>
+    <div style="width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.6rem"></div>
+    <p style="font-size:.9rem;color:var(--tmuted);max-width:400px;line-height:1.75;margin-bottom:2.2rem">Has completado los 4 módulos de análisis on-chain. Aplica la Matriz de Criterios en cada auditoría para operar con rigor profesional.</p>
+    <button class="btn-go" onclick="restartApp()">↺ &nbsp; REINICIAR TALLER</button>
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<script>
+/* ══ DATA ══ */
+const MODULOS=[
+  {id:0,ico:'🧭',num:'Módulo I',title:'Macrosistema Global',tag:'50 Minutos',
+   desc:'Las 3 constantes vitales del ecosistema cripto: Market Cap, Volumen 24h y Dominancia BTC. Configura tu estación de trabajo profesional.',
+   sub:'Laboratorio: Configuración Quirúrgica de la Interfaz CoinMarketCap',chart:'macro'},
+  {id:1,ico:'🔬',num:'Módulo II',title:'Anatomía del Token',tag:'70 Minutos',
+   desc:'Auditoría de suministros, Factor de Dilución FDV, sesgo de unidad y detección de Wash Trading en el libro de órdenes.',
+   sub:'Laboratorio: Desarmado Completo de Tokenomics en Vivo',chart:'token'},
+  {id:2,ico:'💼',num:'Módulo III',title:'Portfolio Institucional',tag:'65 Minutos',
+   desc:'Gestión de cartera profesional: bitácora de transacciones, DCA, Asset Allocation y control emocional del operador.',
+   sub:'Laboratorio: Construcción del Portafolio de la Academia',chart:'portfolio'},
+  {id:3,ico:'🐋',num:'Módulo IV',title:'Análisis On-Chain',tag:'75 Minutos',
+   desc:'Espionaje de ballenas, concentración de riqueza, direcciones activas y detección de divergencias bajistas estructurales.',
+   sub:'Laboratorio: Vigilancia de Grandes Capitales y Divergencias',chart:'onchain'},
+];
+
+const QUIZ=[
+  {q:'Un token cotiza a $0.003. Un alumno afirma que "está baratísimo". ¿Cuál es el error técnico?',
+   opts:['No hay error; el precio bajo indica oportunidad','Sufre del "sesgo de unidad": el precio nominal es irrelevante sin analizar el suministro','El token es deficitario de liquidez','El precio bajo indica alta dominancia institucional'],
+   ok:1,exp:'El "sesgo de unidad" es el error más severo del principiante: asumir que un precio nominal bajo significa que el activo es barato. Sin contrastar con el suministro total y la capitalización, el precio solo es un número sin significado financiero.'},
+  {q:'¿Qué métrica indica si está entrando o saliendo dinero fiat del ecosistema cripto global?',
+   opts:['Dominancia de BTC','Volumen de 24h','Capitalización de Mercado Global','Precio de Bitcoin'],
+   ok:2,exp:'La Capitalización Global suma el valor de todas las criptomonedas. Si su tendencia es alcista, hay inyección de capital fiat nuevo. Si cae, los inversores están saliendo hacia efectivo.'},
+  {q:'La dominancia de BTC supera el 55%. ¿Qué diagnostica el analista?',
+   opts:['Mercado alcista en altcoins de alta capitalización','Mercado en fase macro defensiva; el capital migra hacia el activo de refugio','El ecosistema está en burbuja especulativa','Bitcoin está siendo manipulado por ballenas'],
+   ok:1,exp:'BTC Dominance > 50% señala aversión al riesgo. El capital corporativo e institucional abandona altcoins y busca protección en Bitcoin, el activo de mayor trayectoria y liquidez del sector.'},
+  {q:'Un token tiene 10M en circulación y un suministro máximo de 200M. ¿Cuál es el riesgo principal?',
+   opts:['El token es deflacionario y escaso','Alta presión de venta programada: el 95% restante se liberará diluyendo a cada titular','La liquidez es insuficiente para operar','El volumen nominal es artificialmente inflado'],
+   ok:1,exp:'Solo el 5% del suministro está circulando. El 95% restante está bloqueado en contratos de fundadores y VCs con calendarios de desbloqueo futuros. Cada liberación masiva diluye el valor de cada unidad ya circulante.'},
+  {q:'¿Cómo se calcula el Factor de Dilución de un token?',
+   opts:['Precio × Suministro Máximo','FDV / Market Cap Circulante','Market Cap / Volumen 24h','Suministro Circulante / Suministro Máximo'],
+   ok:1,exp:'Factor de Dilución = FDV / Market Cap. Si el resultado es 10x, significa que si todo el suministro existiera hoy, la capitalización sería 10 veces mayor. Cada nuevo desbloqueo presiona el precio hacia abajo.'},
+  {q:'El Factor de Dilución de un token es 0.22 (22%). ¿Qué alerta técnica activa?',
+   opts:['Token deflacionario ideal para acumulación','ALERTA CRÍTICA: Alta inflación por desbloqueo. Ratio < 30% indica presión vendedora estructural','El token tiene liquidez excesiva','No hay señal de alerta relevante'],
+   ok:1,exp:'Un ratio < 30% significa que más del 70% del suministro máximo aún no está en circulación. Cuando se desbloqueen esos tokens, los primeros tenedores (fundadores y VCs) venderán contra el mercado retail.'},
+  {q:'¿Qué indica la "Profundidad de Mercado a +/-2%" en el libro de órdenes?',
+   opts:['El número de operadores activos en el exchange','La liquidez disponible para absorber órdenes sin que el precio se mueva más del 2%','La volatilidad esperada del token en 24h','El spread entre precio de compra y venta'],
+   ok:1,exp:'La profundidad de mercado mide cuánto dinero hay disponible para comprar o vender sin colapsar el precio. Profundidad baja con volumen nominal alto = señal de Wash Trading (volumen artificial).'},
+  {q:'¿Qué es el Wash Trading en mercados cripto?',
+   opts:['Una estrategia de promedio de costos (DCA)','Volumen artificial generado por algoritmos para simular actividad que no existe','La práctica de lavar criptomonedas en exchanges no regulados','El rebalanceo periódico de un portafolio'],
+   ok:1,exp:'Wash Trading = manipulación de volumen. Los mismos actores compran y venden entre sí para inflar el volumen reportado. La señal de detección: volumen nominal muy alto + profundidad de libro muy baja en USD.'},
+  {q:'Un activo tiene concentración de ballenas del 72% (Top 10 billeteras). ¿Cuál es el diagnóstico?',
+   opts:['Distribución saludable; alta confianza institucional','RIESGO DE LIQUIDACIÓN EXÓGENA ALTO: pocas billeteras pueden colapsar el precio en minutos','El token tiene alta descentralización','No es una métrica relevante para el análisis'],
+   ok:1,exp:'Con el 72% del suministro en solo 10 billeteras, cualquiera de esos tenedores tiene el poder de mercado para iniciar una venta masiva que colapse la cotización. El activo es susceptible de manipulación exógena total.'},
+  {q:'¿Qué son las "Direcciones Activas Diarias" como métrica on-chain?',
+   opts:['El número de exchanges donde cotiza el token','Billeteras únicas que ejecutaron al menos una transacción en la red en 24h; indicador de utilidad orgánica real','Los traders profesionales registrados en el protocolo','El volumen total de transacciones en dólares'],
+   ok:1,exp:'Las Direcciones Activas Diarias son el termómetro más fiable de utilidad real de una red. Crecimiento sostenido = adopción orgánica real. Caída = la red pierde usuarios reales independientemente del precio.'},
+  {q:'El precio de un token sube un 35% en 30 días pero las Direcciones Activas Diarias caen un 40%. ¿Qué detecta el analista?',
+   opts:['Crecimiento orgánico fuerte respaldado por adopción institucional','DIVERGENCIA BAJISTA ESTRUCTURAL: burbuja especulativa sin soporte de utilidad real; corrección inminente','El token está en acumulación profesional silenciosa','Las métricas no tienen correlación directa'],
+   ok:1,exp:'Precio ↑ + Direcciones Activas ↓ es la divergencia más peligrosa del análisis on-chain. Sin usuarios reales usando la red, el precio sube por especulación pura. La corrección no es posible, es matemáticamente inevitable.'},
+  {q:'¿Por qué el Portfolio Tracker de CoinMarketCap NO requiere conectar wallets reales?',
+   opts:['Porque solo funciona con datos simulados','Para eliminar el vector de ataque informático por drenado de carteras y mantener la seguridad operativa','Porque CoinMarketCap no tiene acceso a redes blockchain','Por razones regulatorias únicamente'],
+   ok:1,exp:'El tracker es una bitácora manual deliberadamente separada de las wallets reales. Esto es una práctica de seguridad profesional: registrar posiciones para análisis sin exponer jamás las claves privadas a una interfaz web.'},
+  {q:'¿Cuál es la primera variable que audita un analista antes de evaluar el precio de un token?',
+   opts:['El gráfico de precios y patrones técnicos de corto plazo','La estructura de suministro: Circulante vs Máximo y el Factor de Dilución FDV','El sentimiento de redes sociales','El número de seguidores en Twitter/X'],
+   ok:1,exp:'El precio nominal no tiene significado sin contexto de suministro. La primera auditoría siempre es: ¿Cuánto del suministro máximo ya circula? ¿Cuánto está bloqueado y en manos de quién? El Factor de Dilución FDV responde esta pregunta.'},
+  {q:'Un proyecto muestra Volumen 24h = $180M pero Profundidad de Mercado ±2% = $42K. ¿Cuál es la conclusión?',
+   opts:['El proyecto tiene alta liquidez y es seguro para operar','SEÑAL CRÍTICA DE WASH TRADING: volumen masivo con liquidez real mínima = volumen artificial manipulado','El exchange tiene problemas técnicos temporales','La diferencia es normal en mercados emergentes'],
+   ok:1,exp:'La relación entre volumen nominal y profundidad real es el detector definitivo de Wash Trading. Si puedes generar $180M en volumen pero solo hay $42K de liquidez real a ±2%, el volumen es 100% artificial. El precio puede colapsar en cualquier momento.'},
+  {q:'¿Cuál es la "Regla de Oro" para la Dominancia de BTC según el Manual Maestro?',
+   opts:['BTC Dominance > 60% indica burbuja especulativa inminente','Si BTC Dominance > 50%: el mercado está en fase macro defensiva; el capital corporativo acumula Bitcoin y drena los proyectos de mayor riesgo','BTC Dominance > 50% es señal de compra en altcoins','La dominancia de BTC no tiene valor predictivo'],
+   ok:1,exp:'Regla de Oro literal del Manual: "Si el porcentaje supera el 50%, anote: Mercado en fase macro defensiva; el capital corporativo está acumulando Bitcoin y drenando el dinero de los proyectos de mayor riesgo". Esta métrica calibra la exposición global al riesgo.'},
+];
+
+/* ══ STATE ══ */
+let done=new Set(), charts={};
+const DIM='rgba(255,255,255,0.55)', GOLD='rgba(201,168,76,0.8)', GOLDB='#F0C040', R='#E05050', G='#50C878';
+
+/* ══ NAV ══ */
+function goScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('scr-'+id).classList.add('on');window.scrollTo(0,0);}
+function setProgress(pct,lbl){document.getElementById('pbar').style.width=pct+'%';document.getElementById('pct').textContent=pct+'%';document.getElementById('nbadge').textContent=lbl;}
+function destroyC(id){if(charts[id]){try{charts[id].destroy();}catch(e){}delete charts[id];}}
+
+/* ══ HERO COUNTERS ══ */
+function countUp(el,n,d=1100){
+  let s=null;
+  function f(ts){if(!s)s=ts;const p=Math.min((ts-s)/d,1);el.textContent=Math.round(p*n);if(p<1)requestAnimationFrame(f);else el.textContent=n;}
+  requestAnimationFrame(f);
+}
+setTimeout(()=>{
+  countUp(document.getElementById('kn1'),4);
+  countUp(document.getElementById('kn2'),6,1200);
+  countUp(document.getElementById('kn3'),8,1400);
+  countUp(document.getElementById('kn4'),15,1600);
+},350);
+
+/* ══ MENU ══ */
+function renderMenu(){
+  const g=document.getElementById('pgrid');
+  g.innerHTML=MODULOS.map(m=>`
+    <div class="pcard${done.has(m.id)?' done':''}" onclick="openModulo(${m.id})">
+      <div class="pchk"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="1.8"/></svg></div>
+      <div class="pn">${m.num}</div>
+      <div class="pico">${m.ico}</div>
+      <div class="ptit">${m.title}</div>
+      <div class="pdesc">${m.desc}</div>
+      <div class="ptag">${m.tag}</div>
+    </div>`).join('');
+  setProgress(Math.round((done.size/MODULOS.length)*100),(done.size===MODULOS.length?'¡Completo!':done.size+' de '+MODULOS.length+' módulos'));
+}
+
+/* ══ HINT / ERR helpers ══ */
+let hintIdx=0;
+function hint(tit,body,ejemplo){
+  const id='h'+hintIdx++;
+  return `<div class="hint-wrap" id="${id}">
+    <div class="hint-header" onclick="toggleHint('${id}')">
+      <div class="hint-q">?</div>
+      <div class="hint-title">${tit}</div>
+      <div class="hint-arrow" id="${id}a">▾</div>
+    </div>
+    <div class="hint-body" id="${id}b">
+      <div class="hint-section">
+        <div class="hint-section-lbl">¿Cómo interpretar?</div>
+        <div class="hint-section-txt">${body}</div>
+        ${ejemplo?`<div class="hint-example">${ejemplo}</div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+function toggleHint(id){
+  const w=document.getElementById(id);
+  const b=document.getElementById(id+'b');
+  const a=document.getElementById(id+'a');
+  const open=b.classList.toggle('open');
+  w.classList.toggle('active',open);
+  if(a) a.style.transform=open?'rotate(180deg)':'';
+}
+let errIdx=0;
+function errBox(ico,title,why,exTit,exTxt){
+  const id='e'+errIdx++;
+  return `<div class="err-wrap">
+    <div class="err-top" onclick="toggleErr('${id}')">
+      <div class="err-ico">${ico}</div>
+      <div class="err-head">
+        <div class="err-tag">Error frecuente del alumno</div>
+        <div class="err-title">${title}</div>
+      </div>
+    </div>
+    <div class="err-body" id="${id}b">
+      <div class="err-why">
+        <div class="err-why-title">¿Por qué ocurre?</div>
+        <p>${why}</p>
+      </div>
+      ${exTit?`<div style="background:rgba(0,0,0,.4);border:1px solid rgba(200,60,60,.2);padding:.85rem 1rem;margin-top:.6rem">
+        <div style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.12em;color:rgba(200,100,100,.7);text-transform:uppercase;margin-bottom:.4rem">Ejemplo histórico: ${exTit}</div>
+        <div style="font-size:.92rem;color:rgba(255,200,200,.7);line-height:1.65">${exTxt}</div>
+      </div>`:''}
+    </div>
+  </div>`;
+}
+function toggleErr(id){document.getElementById(id+'b').classList.toggle('open');}
+
+/* ══ OPEN MÓDULO ══ */
+function openModulo(id){
+  const m=MODULOS[id];
+  goScr('content');
+  setProgress(Math.round(((done.size+1)/MODULOS.length)*100), m.title);
+  const ci=document.getElementById('ci');
+  ci.innerHTML=`
+    <button class="back" onclick="goScr('menu');renderMenu()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver al menú
+    </button>
+    <div class="phdr">
+      <div class="pico2">${m.ico}</div>
+      <div>
+        <div class="phnum">${m.num} · ${m.tag}</div>
+        <div class="phtit">${m.title.split(' ')[0]} <em>${m.title.split(' ').slice(1).join(' ')}</em></div>
+        <div class="phsub">${m.sub}</div>
+      </div>
+    </div>
+    ${CONTENT[m.chart]}
+    <div class="pfooter">
+      <div style="font-size:.82rem;color:var(--tmuted)">Módulo ${id+1} de ${MODULOS.length}</div>
+      <button class="btn-next" onclick="completeModulo(${id})">
+        ${id<MODULOS.length-1?'Siguiente Módulo':'Ver Evaluación Final'}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>`;
+  setTimeout(()=>buildChart(m.chart),120);
+}
+function completeModulo(id){
+  done.add(id);
+  if(id<MODULOS.length-1) openModulo(id+1);
+  else{ renderMenu(); goScr('menu'); }
+}
+
+/* ══ CONTENIDO EDUCATIVO ══ */
+const CONTENT={
+macro:`
+  <div class="blk">
+    <div class="blk-lbl">Marco Teórico — Las Constantes Vitales</div>
+    ${errBox('📉','Analizar el precio de un token sin primero diagnosticar la salud del ecosistema global.',
+      'Un analista que ignora el macrosistema es como un médico que trata síntomas sin medir signos vitales. Si el mercado global está en fase de capitulación, incluso los mejores proyectos caerán. El contexto macro precede siempre al análisis individual.',
+      '','')
+    }
+    ${hint('¿Cómo leer las 3 Constantes Vitales?',
+      'Piensa en el mercado cripto como un gran centro comercial. El Market Cap es el tamaño total del edificio (si crece, están invirtiendo en más locales = dinero nuevo entrando). El Volumen 24h es la cantidad de clientes comprando (alto = mercado vivo, bajo = nadie está operando). La Dominancia BTC es el porcentaje de compradores que van solo a la tienda principal.',
+      'Si BTC Dominance > 50% y el Market Cap baja: todos están asustados y corriendo hacia el activo más seguro. Es señal de salida de capital de altcoins.')
+    }
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Tablero de Constantes Vitales — Simulador en Vivo</div>
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-card-lbl">Market Cap Global</div>
+        <div class="kpi-card-val" id="mkt-cap">$2.15T</div>
+        <div class="kpi-card-sub">↑ +2.3% (24h) · Capital fiat en sistema</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-lbl">Volumen 24h</div>
+        <div class="kpi-card-val" id="vol-24h">$85.2B</div>
+        <div class="kpi-card-sub">↑ +5.1% · Tracción comercial activa</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-lbl">Dominancia BTC</div>
+        <div class="kpi-card-val" id="btc-dom">48.5%</div>
+        <div class="kpi-card-sub">↓ Fase de apetito de riesgo moderado</div>
+      </div>
+    </div>
+    ${hint('¿Cómo leer este gráfico de Flujo de Capital?',
+      'El eje Y (vertical) muestra la Capitalización Global en miles de millones de USD. El eje X (horizontal) muestra el tiempo según la temporalidad seleccionada. Una curva con pendiente positiva (sube de izquierda a derecha) = dinero nuevo entrando al sistema. Una curva descendente = capital saliendo hacia dólar u otros mercados.',
+      'Interacción: Haz clic en los botones "24h / 7d / 30d / 1A" para cambiar la ventana temporal. Los analistas usan 30d y 1A para detectar tendencias estructurales, y 24h para ver movimientos de corto plazo.')
+    }
+    <div class="cbox">
+      <div class="ctit"><span>📈</span> Flujo Neto de Capital Global — selecciona temporalidad</div>
+      <div class="tab-row" style="margin-bottom:.8rem">
+        <button class="tbtn on" onclick="switchMacroChart('24h',this)">24h</button>
+        <button class="tbtn" onclick="switchMacroChart('7d',this)">7d</button>
+        <button class="tbtn" onclick="switchMacroChart('30d',this)">30d</button>
+        <button class="tbtn" onclick="switchMacroChart('1a',this)">1A</button>
+      </div>
+      <canvas id="chart-macro" height="200"></canvas>
+    </div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Laboratorio Práctico 1 — Secuencia de Pasos</div>
+    <div class="hint-badge"><div class="hint-q">?</div> Ejecuta cada paso directamente en coinmarketcap.com mientras lees</div>
+    <ul class="step-list">
+      <li class="step-item"><span class="step-num">01</span><div class="step-body"><strong>Ingresa a coinmarketcap.com</strong> y localiza la esquina superior derecha. Cambia el idioma a Español haciendo clic en "EN".</div></li>
+      <li class="step-item"><span class="step-num">02</span><div class="step-body"><strong>Moneda base:</strong> Localiza el botón "USD" junto al selector de idioma. Aunque puedes ver tu moneda local, el analista profesional opera siempre en USD (moneda de reserva global).</div></li>
+      <li class="step-item"><span class="step-num">03</span><div class="step-body"><strong>Modo Oscuro:</strong> Clic en el ícono de luna para activarlo. Reduce fatiga visual en sesiones largas de análisis de alta densidad de datos.</div></li>
+      <li class="step-item"><span class="step-num">04</span><div class="step-body"><strong>Barra superior de datos:</strong> Analiza la "Cap. de Mercado" → haz clic sobre el número → te redirige a <strong>coinmarketcap.com/charts/</strong> para ver el gráfico histórico global.</div></li>
+      <li class="step-item"><span class="step-num">05</span><div class="step-body"><strong>Dominancia:</strong> En la barra superior, localiza el % de BTC. Si supera el 50%, anota en tu bitácora: "Mercado en fase macro defensiva".</div></li>
+    </ul>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Regla de Oro</div>
+    <div class="rule-box"><div class="rule-tag">Regla de Oro — Módulo I</div><p>"Antes de evaluar cualquier token individual, el analista siempre diagnostica los tres signos vitales del ecosistema global. Un macrosistema en distribución o capitulación invalida cualquier señal alcista individual."</p></div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Acciones Concretas</div>
+    <ul class="act-list">
+      <li><strong>Antes de cualquier análisis:</strong> abre CoinMarketCap, lee las 3 métricas de la barra superior y anótalas en tu cuaderno como "contexto macro del día".</li>
+      <li><strong>Si Dominancia BTC sube y Market Cap cae:</strong> el capital huye de altcoins hacia BTC o dólar. No es momento de entrar en proyectos especulativos.</li>
+      <li><strong>Filtra por categorías:</strong> en el menú principal, usa "Categorías" → "AI" para ver los top 3 proyectos del sector con mayor capitalización.</li>
+    </ul>
+  </div>`,
+
+token:`
+  <div class="blk">
+    <div class="blk-lbl">Marco Teórico — Sesgo de Unidad y Dilución</div>
+    ${errBox('💸','Asumir que una moneda es "barata" por su precio nominal de $0.005 sin revisar su tokenómica.',
+      'El precio de una moneda solo tiene sentido comparado con el suministro total. Un token a $0.005 con 100 billones de unidades tiene una capitalización mayor que Bitcoin. La pregunta correcta nunca es "¿cuánto cuesta?" sino "¿cuánto representa eso del valor total del proyecto?"',
+      'Shiba Inu vs Bitcoin','Shiba Inu cotizó a fracciones de centavo mientras Bitcoin cotizaba a $60,000. Muchos compraron SHIB creyendo que era "más barato". En capitalización, SHIB llegó a superar los $40B. El precio nominal engañó a millones de inversores.')
+    }
+    ${hint('¿Cómo calcular el Factor de Dilución?',
+      'Fórmula: FDV / Market Cap = Factor de Dilución. Si el resultado es 1.0 (100%), el token no tiene más por liberar. Si es 5.0 (20% circulante), el 80% todavía está en manos de VCs y fundadores esperando para vender. Eso es presión vendedora programada.',
+      'Ejemplo: Token X tiene Market Cap de $100M y FDV de $800M. Factor = 8x. Si esos tokens se liberan cuando el precio suba, los primeros inversores venderán masivamente contra el mercado retail que está comprando.')
+    }
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Simulador de Tokenomics — Elige un Perfil</div>
+    <div class="tab-row">
+      <button class="tbtn on" onclick="switchToken('btc',this)">💎 BTC — Deflacionario</button>
+      <button class="tbtn" onclick="switchToken('xrp',this)">📤 XRP — Alta Emisión</button>
+      <button class="tbtn" onclick="switchToken('meme',this)">🐕 MEME — Inflacionario</button>
+    </div>
+    <div id="token-alert" style="display:none" class="flash">
+      <div class="flash-tag">⚠ ALERTA — RIESGO DE DILUCIÓN MASIVA</div>
+      <p id="token-alert-txt"></p>
+    </div>
+    ${hint('¿Cómo leer el gráfico de dona de Suministro?',
+      'El círculo está dividido en dos segmentos: VERDE = tokens ya circulando en el mercado (puedes comprarlos o venderlos hoy). ROJO = tokens bloqueados en contratos de fundadores, VCs y tesorería del protocolo, que aún NO existen en el mercado abierto. Cuanto mayor sea el segmento rojo, mayor es la presión de venta futura cuando esos tokens se liberen.',
+      'Interacción: Usa los botones superiores para cambiar entre los 3 perfiles de token. Observa cómo el gráfico, los números y el Diagnóstico Automático cambian en tiempo real. Compara el Factor de Dilución entre BTC (1.07x = casi sin riesgo) y MEME (337x = riesgo extremo).')
+    }
+    <div class="g2" style="margin-bottom:.8rem">
+      <div class="cbox">
+        <div class="ctit"><span>🔵</span> Suministro Circulante vs Máximo</div>
+        <canvas id="chart-token" height="210"></canvas>
+      </div>
+      <div>
+        <div class="wres" style="grid-template-columns:1fr 1fr;margin-top:0;margin-bottom:.8rem">
+          <div class="wr"><div class="wr-l">Circulante</div><div class="wr-v" id="tok-circ">19.7M</div></div>
+          <div class="wr"><div class="wr-l">Suministro Máx.</div><div class="wr-v" id="tok-max">21.0M</div></div>
+          <div class="wr"><div class="wr-l">% Emitido</div><div class="wr-v g" id="tok-pct">93.8%</div></div>
+          <div class="wr"><div class="wr-l">FDV</div><div class="wr-v" id="tok-fdv">$840B</div></div>
+          <div class="wr" style="grid-column:1/-1"><div class="wr-l">Factor de Dilución</div><div class="wr-v" id="tok-factor">1.07x</div></div>
+        </div>
+        <div class="rule-box">
+          <div class="rule-tag">Diagnóstico Automático</div>
+          <p id="tok-diagnosis">Estructura deflacionaria. Suministro casi completo. Sin riesgo significativo de dilución futura.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Simulador de Libro de Órdenes — Profundidad ±2%</div>
+    ${hint('¿Cómo usar este simulador?',
+      'Mueve el deslizador hacia la derecha para simular una venta masiva repentina (dump). Observa cómo la liquidez disponible en el lado de las órdenes de compra se agota y el precio cae progresivamente. Esto es "slippage": la diferencia entre el precio que esperas y el que obtienes.',
+      'Si vendes $1M en un token con solo $200K de profundidad a -2%, colapsas el precio un 10%, 20% o más solo con tu propia orden de venta.')
+    }
+    <div class="wbox">
+      <div class="ctit"><span>📊</span> Impacto de Venta Masiva sobre el Precio (Slippage Simulado)</div>
+      ${hint('¿Cómo leer este gráfico de Profundidad?',
+        'Las barras AZULES representan las órdenes de compra disponibles a precios por debajo del mercado (-1% y -2%). Las barras ROJAS son las órdenes de venta que se activan con el dump simulado. Cuando la barra roja de tu orden supera las azules disponibles, el precio colapsa más de lo esperado. Esto se llama SLIPPAGE.',
+        'Interacción: Arrastra el deslizador hacia la derecha para aumentar el tamaño de tu orden de venta. Observa los tres indicadores en la parte inferior: el Precio Post-Venta va bajando y el Slippage aumenta. Una profundidad muy delgada (barras pequeñas) = mercado manipulable = señal de Wash Trading.')
+      }
+      <div class="wrow">
+        <div class="wlbl">Tamaño de orden de venta</div>
+        <input type="range" class="wslider" min="0" max="100" value="10" oninput="updDepth(this.value)" id="depth-slider">
+        <div class="wval" id="depth-val">$10K</div>
+      </div>
+      <canvas id="chart-depth" height="160"></canvas>
+      <div class="wres">
+        <div class="wr"><div class="wr-l">Precio Original</div><div class="wr-v">$1.000</div></div>
+        <div class="wr"><div class="wr-l">Precio Post-Venta</div><div class="wr-v r" id="price-impact">$0.990</div></div>
+        <div class="wr"><div class="wr-l">Slippage</div><div class="wr-v r" id="slippage-pct">-1.0%</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Regla de Oro</div>
+    <div class="rule-box"><div class="rule-tag">Regla de Oro — Módulo II</div><p>"Nunca evalúes el precio nominal. Audita siempre: ¿Cuánto del suministro máximo ya circula? ¿Cuándo se desbloquea el resto? Un Factor de Dilución > 3x con desbloqueos próximos es una trampa de liquidez para el inversor retail."</p></div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Laboratorio Práctico 2 — Ruta Exacta en CMC</div>
+    <ul class="step-list">
+      <li class="step-item"><span class="step-num">01</span><div class="step-body"><strong>Busca "XRP"</strong> en CoinMarketCap. En el panel lateral izquierdo localiza "Suministro en circulación" y "Suministro máximo". Anota ambos números.</div></li>
+      <li class="step-item"><span class="step-num">02</span><div class="step-body"><strong>Calcula el Factor de Dilución:</strong> divide la "Cap. de mercado totalmente diluida (FDV)" entre la "Cap. de mercado" estándar. Si el resultado supera 3, marca alerta de dilución.</div></li>
+      <li class="step-item"><span class="step-num">03</span><div class="step-body"><strong>Clic en la pestaña "Mercados".</strong> Ordena por columna "Volumen %". Revisa la columna "Profundidad ±2%". Profundidad baja + volumen alto = <strong>Wash Trading detectado</strong>.</div></li>
+    </ul>
+  </div>`,
+
+portfolio:`
+  <div class="blk">
+    <div class="blk-lbl">Marco Teórico — Gestión de Riesgo Operativo</div>
+    ${errBox('🎰','Poner el 90% del capital en un solo token porque "estoy seguro de que va a subir".',
+      'La sobreconcentración en un activo elimina la capacidad de recuperación ante una corrección. Un portafolio no es una apuesta: es una estructura de riesgo controlado. La bitácora financiera fomenta el desapego emocional y permite calcular métricas objetivas como el DCA y el ROI real.',
+      '','')
+    }
+    ${hint('¿Para qué sirve el Portfolio Tracker de CoinMarketCap?',
+      'Tiene dos funciones críticas: SEGURIDAD (registro manual sin conectar wallets reales, eliminando el riesgo de drenado de carteras) y PSICOLÓGICA (la bitácora obliga a registrar cada decisión y ver el rendimiento real, no el percibido). Los profesionales revisan su portafolio en frío, con datos, no con emociones.',
+      'Muchos inversores creen que ganan más de lo que realmente ganan porque recuerdan selectivamente las operaciones exitosas. La bitácora fuerza la objetividad matemática absoluta.')
+    }
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Simulador de Bitácora de Transacciones</div>
+    <div class="wbox">
+      <div class="tab-row" id="ptab-row">
+        <button class="tbtn on" id="tab-buy" onclick="setPTab('buy')">Comprar</button>
+        <button class="tbtn" id="tab-sell" onclick="setPTab('sell')">Vender</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Activo</label>
+          <select id="p-asset">
+            <option value="BTC">BTC — Bitcoin</option>
+            <option value="ETH">ETH — Ethereum</option>
+            <option value="LINK">LINK — Chainlink</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cantidad</label>
+          <input type="number" id="p-qty" placeholder="0.5" step="0.0001" min="0">
+        </div>
+        <div class="form-group">
+          <label>Precio por unidad (USD)</label>
+          <input type="number" id="p-price" placeholder="45000" step="0.01" min="0">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addTxn()">+ Añadir Transacción</button>
+    </div>
+    <div id="p-alert" style="display:none;margin-bottom:.8rem"></div>
+    <div class="g2" style="margin-bottom:.8rem">
+      <div class="cbox">
+        <div class="ctit"><span>🥧</span> Asset Allocation — Distribución de Riesgo</div>
+        ${hint('¿Cómo leer el gráfico de Asset Allocation?',
+          'Cada segmento de color representa un activo en tu portafolio y su proporción del valor total. Un portafolio saludable no tiene un solo color dominando el círculo. Si un segmento supera el 70% del total, el indicador "Riesgo de Cartera" marcará ALTO en rojo: estás sobreexpuesto a un solo activo.',
+          'Interacción: Añade transacciones de distintos activos (BTC, ETH, LINK) usando el formulario de arriba. El gráfico y los indicadores de P&L y ROI se actualizan automáticamente con cada operación registrada. Prueba comprar 0.1 BTC a $40,000 y luego comprar también ETH para ver cómo cambia la distribución.')
+        }
+        <div class="dnut-wrap">
+          <canvas id="chart-portfolio" width="160" height="160" style="max-width:160px;flex-shrink:0"></canvas>
+          <div class="dnut-leg" id="p-legend"><div style="font-size:.85rem;color:var(--tmuted)">Sin posiciones aún. Añade transacciones.</div></div>
+        </div>
+      </div>
+      <div class="wres" style="grid-template-columns:1fr 1fr;align-content:start;margin-top:0">
+        <div class="wr"><div class="wr-l">Capital Total</div><div class="wr-v" id="p-total">$0.00</div></div>
+        <div class="wr"><div class="wr-l">Posiciones</div><div class="wr-v" id="p-count">0</div></div>
+        <div class="wr"><div class="wr-l">P&L Flotante</div><div class="wr-v g" id="p-pnl">$0.00</div></div>
+        <div class="wr"><div class="wr-l">ROI</div><div class="wr-v g" id="p-roi">0%</div></div>
+        <div class="wr" style="grid-column:1/-1"><div class="wr-l">Riesgo de Cartera</div><div class="wr-v" id="p-risk">—</div></div>
+      </div>
+    </div>
+    <div class="cbox" style="overflow-x:auto">
+      <div class="ctit"><span>📓</span> Historial de Transacciones</div>
+      ${hint('¿Cómo usar la Bitácora de Transacciones?',
+        'Esta tabla registra cada operación que añades con el formulario superior. Las filas verdes son COMPRAS (entrada de capital) y las rojas son VENTAS (toma de ganancias o stop loss). La diferencia entre el precio de compra y el precio de venta determina tu P&L flotante. El analista profesional consulta esta tabla para calcular su DCA (promedio de costos) real.',
+        'Interacción: Usa la pestaña "Comprar" para registrar posiciones de entrada, y la pestaña "Vender" para registrar salidas parciales. Prueba comprar BTC a $40,000, luego vender la mitad a $50,000 y observa cómo el ROI y el P&L se actualizan automáticamente.')
+      }
+      <table class="ptbl">
+        <thead><tr><th>Activo</th><th>Tipo</th><th>Cantidad</th><th>Precio USD</th><th>Total USD</th></tr></thead>
+        <tbody id="p-tbody"><tr><td colspan="5" style="color:var(--tmuted);text-align:center;padding:1.2rem">Sin transacciones registradas.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Regla de Oro</div>
+    <div class="rule-box"><div class="rule-tag">Regla de Oro — Módulo III</div><p>"La bitácora financiera no es opcional. Un analista que no registra sus transacciones no tiene datos reales de rendimiento. Sin datos reales, opera con ilusiones cognitivas, no con información."</p></div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Laboratorio Práctico 3 — Ruta Exacta en CMC</div>
+    <ul class="step-list">
+      <li class="step-item"><span class="step-num">01</span><div class="step-body"><strong>Inicia sesión en CoinMarketCap</strong> y accede a <em>coinmarketcap.com/portfolio-tracker/</em>. Crea un portafolio llamado "Fondo de Cobertura y Crecimiento Académico".</div></li>
+      <li class="step-item"><span class="step-num">02</span><div class="step-body"><strong>Añade Bitcoin (BTC):</strong> Clic en "+ Añadir nuevo" → selecciona BTC → ingresa cantidad: 0.25 → precio de compra simulado (zona de soporte anterior) → confirmar.</div></li>
+      <li class="step-item"><span class="step-num">03</span><div class="step-body"><strong>Simula una venta parcial:</strong> clic en tu posición BTC → "Añadir transacción" → cambia la pestaña a "VENDER" → cantidad: 0.05 → precio mayor al de compra → confirmar.</div></li>
+      <li class="step-item"><span class="step-num">04</span><div class="step-body"><strong>Revisa Asignación y Estadísticas:</strong> explora las pestañas "Allocation" y "Statistics" para ver el gráfico circular y el ROI calculado automáticamente.</div></li>
+    </ul>
+  </div>`,
+
+onchain:`
+  <div class="blk">
+    <div class="blk-lbl">Marco Teórico — La Ventaja Competitiva del Blockchain</div>
+    ${errBox('👁️','Analizar el precio de un criptoactivo sin revisar los datos on-chain es como diagnosticar una enfermedad sin análisis de sangre.',
+      'El blockchain es el único mercado financiero del mundo donde puedes auditar de forma anónima y pública los movimientos de TODOS los inversores. Estudios publicados en MDPI Tokenomics demuestran correlación directa entre el crecimiento de usuarios activos de red y la mitigación de volatilidades extremas. Ignorar esta ventaja es operar a ciegas.',
+      '','')
+    }
+    ${hint('¿Cómo usar los dos gráficos on-chain del taller?',
+      'GRÁFICO 1 — Ballenas: el círculo muestra quién controla el dinero. Si el rojo (ballenas) supera el 60%, cualquiera de esas carteras puede vender en masa y colapsar el precio. GRÁFICO 2 — Divergencias: compara la curva de precio (amarillo) vs direcciones activas (verde). Si se separan (precio sube, usuarios bajan), es burbuja especulativa.',
+      'Análogía: imagina una ciudad donde el 70% de las propiedades pertenece a 10 personas. Si esas 10 personas deciden vender todo al mismo tiempo, el mercado inmobiliario colapsa sin importar qué tan bueno sea el barrio.')
+    }
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Simulador — Concentración de Ballenas (Top 10 Billeteras)</div>
+    <div id="whale-banner" style="display:none"></div>
+    <div class="g2">
+      <div class="cbox">
+        <div class="ctit"><span>🐋</span> Distribución de Riqueza On-Chain</div>
+        ${hint('¿Cómo leer el gráfico de Concentración de Ballenas?',
+          'El segmento ROJO muestra el % del suministro total controlado por las 10 billeteras más grandes (ballenas). El segmento VERDE es el resto del mercado (retail e inversores medianos). La regla técnica del taller: si el rojo supera el 60%, el activo tiene riesgo de liquidación exógena alto. Una sola ballena puede colapsar el precio con una orden de venta masiva.',
+          'Interacción: Haz clic en "Distribución Normal (35%)" para ver un activo con distribución aceptable, y luego en "Alta Concentración (68%)" para activar la alerta crítica. Observa cómo cambia el diagnóstico y aparece el banner de advertencia.')
+        }
+        <div class="tab-row">
+          <button class="tbtn on" onclick="switchWhale(35,this)">Distribución Normal (35%)</button>
+          <button class="tbtn" onclick="switchWhale(68,this)">Alta Concentración (68%)</button>
+        </div>
+        <div class="dnut-wrap" style="margin-top:.8rem">
+          <canvas id="chart-whale" width="160" height="160" style="max-width:160px;flex-shrink:0"></canvas>
+          <div class="dnut-leg">
+            <div class="leg-item"><div class="leg-dot" style="background:#E05050"></div> Top 10 Ballenas: <strong id="whale-pct" style="color:var(--gold-b);margin-left:.3rem">35%</strong></div>
+            <div class="leg-item"><div class="leg-dot" style="background:#50C878"></div> Mercado Retail: <strong id="retail-pct" style="color:var(--gold-b);margin-left:.3rem">65%</strong></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="wres" style="grid-template-columns:1fr 1fr;margin-top:0;margin-bottom:.8rem">
+          <div class="wr"><div class="wr-l">Billeteras Activas</div><div class="wr-v">1.24M</div></div>
+          <div class="wr"><div class="wr-l">Top 10 Holding</div><div class="wr-v r" id="whale-hold">35%</div></div>
+        </div>
+        <div id="whale-rule" class="rule-box">
+          <div class="rule-tag">Diagnóstico de Centralización</div>
+          <p id="whale-diag">Distribución relativamente saludable. Las ballenas tienen influencia pero no dominan el mercado de forma absoluta.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Simulador — Divergencias Precio vs Direcciones Activas</div>
+    ${hint('¿Qué significa una Divergencia Bajista?',
+      'Si el precio sube pero el número de usuarios que realmente usa la red baja, la subida no tiene soporte fundamental. Es como una empresa cuyas acciones suben mientras sus clientes se van. En algún punto, el mercado corrige hacia la realidad.',
+      'Escenario B — Burbuja: el precio sube 115% en 6 semanas pero las direcciones activas caen 62%. Los "compradores" son especuladores, no usuarios. Cuando los especuladores vendan, no habrá usuarios reales para sostener el precio.')
+    }
+    <div class="cbox">
+      <div class="ctit"><span>🔍</span> Precio vs Direcciones Activas — Elige el escenario</div>
+      ${hint('¿Cómo leer el gráfico de doble eje?',
+        'Este gráfico tiene DOS ejes Y: el izquierdo (amarillo dorado) mide el Precio del token en índice base 100. El derecho (verde) mide las Direcciones Activas Diarias también en índice base 100. Cuando AMBAS líneas suben juntas = crecimiento orgánico real. Cuando el precio sube PERO las direcciones bajan = DIVERGENCIA BAJISTA: la señal más peligrosa del análisis on-chain.',
+        'Interacción: Haz clic en "Escenario A: Crecimiento Orgánico" para ver cómo se ve una red saludable (ambas líneas suben). Luego clic en "Escenario B: Burbuja Especulativa" para ver la divergencia fatal (precio +115%, usuarios -62%). Lee el panel de diagnóstico debajo del gráfico para la interpretación profesional.')
+      }
+      <div class="tab-row">
+        <button class="tbtn on" onclick="switchDivergence('organic',this)">Escenario A: Crecimiento Orgánico</button>
+        <button class="tbtn" onclick="switchDivergence('bubble',this)">Escenario B: Burbuja Especulativa</button>
+      </div>
+      <canvas id="chart-onchain" height="220" style="margin-top:.8rem"></canvas>
+      <div id="divergence-msg" style="margin-top:.9rem;padding:.85rem 1rem;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);font-size:.9rem;color:var(--tdim);line-height:1.65">
+        <strong style="color:var(--gold)">Escenario A: Crecimiento Orgánico</strong> — Precio y Direcciones Activas suben en sincronía. El aumento de precio tiene soporte de adopción real. La subida es sostenible.
+      </div>
+    </div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Regla de Oro</div>
+    <div class="rule-box"><div class="rule-tag">Regla de Oro — Módulo IV</div><p>"El blockchain es el único mercado donde puedes auditar a todos tus competidores. Un analista que no usa datos on-chain está renunciando a su mayor ventaja competitiva."</p></div>
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Laboratorio Práctico 4 — Ruta Exacta en CMC</div>
+    <ul class="step-list">
+      <li class="step-item"><span class="step-num">01</span><div class="step-body"><strong>Busca "Chainlink (LINK)"</strong> en CoinMarketCap. Desplázate hasta encontrar la fila de pestañas. Clic en <strong>"Análisis"</strong> (o usa coinmarketcap.com/analytics/).</div></li>
+      <li class="step-item"><span class="step-num">02</span><div class="step-body"><strong>Concentración de Ballenas:</strong> revisa el gráfico circular. Si el % de billeteras "Whale" supera el 60%, anota: "Activo de Alta Centralización — Susceptibilidad de Manipulación Exógena".</div></li>
+      <li class="step-item"><span class="step-num">03</span><div class="step-body"><strong>Direcciones Activas Diarias:</strong> cambia la escala a "3M". Compara visualmente la curva de precio vs la barra de actividad. Si precio sube mientras actividad baja, anota: "Divergencia Bajista Estructural Detectada".</div></li>
+    </ul>
+  </div>`
+};
+
+/* ══ CHART BUILDERS ══ */
+const CHART_DEFAULTS={
+  scales:{
+    y:{ticks:{color:DIM,font:{family:'Rajdhani',size:11}},grid:{color:'rgba(201,168,76,0.07)'}},
+    x:{ticks:{color:DIM,font:{family:'Rajdhani',size:11}},grid:{color:'rgba(201,168,76,0.07)'}}
+  },
+  plugins:{legend:{labels:{color:DIM,font:{family:'Rajdhani',size:11},boxWidth:10}}}
+};
+
+const macroData={
+  '24h':{labels:['00:00','04:00','08:00','12:00','16:00','20:00','23:59'],data:[2100,2108,2112,2119,2125,2135,2150]},
+  '7d':{labels:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],data:[2010,2040,2055,2090,2110,2125,2150]},
+  '30d':{labels:['S1','S2','S3','S4'],data:[1950,2020,2090,2150]},
+  '1a':{labels:['Ene','Mar','May','Jul','Sep','Nov','Dic'],data:[1200,1450,1780,2050,1900,2000,2150]},
+};
+let macroChartRef=null;
+
+function buildChart(type){
+  if(type==='macro') buildMacro('24h');
+  if(type==='token') buildToken('btc');
+  if(type==='portfolio') buildPortfolio();
+  if(type==='onchain'){buildWhale(35);buildDivergence('organic');buildDepth(10);}
+}
+
+function buildMacro(period){
+  destroyC('macro');
+  const ctx=document.getElementById('chart-macro');if(!ctx)return;
+  const d=macroData[period];
+  macroChartRef=new Chart(ctx,{type:'line',data:{
+    labels:d.labels,
+    datasets:[{label:'Market Cap Global (Bn USD)',data:d.data,
+      borderColor:GOLDB,backgroundColor:'rgba(240,192,64,0.07)',
+      borderWidth:2,fill:true,tension:0.4,
+      pointBackgroundColor:GOLDB,pointRadius:4,pointHoverRadius:6}]
+  },options:{responsive:true,...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,legend:{display:false}}}});
+  charts['macro']=macroChartRef;
+}
+function switchMacroChart(period,btn){
+  document.querySelectorAll('#scr-content .tab-row .tbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  buildMacro(period);
+}
+
+const tokenProfiles={
+  btc:{circ:19.7,max:21,mkt:840,fdv:900,label:'Bitcoin (BTC)'},
+  xrp:{circ:52,max:100,mkt:28,fdv:54,label:'XRP (Ripple)'},
+  meme:{circ:1000,max:420690,mkt:0.8,fdv:337,label:'Meme Coin'},
+};
+let tokenChartRef=null,depthChartRef=null;
+
+function buildToken(tok){
+  const p=tokenProfiles[tok];
+  const pct=(p.circ/p.max*100).toFixed(1);
+  const factor=(p.fdv/p.mkt).toFixed(2);
+  document.getElementById('tok-circ').textContent=p.circ+'M';
+  document.getElementById('tok-max').textContent=p.max.toLocaleString()+'M';
+  document.getElementById('tok-pct').textContent=pct+'%';
+  document.getElementById('tok-fdv').textContent='$'+p.fdv+'B';
+  document.getElementById('tok-factor').textContent=factor+'x';
+  const pctEl=document.getElementById('tok-pct');
+  const fEl=document.getElementById('tok-factor');
+  const diag=document.getElementById('tok-diagnosis');
+  const alertEl=document.getElementById('token-alert');
+  const alertTxt=document.getElementById('token-alert-txt');
+  if(parseFloat(pct)<30){
+    pctEl.className='wr-v r';
+    fEl.className='wr-v r';
+    alertEl.style.display='block';
+    alertTxt.textContent='Solo el '+pct+'% del suministro máximo está circulando. El '+
+      (100-parseFloat(pct)).toFixed(1)+'% restante está bloqueado en contratos de fundadores y VCs. Factor de Dilución: '+factor+'x. Alta inflación programada por desbloqueo.';
+    diag.textContent='RIESGO ALTO: '+p.label+' tiene el '+pct+'% emitido. El '+
+      (100-parseFloat(pct)).toFixed(1)+'% restante puede llegar al mercado diluendo el valor. Presión vendedora estructural.';
+  } else {
+    pctEl.className='wr-v g';
+    fEl.className=parseFloat(factor)>1.5?'wr-v r':'wr-v g';
+    alertEl.style.display='none';
+    diag.textContent=parseFloat(pct)>90?'Estructura deflacionaria. Suministro casi completo. Sin riesgo significativo de dilución futura.':'Emisión moderada. Revisa el calendario de vesting para confirmar plazos de desbloqueo del resto.';
+  }
+  destroyC('token-d');
+  const ctx=document.getElementById('chart-token');if(!ctx)return;
+  tokenChartRef=new Chart(ctx,{type:'doughnut',data:{
+    labels:['Circulante','Bloqueado'],
+    datasets:[{data:[parseFloat(pct),100-parseFloat(pct)],
+      backgroundColor:['rgba(80,200,120,0.75)','rgba(224,80,80,0.65)'],
+      borderColor:'#0D0D0D',borderWidth:2}]
+  },options:{responsive:true,plugins:{legend:{labels:{color:DIM,font:{family:'Rajdhani',size:11},boxWidth:10}}}}});
+  charts['token-d']=tokenChartRef;
+  buildDepth(10);
+}
+function switchToken(tok,btn){
+  document.querySelectorAll('#scr-content .tab-row').forEach(r=>r.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on')));
+  btn.classList.add('on');
+  buildToken(tok);
+}
+
+function buildDepth(val){
+  destroyC('depth-d');
+  const ctx=document.getElementById('chart-depth');if(!ctx)return;
+  const impact=val/100;
+  const base=[950000,720000,480000,260000,120000];
+  const sells=base.map(v=>v*(1-impact*0.65));
+  depthChartRef=new Chart(ctx,{type:'bar',data:{
+    labels:['-2%','-1%','Precio','  +1%','  +2%'],
+    datasets:[
+      {label:'Órdenes Compra',data:[base[4],base[3],0,0,0].reverse().map((v,i)=>i<=2?0:v),
+       backgroundColor:'rgba(43,108,176,0.7)',stack:'orders'},
+      {label:'Órdenes Venta (con dump)',data:[0,0,0,sells[1],sells[0]],
+       backgroundColor:'rgba(224,80,80,0.7)',stack:'orders'},
+    ]
+  },options:{responsive:true,...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,legend:{display:true}}}});
+  charts['depth-d']=depthChartRef;
+}
+function updDepth(v){
+  const labels=['$1K','$5K','$10K','$25K','$50K','$100K','$250K','$500K','$1M','$5M','$10M'];
+  const idx=Math.round(v/10);
+  document.getElementById('depth-val').textContent=labels[Math.min(idx,labels.length-1)];
+  const slippagePct=Math.min(v*0.25,35).toFixed(1);
+  const newPrice=(1-slippagePct/100).toFixed(3);
+  document.getElementById('price-impact').textContent='$'+newPrice;
+  document.getElementById('slippage-pct').textContent='-'+slippagePct+'%';
+  buildDepth(v);
+}
+
+/* PORTFOLIO */
+let pTxns=[],pMode='buy';
+const PRICES={BTC:45000,ETH:2500,LINK:14};
+const COLORS_P=['rgba(201,168,76,0.8)','rgba(43,108,176,0.75)','rgba(80,200,120,0.75)'];
+let portChartRef=null;
+
+function buildPortfolio(){
+  destroyC('portfolio-d');
+  const ctx=document.getElementById('chart-portfolio');if(!ctx)return;
+  portChartRef=new Chart(ctx,{type:'doughnut',data:{labels:[],datasets:[{data:[],backgroundColor:[],borderColor:'#0D0D0D',borderWidth:2}]},
+    options:{responsive:true,plugins:{legend:{display:false}}}});
+  charts['portfolio-d']=portChartRef;
+}
+function setPTab(mode){
+  pMode=mode;
+  document.getElementById('tab-buy').classList.toggle('on',mode==='buy');
+  document.getElementById('tab-sell').classList.toggle('on',mode==='sell');
+}
+function addTxn(){
+  const asset=document.getElementById('p-asset').value;
+  const qty=parseFloat(document.getElementById('p-qty').value);
+  const price=parseFloat(document.getElementById('p-price').value);
+  if(!qty||!price||qty<=0||price<=0){
+    showPAlert('Por favor ingresa una cantidad y precio válidos.','r');return;
+  }
+  pTxns.push({asset,qty,price,type:pMode,total:qty*price});
+  document.getElementById('p-qty').value='';
+  document.getElementById('p-price').value='';
+  updatePortfolioUI();
+  showPAlert(pMode==='buy'?'✓ Compra registrada exitosamente.':'✓ Venta registrada exitosamente.','g');
+}
+function showPAlert(msg,type){
+  const el=document.getElementById('p-alert');
+  el.style.display='block';
+  el.className=type==='g'?'alert':'alert-red';
+  el.innerHTML='<strong>'+(type==='g'?'Transacción añadida:':'Atención:')+'</strong> '+msg;
+  setTimeout(()=>el.style.display='none',3000);
+}
+function updatePortfolioUI(){
+  const holdings={};let totalBuy=0,totalSell=0;
+  pTxns.forEach(t=>{
+    if(t.type==='buy'){holdings[t.asset]=(holdings[t.asset]||0)+t.qty;totalBuy+=t.total;}
+    else{holdings[t.asset]=(holdings[t.asset]||0)-t.qty;totalSell+=t.total;}
+  });
+  const assetNames=Object.keys(holdings).filter(a=>holdings[a]>0);
+  const currentValues=assetNames.map(a=>holdings[a]*PRICES[a]);
+  const totalCurrent=currentValues.reduce((a,b)=>a+b,0);
+  const invested=totalBuy-totalSell;
+  const pnl=totalCurrent-invested;
+  const roi=invested>0?(pnl/invested*100):0;
+
+  document.getElementById('p-total').textContent='$'+totalCurrent.toFixed(2);
+  document.getElementById('p-count').textContent=pTxns.length;
+  const pnlEl=document.getElementById('p-pnl');
+  pnlEl.textContent=(pnl>=0?'+':'')+' $'+pnl.toFixed(2);
+  pnlEl.className='wr-v '+(pnl>=0?'g':'r');
+  const roiEl=document.getElementById('p-roi');
+  roiEl.textContent=(roi>=0?'+':'')+roi.toFixed(1)+'%';
+  roiEl.className='wr-v '+(roi>=0?'g':'r');
+  const maxW=currentValues.length?Math.max(...currentValues)/totalCurrent:0;
+  const riskEl=document.getElementById('p-risk');
+  riskEl.textContent=maxW>0.7?'ALTO':maxW>0.5?'Medio':'Bajo';
+  riskEl.className='wr-v '+(maxW>0.7?'r':maxW>0.5?'':'g');
+
+  // Chart
+  if(portChartRef){
+    portChartRef.data.labels=assetNames;
+    portChartRef.data.datasets[0].data=currentValues;
+    portChartRef.data.datasets[0].backgroundColor=COLORS_P.slice(0,assetNames.length);
+    portChartRef.update();
+  }
+  // Legend
+  const leg=document.getElementById('p-legend');
+  if(assetNames.length){
+    leg.innerHTML=assetNames.map((a,i)=>`<div class="leg-item"><div class="leg-dot" style="background:${COLORS_P[i]}"></div> ${a}: <strong style="color:var(--gold-b);margin-left:.3rem">$${currentValues[i].toFixed(0)}</strong></div>`).join('');
+  }else{leg.innerHTML='<div style="font-size:.85rem;color:var(--tmuted)">Sin posiciones activas.</div>';}
+  // Tabla
+  const tb=document.getElementById('p-tbody');
+  if(pTxns.length){
+    tb.innerHTML=pTxns.map(t=>`<tr>
+      <td>${t.asset}</td>
+      <td class="${t.type}">${t.type==='buy'?'COMPRA':'VENTA'}</td>
+      <td>${t.qty.toFixed(4)}</td>
+      <td>$${t.price.toFixed(2)}</td>
+      <td>$${t.total.toFixed(2)}</td>
+    </tr>`).join('');
+  }else{tb.innerHTML='<tr><td colspan="5" style="color:var(--tmuted);text-align:center;padding:1.2rem">Sin transacciones registradas.</td></tr>';}
+}
+
+/* ON-CHAIN */
+let whaleChartRef=null,divChartRef=null;
+
+function buildWhale(pct){
+  destroyC('whale-d');
+  const ctx=document.getElementById('chart-whale');if(!ctx)return;
+  document.getElementById('whale-pct').textContent=pct+'%';
+  document.getElementById('retail-pct').textContent=(100-pct)+'%';
+  document.getElementById('whale-hold').textContent=pct+'%';
+  const banner=document.getElementById('whale-banner');
+  const diagEl=document.getElementById('whale-diag');
+  if(pct>60){
+    banner.style.display='block';
+    banner.innerHTML=`<div class="flash"><div class="flash-tag">⚠ RIESGO DE LIQUIDACIÓN EXÓGENA ALTO</div><p>Concentración del ${pct}% en Top 10 billeteras supera el umbral crítico del 60%. Cualquiera de esas carteras tiene el poder de iniciar una venta masiva que colapse la cotización sin previo aviso.</p></div>`;
+    diagEl.textContent='CENTRALIZACIÓN EXTREMA: '+pct+'% del suministro en 10 billeteras. El activo es susceptible de manipulación exógena absoluta. Riesgo de dump coordinado muy alto.';
+    document.getElementById('whale-rule').style.borderLeftColor='var(--red)';
+  }else{
+    banner.style.display='none';
+    diagEl.textContent='Distribución relativamente saludable ('+pct+'%). Las ballenas tienen influencia pero no dominan el mercado de forma absoluta. Monitorear si sube hacia el 60%.';
+    document.getElementById('whale-rule').style.borderLeftColor='var(--gold)';
+  }
+  whaleChartRef=new Chart(ctx,{type:'doughnut',data:{
+    labels:['Ballenas Top 10','Retail y Holders Menores'],
+    datasets:[{data:[pct,100-pct],backgroundColor:['rgba(224,80,80,0.75)','rgba(80,200,120,0.65)'],borderColor:'#0D0D0D',borderWidth:2}]
+  },options:{responsive:true,plugins:{legend:{display:false}}}});
+  charts['whale-d']=whaleChartRef;
+}
+function switchWhale(pct,btn){
+  document.querySelectorAll('#scr-content .cbox .tab-row .tbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  destroyC('whale-d');
+  buildWhale(pct);
+}
+
+const divScenarios={
+  organic:{price:[100,103,107,112,118,124],addrs:[100,107,115,122,130,138],msg:'<strong style="color:var(--green)">Escenario A: Crecimiento Orgánico</strong> — Precio y Direcciones Activas suben en sincronía. La adopción real sustenta el incremento del precio. Subida sostenible con fundamentos sólidos.'},
+  bubble:{price:[100,116,138,165,198,215],addrs:[100,92,80,65,48,38],msg:'<strong style="color:var(--red)">Escenario B: DIVERGENCIA BAJISTA DETECTADA</strong> — Precio sube +115% mientras las Direcciones Activas caen -62%. Sin usuarios reales sustentando la red, la corrección estructural es inminente. Señal de venta para el analista profesional.'},
+};
+function buildDivergence(scenario){
+  destroyC('div-d');
+  const ctx=document.getElementById('chart-onchain');if(!ctx)return;
+  const d=divScenarios[scenario];
+  document.getElementById('divergence-msg').innerHTML=d.msg;
+  divChartRef=new Chart(ctx,{type:'line',data:{
+    labels:['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6'],
+    datasets:[
+      {label:'Precio (índice base 100)',data:d.price,borderColor:GOLDB,backgroundColor:'rgba(240,192,64,0.05)',borderWidth:2.5,fill:false,tension:0.3,pointBackgroundColor:GOLDB,pointRadius:4,yAxisID:'y'},
+      {label:'Direcciones Activas Diarias',data:d.addrs,borderColor:G,backgroundColor:'rgba(80,200,120,0.05)',borderWidth:2.5,fill:false,tension:0.3,pointBackgroundColor:G,pointRadius:4,yAxisID:'y1'},
+    ]
+  },options:{responsive:true,interaction:{mode:'index',intersect:false},
+    plugins:{...CHART_DEFAULTS.plugins,legend:{labels:{color:DIM,font:{family:'Rajdhani',size:11},boxWidth:10}}},
+    scales:{
+      y:{type:'linear',position:'left',ticks:{color:DIM,font:{family:'Rajdhani',size:11},callback:v=>v},grid:{color:'rgba(201,168,76,0.07)'}},
+      y1:{type:'linear',position:'right',ticks:{color:DIM,font:{family:'Rajdhani',size:11}},grid:{drawOnChartArea:false}},
+      x:{ticks:{color:DIM,font:{family:'Rajdhani',size:11}},grid:{color:'rgba(201,168,76,0.07)'}}
+    }}});
+  charts['div-d']=divChartRef;
+}
+function switchDivergence(s,btn){
+  document.querySelectorAll('#scr-content .cbox .tab-row .tbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  buildDivergence(s);
+}
+
+/* ══ UTILS / NAV ══ */
+function openMatriz(){goScr('matriz');setProgress(Math.round((done.size/MODULOS.length)*100),'Matriz de Criterios');}
+function openEval(){buildQuiz();goScr('eval');setProgress(Math.round((done.size/MODULOS.length)*100),'Evaluación Final');}
+
+/* ══ QUIZ ══ */
+function buildQuiz(){
+  const c=document.getElementById('quiz-container');
+  c.innerHTML=QUIZ.map((q,i)=>`
+    <div class="q-wrap" id="qw${i}">
+      <div class="q-num">Pregunta ${i+1} / ${QUIZ.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-opts">
+        ${q.opts.map((o,j)=>`
+          <label class="q-opt" id="qo${i}_${j}">
+            <input type="radio" name="q${i}" value="${j}">
+            <span>${o}</span>
+          </label>`).join('')}
+      </div>
+      <div class="q-feedback" id="qf${i}"></div>
+    </div>`).join('');
+  document.getElementById('quiz-footer').style.display='block';
+  document.getElementById('quiz-result').style.display='none';
+}
+function submitQuiz(){
+  let score=0;
+  const results=QUIZ.map((q,i)=>{
+    const sel=document.querySelector(`input[name="q${i}"]:checked`);
+    if(!sel) return null;
+    const ans=parseInt(sel.value);
+    return{i,ans,ok:ans===q.ok};
+  });
+  if(results.some(r=>r===null)){
+    alert('Por favor responde todas las preguntas antes de enviar.');return;
+  }
+  results.forEach(r=>{
+    const q=QUIZ[r.i];
+    q.opts.forEach((_,j)=>{
+      const el=document.getElementById('qo'+r.i+'_'+j);
+      el.style.pointerEvents='none';
+      if(j===q.ok) el.classList.add('correct');
+      else if(j===r.ans&&!r.ok) el.classList.add('wrong');
+    });
+    const fb=document.getElementById('qf'+r.i);
+    fb.innerHTML=(r.ok?'✓ Correcto. ':'✗ Incorrecto. ')+q.exp;
+    fb.classList.add('show');
+    if(r.ok) score++;
+  });
+  const pct=Math.round(score/QUIZ.length*100);
+  const label=pct>=80?'Aprobado con distinción ✓':pct>=60?'Aprobado ✓':'Requiere repaso ✗';
+  const col=pct>=80?G:pct>=60?GOLDB:R;
+  document.getElementById('quiz-footer').style.display='none';
+  const resEl=document.getElementById('quiz-result');
+  resEl.style.display='block';
+  resEl.innerHTML=`
+    <div class="cbox" style="text-align:center;padding:2rem">
+      <div style="font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:.18em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.6rem">Puntaje Final</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:3.5rem;font-weight:700;color:${col};line-height:1;margin-bottom:.4rem">${pct}</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:.75rem;letter-spacing:.12em;color:${col};text-transform:uppercase;margin-bottom:1.5rem">${label} — ${score} de ${QUIZ.length} correctas</div>
+      <div style="width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.5rem"></div>
+      <p style="font-size:.9rem;color:var(--tdim);max-width:500px;margin:0 auto">Revisa la retroalimentación técnica de cada pregunta arriba. Las explicaciones están basadas en el Manual Maestro del Taller.</p>
+    </div>`;
+  done.add('eval');
+  if(done.size>=MODULOS.length) setTimeout(()=>{ goScr('cert');setProgress(100,'¡Completado!'); },1800);
+  else setProgress(Math.round((done.size/MODULOS.length)*100),'Evaluación Completada');
+}
+
+function restartApp(){
+  done.clear();
+  Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
+  pTxns=[];
+  goScr('hero');setProgress(0,'Bienvenido');
+}
+
+/* ══ MATRIZ DE CRITERIOS — JS ══ */
+let mzOpen=[-1];  // índice del criterio abierto
+let mzVerdicts={0:null,1:null,2:null,3:null};
+
+function openMatriz(){
+  goScr('matriz');
+  setProgress(Math.round((done.size/MODULOS.length)*100),'Matriz de Criterios');
+  setTimeout(()=>{
+    renderWhaleBars();
+    calcDilucion();
+    calcWash();
+    calcWhaleRisk(35);
+    calcDivergencia();
+    renderMzProgress();
+  },80);
+}
+
+function toggleMz(idx){
+  const body=document.getElementById('mzcb'+idx);
+  const card=document.getElementById('mzc'+idx);
+  const arr=document.getElementById('mzarr'+idx);
+  const isOpen=body.classList.contains('open');
+  // Cerrar todos
+  [0,1,2,3].forEach(i=>{
+    document.getElementById('mzcb'+i).classList.remove('open');
+    document.getElementById('mzc'+i).classList.remove('open');
+  });
+  if(!isOpen){
+    body.classList.add('open');
+    card.classList.add('open');
+  }
+}
+
+function setMzVerdict(idx,verdict){
+  mzVerdicts[idx]=verdict;
+  const card=document.getElementById('mzc'+idx);
+  const status=document.getElementById('mzst'+idx);
+  card.classList.remove('verdict-ok','verdict-fail');
+  card.classList.add(verdict==='ok'?'verdict-ok':'verdict-fail');
+  status.textContent=verdict==='ok'?'APROBADO':'RECHAZADO';
+  renderMzProgress();
+  checkMzComplete();
+}
+
+function renderMzProgress(){
+  const labels=['Dilución','Liquidez','Ballenas','Tracción','Veredicto'];
+  [0,1,2,3].forEach(i=>{
+    const step=document.getElementById('mzs'+i);
+    if(!step) return;
+    step.classList.remove('ok','fail','active');
+    if(mzVerdicts[i]==='ok') step.classList.add('ok');
+    else if(mzVerdicts[i]==='fail') step.classList.add('fail');
+    else step.classList.add('active');
+  });
+  const allDone=Object.values(mzVerdicts).every(v=>v!==null);
+  const step4=document.getElementById('mzs4');
+  if(step4) step4.classList.toggle('active',allDone);
+  const msg=document.getElementById('mz-audit-msg');
+  const filled=Object.values(mzVerdicts).filter(v=>v!==null).length;
+  const fails=Object.values(mzVerdicts).filter(v=>v==='fail').length;
+  if(filled===0) msg.textContent='Completa los 4 criterios para generar el veredicto de auditoría.';
+  else if(filled<4) msg.textContent=`${filled} de 4 criterios evaluados. ${fails>0?fails+' fallo(s) detectado(s) hasta ahora.':'Sin alertas hasta ahora.'}`;
+  else msg.textContent=fails===0?'✓ Los 4 criterios aprobados. Activo apto para análisis profundo.':
+    `✗ ${fails} criterio(s) fallido(s). El activo no supera el filtro de calidad mínimo.`;
+}
+
+function checkMzComplete(){
+  const allDone=Object.values(mzVerdicts).every(v=>v!==null);
+  const blk=document.getElementById('mz-veredicto-blk');
+  if(!allDone){blk.style.display='none';return;}
+  blk.style.display='block';
+  const fails=Object.values(mzVerdicts).filter(v=>v==='fail').length;
+  const score=Math.round(((4-fails)/4)*100);
+  const labels={0:'Dilución FDV',1:'Liquidez Real',2:'Concentración',3:'Tracción Orgánica'};
+  let color,verdict,detail;
+  if(fails===0){color=G;verdict='ACTIVO APTO — ANÁLISIS AVANZADO RECOMENDADO';detail='Los 4 filtros de calidad mínima están aprobados. Procede al análisis técnico y fundamental profundo antes de cualquier decisión de posición.';}
+  else if(fails===1){color='#F0A050';verdict='APROBADO PARCIAL — RIESGO MODERADO';detail='Un criterio fallido es una señal de advertencia. Evalúa si el fallo es estructural (tokenomics, ballenas) o coyuntural (liquidez temporal). Procede con gestión de riesgo reducida.';}
+  else if(fails===2){color=R;verdict='RECHAZADO — RIESGO ALTO';detail='Dos o más criterios fallidos indican fragilidad estructural del activo. La probabilidad de pérdida severa es alta. La decisión profesional es no tomar posición.';}
+  else{color=R;verdict='RECHAZADO — TRAMPA PARA RETAIL DETECTADA';detail='Tres o más criterios fallidos es la firma de un proyecto diseñado para extraer capital del retail. No continúes el análisis. Descarta el activo completamente.';}
+  const card=document.getElementById('mz-veredicto-card');
+  card.innerHTML=`
+    <div class="mz-veredicto" style="border-color:${color};background:${color}14">
+      <div class="mz-veredicto-score" style="color:${color}">${score}</div>
+      <div class="mz-veredicto-label" style="color:${color}">${verdict}</div>
+      <p style="font-size:.9rem;color:var(--tdim);max-width:580px;margin:0 auto;line-height:1.7">${detail}</p>
+      <div class="mz-veredicto-breakdown">
+        ${[0,1,2,3].map(i=>`
+          <div class="mz-vb-item" style="border-color:${mzVerdicts[i]==='ok'?'rgba(80,200,120,.3)':'rgba(224,80,80,.3)'};color:${mzVerdicts[i]==='ok'?G:R}">
+            ${labels[i]}<br><span style="font-size:.65rem">${mzVerdicts[i]==='ok'?'✓ APROBADO':'✗ FALLIDO'}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+/* ─ SIMULADOR 1: DILUCIÓN ─ */
+function calcDilucion(){
+  const mkt=parseFloat(document.getElementById('mz-mktcap')?.value)||100000000;
+  const fdv=parseFloat(document.getElementById('mz-fdv')?.value)||800000000;
+  const pct=parseFloat(document.getElementById('mz-pctcirc')?.value)||12.5;
+  if(!document.getElementById('mz-factor')) return;
+  const factor=fdv>0?fdv/mkt:1;
+  const locked=Math.max(0,100-pct).toFixed(1);
+  const fEl=document.getElementById('mz-factor');
+  const lEl=document.getElementById('mz-locked');
+  const dEl=document.getElementById('mz-dil-diag');
+  const aEl=document.getElementById('mz-dil-alert');
+  const aTxt=document.getElementById('mz-dil-alert-txt');
+  fEl.textContent=factor.toFixed(1)+'x';
+  lEl.textContent=locked+'%';
+  let risk,cls;
+  if(factor<=1.3){risk='BAJO — SALUDABLE';cls='g';aEl.style.display='none';}
+  else if(factor<=3){risk='MODERADO';cls='y';aEl.style.display='none';}
+  else if(factor<=10){risk='ALTO';cls='r';aEl.style.display='block';aTxt.textContent=`Factor ${factor.toFixed(1)}x: el ${locked}% del suministro máximo aún no existe en el mercado. Presión de venta programada severa cuando se libere.`;}
+  else{risk='CRÍTICO — TRAMPA';cls='r';aEl.style.display='block';aTxt.textContent=`Factor ${factor.toFixed(1)}x: TRAMPA DE RETAIL. Prácticamente nada del suministro real existe hoy. Los fundadores pueden vender ${factor.toFixed(0)}x más tokens que los que circulan.`;}
+  fEl.className='mz-sim-kpi-v '+cls;
+  lEl.className='mz-sim-kpi-v '+cls;
+  dEl.textContent=risk;
+  dEl.className='mz-sim-kpi-v '+cls;
+}
+
+/* ─ SIMULADOR 2: WASH TRADING ─ */
+function calcWash(){
+  const vol=parseFloat(document.getElementById('mz-vol')?.value)||50000000;
+  const depth=parseFloat(document.getElementById('mz-depth')?.value)||30000;
+  if(!document.getElementById('mz-wash-ratio')) return;
+  const ratio=vol>0?(depth/vol*100):0;
+  const fake=Math.max(0,100-ratio);
+  const rEl=document.getElementById('mz-wash-ratio');
+  const fEl=document.getElementById('mz-wash-fake');
+  const dEl=document.getElementById('mz-wash-diag');
+  const aEl=document.getElementById('mz-wash-alert');
+  const aTxt=document.getElementById('mz-wash-txt');
+  rEl.textContent=ratio.toFixed(4)+'%';
+  fEl.textContent=fake.toFixed(2)+'%';
+  let risk,cls;
+  if(ratio>=5){risk='LIQUIDEZ REAL';cls='g';aEl.style.display='none';}
+  else if(ratio>=1){risk='LIQUIDEZ BAJA';cls='y';aEl.style.display='none';}
+  else{risk='WASH TRADING';cls='r';aEl.style.display='block';
+    const mult=vol>0?Math.round(vol/depth):0;
+    aTxt.textContent=`Ratio de ${ratio.toFixed(4)}%: por cada $1 de liquidez real hay $${mult.toLocaleString()} de volumen reportado. El volumen es artificial. Salida sin colapso de precio: imposible.`;}
+  rEl.className='mz-sim-kpi-v '+cls;
+  fEl.className='mz-sim-kpi-v '+cls;
+  dEl.textContent=risk;dEl.className='mz-sim-kpi-v '+cls;
+}
+
+/* ─ SIMULADOR 3: BALLENAS ─ */
+function renderWhaleBars(){
+  const el=document.getElementById('mz-whale-bars');if(!el)return;
+  const items=[
+    {lbl:'Bitcoin (BTC)',pct:8,col:G},
+    {lbl:'Ethereum (ETH)',pct:22,col:G},
+    {lbl:'XRP (Ripple)',pct:48,col:'#F0A050'},
+    {lbl:'Token Típico DeFi',pct:67,col:R},
+    {lbl:'Meme Coin Nueva',pct:88,col:R},
+  ];
+  el.innerHTML=items.map(item=>`
+    <div class="mz-whale-bar-row">
+      <div class="mz-whale-bar-lbl">${item.lbl}</div>
+      <div class="mz-whale-bar-track">
+        <div class="mz-whale-bar-fill" style="width:0%;background:${item.col}" data-w="${item.pct}">
+          ${item.pct>25?'Top 10 Wallets':''}
+        </div>
+      </div>
+      <div class="mz-whale-bar-pct" style="color:${item.col}">${item.pct}%</div>
+    </div>`).join('');
+  setTimeout(()=>{
+    el.querySelectorAll('.mz-whale-bar-fill').forEach(b=>{b.style.width=b.getAttribute('data-w')+'%';});
+  },200);
+}
+function calcWhaleRisk(v){
+  if(!document.getElementById('mz-whale-val')) return;
+  document.getElementById('mz-whale-val').textContent=v+'%';
+  document.getElementById('mz-whale-conc').textContent=v+'%';
+  document.getElementById('mz-whale-retail').textContent=(100-v)+'%';
+  const rEl=document.getElementById('mz-whale-risk');
+  const mEl=document.getElementById('mz-whale-msg');
+  let risk,cls,msg;
+  if(v<=40){risk='BAJO';cls='g';msg='Distribución saludable. Las ballenas tienen influencia pero el retail domina el mercado. Riesgo de manipulación controlado.';}
+  else if(v<=60){risk='MEDIO';cls='y';msg='Zona de vigilancia. La concentración comienza a ser preocupante. Un movimiento coordinado de las ballenas podría generar alta volatilidad.';}
+  else if(v<=75){risk='ALTO';cls='r';msg='⚠ Riesgo de liquidación exógena alto. Las 10 principales wallets dominan más del 60%. Una sola orden de venta masiva puede colapsar el precio.';}
+  else{risk='CRÍTICO';cls='r';msg='🚨 Concentración extrema. El activo está bajo control casi total de unos pocos actores. El mercado retail no tiene influencia real sobre el precio. DESCARTA EL ACTIVO.';}
+  rEl.textContent=risk;rEl.className='mz-sim-kpi-v '+cls;
+  mEl.innerHTML=msg;
+  mEl.style.borderLeftColor=cls==='g'?G:cls==='y'?'#F0A050':R;
+}
+
+/* ─ SIMULADOR 4: DIVERGENCIA ─ */
+function calcDivergencia(){
+  const pr=document.getElementById('mz-price-trend')?.value||'up';
+  const ar=document.getElementById('mz-addr-trend')?.value||'down';
+  const el=document.getElementById('mz-div-result');if(!el)return;
+  const combos={
+    'up-up':{cls:'ok',icon:'✓',title:'CONVERGENCIA ALCISTA — CRECIMIENTO ORGÁNICO',txt:'Precio y Direcciones Activas suben en sincronía. La adopción real de la red sustenta el incremento del precio. Tesis de inversión válida con fundamentos on-chain sólidos. Procede al análisis de tokenomics.'},
+    'up-flat':{cls:'warn',icon:'⚠',title:'SEÑAL AMBIGUA — ESPECULACIÓN MODERADA',txt:'El precio sube pero la actividad de usuarios no acompaña. Puede ser especulación anticipatoria antes de un catalizador real. Monitorea las próximas 2–4 semanas para confirmar si la actividad sube.'},
+    'up-down':{cls:'fail',icon:'✗',title:'DIVERGENCIA BAJISTA CRÍTICA — BURBUJA ESPECULATIVA',txt:'Precio +40% con Direcciones Activas -40%. Esta es la señal más peligrosa del análisis on-chain. Sin usuarios reales, la corrección puede superar el 70%. El analista NO toma posición en esta configuración.'},
+    'flat-up':{cls:'ok',icon:'↑',title:'ACUMULACIÓN SILENCIOSA — OPORTUNIDAD DE LARGO PLAZO',txt:'El precio está lateral o bajando pero la actividad de usuarios crece. Los grandes actores acumulan mientras el retail no presta atención. Configuración de alto valor para posiciones a largo plazo.'},
+    'flat-flat':{cls:'warn',icon:'→',title:'MERCADO EN PAUSA — INDECISIÓN ESTRUCTURAL',txt:'Ni el precio ni los usuarios muestran tendencia clara. El mercado está en equilibrio. No hay señal clara de entrada ni de salida. Espera un catalizador antes de tomar posición.'},
+    'flat-down':{cls:'fail',icon:'↓',title:'SEÑAL DE ABANDONO — PÉRDIDA DE TRACCIÓN',txt:'Los usuarios están dejando la red aunque el precio no haya caído aún. Esto precede caídas de precio. Los fundamentos se están deteriorando antes de que el mercado lo refleje.'},
+    'down-up':{cls:'ok',icon:'◈',title:'DIVERGENCIA ALCISTA — ACUMULACIÓN EN CICLO BAJO',txt:'El precio baja pero los usuarios aumentan. Los inversores inteligentes acumulan mientras el mercado está asustado. Patrón histórico de oportunidad de acumulación antes de un ciclo alcista.'},
+    'down-flat':{cls:'warn',icon:'⚡',title:'CORRECCIÓN NORMAL — EVALUAR PROFUNDIDAD',txt:'El precio corrige pero la actividad se mantiene. Si la corrección viene después de un ciclo alcista, puede ser una toma de ganancias saludable. Evalúa si el precio retorna a soportes clave.'},
+    'down-down':{cls:'fail',icon:'✗',title:'CAPITULACIÓN ESTRUCTURAL — ABANDONO TOTAL',txt:'Precio y Direcciones caen juntos. El mercado y los usuarios están abandonando el activo simultáneamente. Sin catalizador externo, esta tendencia continúa. No tomar posición.'},
+  };
+  const key=pr+'-'+ar;
+  const r=combos[key]||combos['flat-flat'];
+  el.className='mz-div-result '+r.cls;
+  el.innerHTML=`<strong>${r.icon} ${r.title}</strong><br><span style="font-size:.88rem">${r.txt}</span>`;
+}
+
+/* ══ PARTICLES ══ */
+(function(){
+  const c=document.getElementById('cvs'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();addEventListener('resize',resize);
+  class P{constructor(){this.reset(true);}
+    reset(r){this.x=Math.random()*W;this.y=r?Math.random()*H:H+5;
+      this.vx=(Math.random()-.5)*.22;this.vy=-(Math.random()*.35+.08);
+      this.r=Math.random()*1.3+.3;this.a=Math.random()*.45+.1;this.da=(Math.random()-.5)*.0038;}
+    update(){this.x+=this.vx;this.y+=this.vy;this.a+=this.da;
+      if(this.a<.05)this.da=Math.abs(this.da);if(this.a>.7)this.da=-Math.abs(this.da);
+      if(this.y<-5||this.x<-10||this.x>W+10)this.reset(false);}
+    draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,168,76,${this.a})`;ctx.fill();}}
+  for(let i=0;i<90;i++)pts.push(new P());
+  function lines(){
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<105){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(201,168,76,${.1*(1-d/105)})`;ctx.lineWidth=.35;ctx.stroke();}}}
+  function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw();});lines();requestAnimationFrame(loop);}
+  loop();
+})();
+</script>
+</body>
+</html>

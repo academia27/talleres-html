@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Taller · Diagnóstico y Arquitectura de Portafolios Cripto</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0A0C10;--surface:#12151C;--surface2:#1A1E28;--surface3:#222838;
+  --border:#2A2F3E;--border2:#353C50;
+  --gold:#C9A227;--gold2:#E8BC3A;--gold-dim:rgba(201,162,39,0.15);--gold-glow:rgba(201,162,39,0.25);
+  --blue:#3B7AF5;--green:#10B981;--red:#EF4444;--purple:#8B5CF6;--pink:#EC4899;--amber:#F59E0B;
+  --txt:#E8EAF0;--txt2:#8B90A0;--txt3:#555E75;
+  --r8:8px;--r12:12px;--r16:16px;
+  --font-head:'DM Serif Display',Georgia,serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.6;overflow-x:hidden}
+
+/* ── GRID BACKGROUND ── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(201,162,39,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(201,162,39,.025) 1px,transparent 1px);
+  background-size:48px 48px}
+.app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+/* ── HEADER ── */
+.header{display:flex;align-items:center;gap:14px;padding-bottom:20px;margin-bottom:28px;border-bottom:1px solid var(--border)}
+.header-icon{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--gold);background:var(--gold-dim);flex-shrink:0;animation:iconPulse 3s ease infinite}
+@keyframes iconPulse{0%,100%{box-shadow:0 0 0 0 var(--gold-dim)}50%{box-shadow:0 0 0 8px transparent}}
+.header-title{font-size:17px;font-weight:600;color:var(--txt);letter-spacing:-.02em}
+.header-sub{font-size:11.5px;color:var(--txt2);margin-top:2px;letter-spacing:.03em}
+.header-badge{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--gold);border:1px solid rgba(201,162,39,.3);padding:4px 10px;border-radius:20px;white-space:nowrap}
+
+/* ── NAV TABS ── */
+.nav-tabs{display:flex;gap:6px;margin-bottom:28px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 14px;border-radius:var(--r8);font-size:12.5px;white-space:nowrap;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:var(--font-body);transition:all .2s;font-weight:400}
+.tab.active{border:1.5px solid var(--gold);background:var(--gold-dim);color:var(--gold);font-weight:500}
+.tab:hover:not(.active){border-color:var(--border2);color:var(--txt)}
+
+/* ── SECTION FADE ── */
+.section{display:none;animation:fadeIn .3s ease}.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TYPOGRAPHY ── */
+.display{font-family:var(--font-head);font-size:clamp(1.6rem,4vw,2.1rem);color:var(--txt);line-height:1.15;margin-bottom:.5rem}
+.display em{font-style:italic;color:var(--gold)}
+.section-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:.6rem;display:flex;align-items:center;gap:6px}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,162,39,.3),transparent)}
+.lead{font-size:15px;color:var(--txt2);line-height:1.7;margin-bottom:1.4rem}
+.lead strong{color:var(--txt);font-weight:500}
+h3{font-size:14px;font-weight:600;color:var(--txt);margin-bottom:.4rem}
+h4{font-size:13px;font-weight:500;color:var(--txt2);margin-bottom:.35rem}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r12);padding:1.2rem;margin-bottom:1rem}
+.card-accent{border-left:3px solid var(--gold)}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+@media(max-width:540px){.card-grid{grid-template-columns:1fr}}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-family:var(--font-mono);padding:3px 9px;border-radius:20px;font-weight:500}
+.badge-blue{background:rgba(59,122,245,.15);color:var(--blue);border:1px solid rgba(59,122,245,.25)}
+.badge-green{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.22)}
+.badge-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.22)}
+.badge-amber{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.22)}
+.badge-purple{background:rgba(139,92,246,.12);color:var(--purple);border:1px solid rgba(139,92,246,.22)}
+
+/* ── STAT ROW ── */
+.stat-row{display:flex;gap:.65rem;margin-bottom:1rem;flex-wrap:wrap}
+.stat{flex:1;min-width:90px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:.75rem;text-align:center}
+.stat-val{font-family:var(--font-mono);font-size:1.25rem;font-weight:500;color:var(--gold);line-height:1}
+.stat-lbl{font-size:10.5px;color:var(--txt3);margin-top:4px;letter-spacing:.04em}
+
+/* ── CTA BUTTON ── */
+.cta{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--gold);color:#000;border:none;border-radius:var(--r8);font-family:var(--font-body);font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s}
+.cta:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 6px 20px var(--gold-glow)}
+.cta-outline{background:transparent;border:1.5px solid var(--gold);color:var(--gold)}
+.cta-outline:hover{background:var(--gold-dim)}
+
+/* ── HELP TOOLTIP (?) ── */
+.help-wrap{position:relative;display:inline-block}
+.help-btn{width:20px;height:20px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);color:var(--txt2);font-size:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:700;transition:all .18s;vertical-align:middle;margin-left:6px;flex-shrink:0}
+.help-btn:hover,.help-btn.open{background:var(--gold-dim);border-color:rgba(201,162,39,.5);color:var(--gold)}
+.tooltip-panel{display:none;position:absolute;top:calc(100% + 8px);left:0;width:280px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r12);padding:14px;z-index:100;box-shadow:0 12px 36px rgba(0,0,0,.55);animation:fadeIn .2s ease}
+.tooltip-panel.open{display:block}
+@media(max-width:400px){.tooltip-panel{width:220px}}
+.tooltip-section{margin-bottom:10px}
+.tooltip-section:last-child{margin-bottom:0}
+.tooltip-label{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.tooltip-text{font-size:12.5px;color:var(--txt2);line-height:1.55}
+.tooltip-close{float:right;background:none;border:none;color:var(--txt3);cursor:pointer;font-size:14px;line-height:1;margin-top:-2px}
+
+/* ── CHART CONTAINER ── */
+.chart-wrap{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r12);padding:1.1rem;margin-bottom:1rem}
+.chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;flex-wrap:wrap;gap:.5rem}
+.chart-title{font-size:13px;font-weight:500;color:var(--txt);display:flex;align-items:center;gap:4px}
+.chart-canvas-wrap{height:200px;position:relative}
+
+/* ── PIE / DONUT LEGEND ── */
+.pie-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:center}
+@media(max-width:480px){.pie-row{grid-template-columns:1fr}}
+.pie-canvas-wrap{height:190px;position:relative}
+.pie-legend{display:flex;flex-direction:column;gap:7px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--txt2)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-pct{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--txt);font-weight:500}
+
+/* ── PROFILE CARDS ── */
+.profile-tabs{display:flex;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap}
+.p-tab{flex:1;min-width:80px;padding:8px 10px;border-radius:var(--r8);border:1.5px solid var(--border);background:transparent;color:var(--txt2);cursor:pointer;font-size:12px;font-family:var(--font-body);font-weight:500;text-align:center;transition:all .2s}
+.p-tab.act-blue{border-color:var(--blue);color:var(--blue);background:rgba(59,122,245,.1)}
+.p-tab.act-green{border-color:var(--green);color:var(--green);background:rgba(16,185,129,.1)}
+.p-tab.act-red{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.1)}
+.profile-panel{display:none}.profile-panel.active{display:block;animation:fadeIn .25s ease}
+
+/* ── STEPS ── */
+.steps-list{list-style:none;display:flex;flex-direction:column;gap:0}
+.step-item{display:flex;gap:10px;position:relative;padding-bottom:18px}
+.step-item:last-child{padding-bottom:0}
+.step-item:not(:last-child)::before{content:'';position:absolute;left:13px;top:28px;width:1px;height:calc(100% - 10px);background:linear-gradient(to bottom,var(--border2),transparent)}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--surface3);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:500;color:var(--txt2);flex-shrink:0;margin-top:3px}
+.step-body{flex:1}
+.step-text{font-size:13.5px;color:var(--txt2);line-height:1.6}
+.step-text strong{color:var(--txt);font-weight:500}
+
+/* ── MIGRATION PATH ── */
+.migration-path{display:flex;align-items:center;gap:0;margin:1.2rem 0;overflow-x:auto;padding-bottom:4px}
+.mig-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.mig-circle{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid}
+.mig-label{font-size:11px;color:var(--txt2);text-align:center;font-weight:500;max-width:70px}
+.mig-sub{font-size:9.5px;color:var(--txt3);text-align:center;font-family:var(--font-mono)}
+.mig-arrow{padding:0 6px;color:var(--txt3);font-size:14px;flex-shrink:0;align-self:center;margin-bottom:16px}
+.mig-cond{font-size:10.5px;color:var(--txt3);padding:3px 8px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);text-align:center;max-width:90px;margin-top:2px}
+
+/* ── SEMÁFORO ── */
+.semaforo-row{display:flex;gap:.7rem;margin-bottom:1rem;flex-wrap:wrap}
+.sem-card{flex:1;min-width:120px;border-radius:var(--r12);padding:14px;text-align:center;border:1.5px solid}
+.sem-dot{width:20px;height:20px;border-radius:50%;margin:0 auto 8px;box-shadow:0 0 12px currentColor}
+.sem-name{font-weight:600;font-size:13px;margin-bottom:4px}
+.sem-desc{font-size:11.5px;color:var(--txt2);line-height:1.5}
+
+/* ── CALENDAR ── */
+.cal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-bottom:1rem}
+@media(max-width:500px){.cal-grid{grid-template-columns:1fr}}
+.cal-phase{border-radius:var(--r12);padding:14px;border:1px solid var(--border)}
+.cal-phase-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.cal-phase-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-family:var(--font-mono)}
+.cal-months{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.cal-month{font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--txt2);font-family:var(--font-mono)}
+.cal-objective{font-size:12px;color:var(--txt2);line-height:1.5;margin-bottom:6px}
+.cal-quote{font-size:11px;color:var(--txt3);font-style:italic;padding-left:8px;border-left:2px solid var(--border2)}
+
+/* ── DCA TABLE ── */
+.dca-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:.9rem}
+.dca-table th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--txt2);font-size:11px;font-weight:500;letter-spacing:.04em;font-family:var(--font-mono)}
+.dca-table td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--txt2);vertical-align:top;line-height:1.45}
+.dca-table td:first-child{color:var(--txt);font-weight:500}
+.dca-table tr:hover td{background:var(--surface2)}
+
+/* ── QUIZ ── */
+.quiz-progress{height:5px;background:var(--surface3);border-radius:3px;margin-bottom:1.2rem;overflow:hidden}
+.quiz-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;transition:width .35s ease}
+.quiz-counter{font-family:var(--font-mono);font-size:11px;color:var(--txt2);text-align:right;margin-bottom:.6rem}
+.quiz-q-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r12);padding:1.1rem;margin-bottom:1rem}
+.quiz-q-text{font-size:15px;font-weight:500;color:var(--txt);line-height:1.5}
+.quiz-q-mod{font-family:var(--font-mono);font-size:10px;color:var(--txt3);margin-top:4px;letter-spacing:.05em}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:1rem}
+.quiz-opt{width:100%;text-align:left;padding:11px 14px;border-radius:var(--r8);border:1px solid var(--border);background:var(--surface);color:var(--txt2);font-family:var(--font-body);font-size:13.5px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:10px}
+.quiz-opt:hover:not(.locked){border-color:var(--border2);color:var(--txt);background:var(--surface2)}
+.quiz-opt.selected{border-color:var(--gold);background:var(--gold-dim);color:var(--gold)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(16,185,129,.1);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(239,68,68,.08);color:var(--red)}
+.quiz-opt.dimmed{opacity:.3;cursor:default}
+.quiz-opt.locked{cursor:default}
+.opt-key{width:22px;height:22px;border-radius:4px;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;flex-shrink:0;transition:inherit}
+.quiz-opt.selected .opt-key{background:var(--gold);color:#000;border-color:var(--gold)}
+.quiz-opt.correct .opt-key{background:var(--green);color:#000;border-color:var(--green)}
+.quiz-opt.wrong .opt-key{background:var(--red);color:#fff;border-color:var(--red)}
+.quiz-feedback{display:none;border-radius:var(--r8);padding:10px 13px;margin-bottom:1rem;font-size:13px;line-height:1.55;animation:fadeIn .25s ease}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.22);border-left:3px solid var(--green);color:rgba(175,235,180,.9)}
+.quiz-feedback.bad{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-left:3px solid var(--red);color:rgba(255,190,200,.85)}
+.quiz-feedback strong{display:block;margin-bottom:3px;font-size:13.5px}
+.quiz-nav{display:flex;justify-content:space-between;gap:8px}
+.quiz-btn{padding:8px 18px;border-radius:var(--r8);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.quiz-btn-prev{background:transparent;border:1px solid var(--border);color:var(--txt2)}
+.quiz-btn-prev:hover:not(:disabled){border-color:var(--border2);color:var(--txt)}
+.quiz-btn-prev:disabled{opacity:.3;cursor:default}
+.quiz-btn-next{background:var(--gold);color:#000;border:none}
+.quiz-btn-next:hover:not(:disabled){background:var(--gold2);box-shadow:0 4px 14px var(--gold-glow)}
+.quiz-btn-next:disabled{background:var(--surface3);color:var(--txt3);cursor:default}
+
+/* ── RESULT ── */
+.result-score{text-align:center;padding:1.5rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r16);margin-bottom:1.2rem}
+.score-num{font-family:var(--font-mono);font-size:3.5rem;font-weight:500;line-height:1;margin-bottom:.25rem}
+.score-label{font-size:13px;color:var(--txt2);margin-bottom:.9rem}
+.score-stars{font-size:1.6rem;letter-spacing:.25rem;margin-bottom:.6rem}
+.score-msg{font-size:14px;color:var(--txt2);line-height:1.65;max-width:380px;margin:0 auto 1rem;padding:10px 14px;background:var(--surface2);border-radius:var(--r8);border:1px solid var(--border)}
+.result-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--r12);padding:1rem;margin-bottom:1rem;max-height:360px;overflow-y:auto}
+.result-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.45}
+.result-item:last-child{border-bottom:none}
+.result-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.result-q{color:var(--txt2);flex:1}
+.result-status{font-size:11.5px;font-family:var(--font-mono);margin-left:auto;flex-shrink:0}
+
+/* ── MODULE FOOTER NAV ── */
+.mod-footer{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1.2rem;border-top:1px solid var(--border)}
+.btn-prev{padding:8px 16px;background:transparent;border:1px solid var(--border);border-radius:var(--r8);color:var(--txt2);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .2s}
+.btn-prev:hover:not(:disabled){border-color:var(--border2);color:var(--txt)}
+.btn-prev:disabled{opacity:.3;cursor:default}
+.btn-fwd{padding:8px 20px;background:var(--gold);color:#000;border:none;border-radius:var(--r8);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-fwd:hover:not(:disabled){background:var(--gold2);box-shadow:0 4px 14px var(--gold-glow)}
+.btn-fwd:disabled{background:var(--surface3);color:var(--txt3);cursor:default}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:1.4rem 0}
+
+/* ── INLINE ICON ── */
+.icobox{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:var(--r8);font-size:14px;flex-shrink:0}
+
+/* ── INFO GRID ── */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-bottom:1rem}
+@media(max-width:480px){.info-grid{grid-template-columns:1fr 1fr}}
+.info-cell{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r8);padding:.7rem;text-align:center}
+.info-cell-val{font-family:var(--font-mono);font-size:.95rem;font-weight:500;margin-bottom:2px}
+.info-cell-lbl{font-size:10.5px;color:var(--txt3);letter-spacing:.03em}
+
+/* ── SCROLL ── */
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ── PARTICLES CANVAS ── */
+#cvs{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.32}
+
+/* ── STICKY NAV ── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.8rem;
+  border-bottom:1px solid rgba(201,162,39,.22);background:rgba(10,12,16,.88);
+  backdrop-filter:blur(18px);position:sticky;top:0;z-index:200;gap:1rem;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:.75rem;cursor:pointer;flex-shrink:0}
+.logo-ring{width:38px;height:38px;border:1.5px solid var(--gold);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;animation:glow 4s ease infinite}
+@keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 14px rgba(201,162,39,.4)}}
+.logo-ring svg{width:20px;height:20px}
+.logo-txt{font-family:var(--font-mono);font-size:.6rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;line-height:1.4}
+.logo-txt b{display:block;font-size:.48rem;color:rgba(201,162,39,.5);letter-spacing:.16em;font-weight:400}
+.nav-prog{flex:1;max-width:260px}
+.plbl{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.1em;color:rgba(201,162,39,.5);text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:4px}
+.ptrack{height:2px;background:rgba(201,162,39,.1);border-radius:2px}
+.pbar{height:100%;background:linear-gradient(90deg,#8A6A20,var(--gold2));border-radius:2px;transition:width .5s ease;width:0%}
+.nbadge{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.09em;padding:.28rem .75rem;border:1px solid rgba(201,162,39,.5);color:var(--gold2);text-transform:uppercase;background:rgba(201,162,39,.06);white-space:nowrap}
+
+/* ── SCREENS ── */
+.scr{display:none;flex-direction:column;flex:1;animation:fadeIn .4s ease both}
+.scr.on{display:flex}
+
+/* ── HERO SCREEN ── */
+.hero-scr{min-height:calc(100vh - 58px);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:2.5rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+.hero-deco{position:absolute;inset:0;pointer-events:none}
+.hdline{position:absolute;top:50%;left:50%;width:650px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,162,39,.09),transparent);
+  transform:translate(-50%,-50%) rotate(var(--r));animation:lf 7s ease infinite;animation-delay:var(--d)}
+@keyframes lf{0%,100%{opacity:0}50%{opacity:1}}
+.emblem{position:relative;width:200px;height:200px;margin:0 auto 1.8rem;flex-shrink:0}
+.er{position:absolute;border-radius:50%;border:1px solid rgba(201,162,39,.16);animation:rp 4.5s ease infinite}
+.er:nth-child(1){inset:0}.er:nth-child(2){inset:-18px;animation-delay:.7s;border-color:rgba(201,162,39,.09)}.er:nth-child(3){inset:-36px;animation-delay:1.4s;border-color:rgba(201,162,39,.05)}
+@keyframes rp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.55}}
+.ecore{position:absolute;inset:12px;border-radius:50%;border:2px solid rgba(201,162,39,.5);
+  background:radial-gradient(circle at 35% 30%,rgba(201,162,39,.16),rgba(0,0,0,.9));
+  display:flex;align-items:center;justify-content:center}
+.hero-tag{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.22em;color:var(--gold);
+  border:1px solid rgba(201,162,39,.22);padding:.32rem 1rem;text-transform:uppercase;margin-bottom:1.5rem;
+  display:inline-block;animation:bp 3s ease infinite}
+@keyframes bp{0%,100%{border-color:rgba(201,162,39,.2)}50%{border-color:rgba(201,162,39,.6);box-shadow:0 0 12px rgba(201,162,39,.16)}}
+.hero-h1{font-family:'Cinzel',serif;font-size:clamp(1.9rem,4.5vw,3rem);color:#fff;line-height:1.05;font-weight:700;margin-bottom:.4rem}
+.hero-h1 span{color:var(--gold2);display:block}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.6);letter-spacing:.04em;margin-bottom:1.8rem;max-width:480px;line-height:1.7;font-weight:300}
+.hero-sub strong{color:var(--gold);font-weight:600}
+.hero-kpis{display:flex;gap:1.8rem;margin-bottom:2.2rem;flex-wrap:wrap;justify-content:center}
+.kpi-h{text-align:center}
+.kpi-n{font-family:var(--font-mono);font-size:1.7rem;font-weight:500;color:var(--gold2);line-height:1}
+.kpi-l{font-size:.62rem;letter-spacing:.11em;color:rgba(201,162,39,.5);text-transform:uppercase;margin-top:.2rem}
+.ksep{width:1px;background:rgba(201,162,39,.22);align-self:stretch}
+.btn-go-hero{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.17em;padding:.9rem 2.2rem;
+  background:linear-gradient(135deg,#8A6A20,var(--gold));color:#000;text-transform:uppercase;
+  border:none;cursor:pointer;font-weight:700;transition:all .3s;position:relative;overflow:hidden}
+.btn-go-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-120%);transition:transform .5s}
+.btn-go-hero:hover::after{transform:translateX(120%)}
+.btn-go-hero:hover{box-shadow:0 0 26px rgba(201,162,39,.4);transform:translateY(-2px)}
+
+/* ── MODULE SCREENS WRAP ── */
+.mod-scr{display:none;animation:fadeIn .3s ease}.mod-scr.active{display:block}
+
+/* ── MODULE NAV BAR (inside scr-content) ── */
+.mod-nav{display:flex;gap:6px;margin-bottom:28px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;padding-top:.2rem}
+.mod-nav::-webkit-scrollbar{display:none}
+.mod-tab{padding:7px 14px;border-radius:var(--r8);font-size:12.5px;white-space:nowrap;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--txt2);font-family:var(--font-body);transition:all .2s;font-weight:400}
+.mod-tab.active{border:1.5px solid var(--gold);background:var(--gold-dim);color:var(--gold);font-weight:500}
+.mod-tab:hover:not(.active){border-color:var(--border2);color:var(--txt)}
+
+/* ── INTRO HERO PILL ── */
+.hero-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:var(--gold-dim);border:1px solid rgba(201,162,39,.3);font-family:var(--font-mono);font-size:10.5px;color:var(--gold);letter-spacing:.08em;margin-bottom:1rem}
+.diag-link-card{border:1.5px solid var(--gold);border-radius:var(--r12);padding:1.1rem 1.3rem;background:var(--gold-dim);display:flex;align-items:center;gap:12px;margin:1.2rem 0;text-decoration:none;transition:all .2s}
+.diag-link-card:hover{background:rgba(201,162,39,.2);box-shadow:0 6px 20px var(--gold-glow)}
+.diag-link-icon{font-size:1.5rem;flex-shrink:0}
+.diag-link-title{font-weight:600;font-size:14px;color:var(--gold)}
+.diag-link-sub{font-size:12px;color:rgba(201,162,39,.7);font-family:var(--font-mono)}
+.diag-link-arrow{margin-left:auto;color:var(--gold);font-size:16px}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="cvs"></canvas>
+<div class="app" style="max-width:100%;padding:0">
+
+<!-- ══ STICKY NAV ══ -->
+<nav class="nav">
+  <div class="logo" onclick="goHero()">
+    <div class="logo-ring">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C9A227" stroke-width="1.4"/><path d="M8 12L12 6L16 12L12 18Z" stroke="#C9A227" stroke-width="1.4" fill="rgba(201,162,39,.1)"/><path d="M10 12L12 9L14 12L12 15Z" fill="#C9A227"/></svg>
+    </div>
+    <div class="logo-txt">Arquitectura de Portafolios <b>Cripto · 2026</b></div>
+  </div>
+  <div class="nav-prog">
+    <div class="plbl"><span>Progreso</span><span id="pct">0%</span></div>
+    <div class="ptrack"><div class="pbar" id="pbar"></div></div>
+  </div>
+  <div class="nbadge" id="nbadge">Bienvenida</div>
+</nav>
+
+<!-- ══ HERO SCREEN ══ -->
+<div class="scr on" id="scr-hero">
+  <div class="hero-scr">
+    <div class="hero-deco">
+      <div class="hdline" style="--r:-22deg;--d:0s"></div>
+      <div class="hdline" style="--r:22deg;--d:2.5s"></div>
+      <div class="hdline" style="--r:0deg;--d:5s"></div>
+    </div>
+    <div class="hero-tag">Taller Práctico · Edición 2026</div>
+    <div class="emblem">
+      <div class="er"></div><div class="er"></div><div class="er"></div>
+      <div class="ecore">
+        <svg width="78" height="78" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="30" stroke="#C9A227" stroke-width="1" stroke-dasharray="5 3" opacity=".4"/>
+          <circle cx="40" cy="40" r="20" stroke="#C9A227" stroke-width="1.5" opacity=".75"/>
+          <path d="M26 40L40 20L54 40L40 60Z" stroke="#C9A227" stroke-width="1.5" fill="rgba(201,162,39,.1)"/>
+          <path d="M33 40L40 30L47 40L40 50Z" fill="#C9A227" opacity=".9"/>
+          <circle cx="40" cy="40" r="4.5" fill="#E8BC3A"/>
+          <line x1="40" y1="8" x2="40" y2="72" stroke="#C9A227" stroke-width=".5" opacity=".18"/>
+          <line x1="8" y1="40" x2="72" y2="40" stroke="#C9A227" stroke-width=".5" opacity=".18"/>
+        </svg>
+      </div>
+    </div>
+    <h1 class="hero-h1">DIAGNÓSTICO Y <span>ARQUITECTURA DE PORTAFOLIOS</span></h1>
+    <p class="hero-sub">4 módulos teórico-prácticos para construir un portafolio cripto con <strong>criterio, disciplina y estrategia</strong> — adaptado a tu perfil real de inversor.</p>
+    <div class="hero-kpis">
+      <div class="kpi-h"><div class="kpi-n" id="kn1">0</div><div class="kpi-l">Módulos</div></div>
+      <div class="ksep"></div>
+      <div class="kpi-h"><div class="kpi-n" id="kn2">0</div><div class="kpi-l">Perfiles</div></div>
+      <div class="ksep"></div>
+      <div class="kpi-h"><div class="kpi-n" id="kn3">0</div><div class="kpi-l">Preguntas</div></div>
+      <div class="ksep"></div>
+      <div class="kpi-h"><div class="kpi-n" id="kn4">0</div><div class="kpi-l">Fases DCA</div></div>
+    </div>
+    <button class="btn-go-hero" onclick="goContent()">▶ &nbsp;INICIAR TALLER</button>
+  </div>
+</div>
+
+<!-- ══ CONTENT SCREEN ══ -->
+<div class="scr" id="scr-content">
+<div style="max-width:860px;margin:0 auto;padding:1.5rem 1rem 4rem">
+
+<!-- MODULE NAV BAR -->
+<div class="mod-nav" id="modNav">
+  <button class="mod-tab active" onclick="setMod(0,this)">🏠 Diagnóstico</button>
+  <button class="mod-tab" onclick="setMod(1,this)">👤 Perfiles</button>
+  <button class="mod-tab" onclick="setMod(2,this)">🏗️ Arquitectura</button>
+  <button class="mod-tab" onclick="setMod(3,this)">📅 Calendario</button>
+  <button class="mod-tab" onclick="setMod(4,this)">🎯 Evaluación</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     MÓDULO 0 — DIAGNÓSTICO
+══════════════════════════════════════ -->
+<div class="section active" id="mod-0">
+
+  <div class="hero-pill">📋 Módulo 1 · Diagnóstico Inicial</div>
+  <div class="display">Conoce tu perfil antes de <em>invertir un solo peso</em></div>
+  <p class="lead">El error más costoso en criptomonedas no es elegir la moneda incorrecta — es elegir el portafolio incorrecto para <strong>tu tolerancia al riesgo, tu capital y tu horizonte de tiempo</strong>. Este taller comienza donde debe comenzar: contigo.</p>
+
+  <!-- DIAGNÓSTICO LINK -->
+  <a href="https://diagnosticofinanciero.lovable.app" target="_blank" class="diag-link-card">
+    <div class="diag-link-icon">🔗</div>
+    <div>
+      <div class="diag-link-title">Realizar el Diagnóstico Financiero</div>
+      <div class="diag-link-sub">diagnosticofinanciero.lovable.app</div>
+    </div>
+    <div class="diag-link-arrow">↗</div>
+  </a>
+
+  <div class="card card-accent">
+    <p style="font-size:13px;color:var(--txt2);line-height:1.65">Antes de continuar al Módulo 2, realiza el test en el enlace de arriba. Tarda menos de 5 minutos y determinará tu perfil de partida: <strong style="color:var(--txt)">Ajedrecista, Ciclista o Paracaidista</strong>. Trae tu resultado para aplicarlo directamente en los módulos siguientes.</p>
+  </div>
+
+  <div class="section-label">Por qué el diagnóstico importa</div>
+  <div class="card-grid">
+    <div class="card">
+      <div style="font-size:1.3rem;margin-bottom:.5rem">🧠</div>
+      <h3>Psicología primero</h3>
+      <p style="font-size:13px;color:var(--txt2);line-height:1.55">Un portafolio técnicamente perfecto que no puedes sostener emocionalmente te llevará a vender en el peor momento. El diagnóstico mide tu resistencia real a la volatilidad.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:1.3rem;margin-bottom:.5rem">⏳</div>
+      <h3>El tiempo es una variable</h3>
+      <p style="font-size:13px;color:var(--txt2);line-height:1.55">¿Necesitas el dinero en 6 meses o en 3 años? Esta respuesta cambia completamente qué activos puedes tener y qué niveles de pérdida temporal puedes tolerar.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:1.3rem;margin-bottom:.5rem">💰</div>
+      <h3>Capital disponible real</h3>
+      <p style="font-size:13px;color:var(--txt2);line-height:1.55">La regla de oro: solo inviertes capital que puedes perder completamente sin afectar tu calidad de vida. Esto no es pesimismo — es gestión profesional del riesgo.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:1.3rem;margin-bottom:.5rem">📊</div>
+      <h3>Experiencia real en el mercado</h3>
+      <p style="font-size:13px;color:var(--txt2);line-height:1.55">Creer que toleras el riesgo vs. haberlo vivido son cosas distintas. El diagnóstico identifica en qué nivel de experiencia real te encuentras para recomendarte el perfil adecuado.</p>
+    </div>
+  </div>
+
+  <!-- MINI TEST RÁPIDO -->
+  <div class="section-label" style="margin-top:.5rem">
+    Test exprés de 5 preguntas
+    <button class="help-btn" onclick="toggleHelp('h-diag')">?</button>
+  </div>
+  <div class="help-wrap">
+    <div class="tooltip-panel" id="h-diag">
+      <button class="tooltip-close" onclick="closeHelp('h-diag')">✕</button>
+      <div class="tooltip-section">
+        <div class="tooltip-label">Cómo interactuar</div>
+        <div class="tooltip-text">Selecciona una opción por pregunta haciendo clic. Al responder las 5, el botón "Ver mi perfil" se activará y mostrará el resultado.</div>
+      </div>
+      <div class="tooltip-section">
+        <div class="tooltip-label">Cómo interpretar</div>
+        <div class="tooltip-text">Cada opción tiene un peso: conservadora = 1 pt, moderada = 2 pts, agresiva = 3 pts. La suma total determina tu perfil orientativo: 5–8 = Ajedrecista, 9–11 = Ciclista, 12–15 = Paracaidista.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="diagTest"></div>
+  <div id="diagResult" style="display:none"></div>
+
+  <!-- PILARES DEL TALLER -->
+  <div class="divider"></div>
+  <div class="section-label">Los 4 pilares del taller</div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">Módulos</div></div>
+    <div class="stat"><div class="stat-val">3</div><div class="stat-lbl">Perfiles</div></div>
+    <div class="stat"><div class="stat-val">12</div><div class="stat-lbl">Meses · DCA</div></div>
+    <div class="stat"><div class="stat-val">15</div><div class="stat-lbl">Preguntas</div></div>
+  </div>
+
+  <div class="mod-footer">
+    <button class="btn-prev" disabled>← Anterior</button>
+    <button class="btn-fwd" onclick="setModIdx(1)">Módulo 2: Perfiles →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MÓDULO 1 — PERFILES
+══════════════════════════════════════ -->
+<div class="section" id="mod-1">
+
+  <div class="hero-pill">👤 Módulo 2 · Los 3 Perfiles de Inversor</div>
+  <div class="display">Tres mentalidades, <em>tres portafolios</em></div>
+  <p class="lead">No existe el portafolio universalmente correcto — existe el portafolio <strong>correcto para ti hoy</strong>. Cada perfil tiene una psicología, una estrategia de asignación y unas reglas operativas distintas.</p>
+
+  <!-- PROFILE SELECTOR -->
+  <div class="profile-tabs">
+    <button class="p-tab act-blue" onclick="setProfile('ajedrecista',this,'act-blue','#3B7AF5')">♟ Ajedrecista<br><span style="font-size:10px;font-weight:400;opacity:.7">Conservador</span></button>
+    <button class="p-tab" onclick="setProfile('ciclista',this,'act-green','#10B981')">🚴 Ciclista<br><span style="font-size:10px;font-weight:400;opacity:.7">Moderado</span></button>
+    <button class="p-tab" onclick="setProfile('paracaidista',this,'act-red','#EF4444')">🪂 Paracaidista<br><span style="font-size:10px;font-weight:400;opacity:.7">Agresivo</span></button>
+  </div>
+
+  <!-- AJEDRECISTA -->
+  <div class="profile-panel active" id="prof-ajedrecista">
+    <div class="card" style="border-color:rgba(59,122,245,.35)">
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:1.5rem">♟</span>
+            <div>
+              <div style="font-size:17px;font-weight:600;color:var(--txt)">El Ajedrecista</div>
+              <div style="font-size:12px;color:var(--txt2)">Conservador · Paciente · Estratégico</div>
+            </div>
+          </div>
+          <p style="font-size:13.5px;color:var(--txt2);line-height:1.65;margin-bottom:.9rem">Estratégico, paciente y metódico. <strong style="color:var(--txt)">Prioriza preservar el capital</strong> y construir posición en activos sólidos antes que buscar rendimientos agresivos. No le importa no ser el más rápido — le importa seguir en el tablero.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge badge-blue">Riesgo Bajo</span>
+            <span class="badge badge-blue">12–24 meses</span>
+            <span class="badge" style="background:rgba(201,162,39,.12);color:var(--gold);border-color:rgba(201,162,39,.25)">★ Perfil Recomendado para iniciar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--blue)">50%</div><div class="info-cell-lbl">BTC</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--purple)">25%</div><div class="info-cell-lbl">ETH</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--green)">15%</div><div class="info-cell-lbl">Altcoins fuertes</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--txt2)">10%</div><div class="info-cell-lbl">Liquidez</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--txt2)">0%</div><div class="info-cell-lbl">Narrativas</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--green)">~</div><div class="info-cell-lbl">Horizonte</div></div>
+    </div>
+
+    <!-- PIE CHART AJEDRECISTA -->
+    <div class="chart-wrap">
+      <div class="chart-head">
+        <span class="chart-title">📊 Distribución del portafolio
+          <button class="help-btn" onclick="toggleHelp('h-pie-a')">?</button>
+        </span>
+      </div>
+      <div class="help-wrap"><div class="tooltip-panel" id="h-pie-a">
+        <button class="tooltip-close" onclick="closeHelp('h-pie-a')">✕</button>
+        <div class="tooltip-section"><div class="tooltip-label">Cómo interactuar</div><div class="tooltip-text">Pasa el cursor sobre cada segmento del gráfico para ver el nombre del activo y su porcentaje exacto. Haz clic en los elementos de la leyenda para mostrar u ocultar activos.</div></div>
+        <div class="tooltip-section"><div class="tooltip-label">Cómo interpretar</div><div class="tooltip-text">Los segmentos más grandes representan mayor asignación. El dominio de BTC (50%) refleja un enfoque conservador: prioriza el activo con mayor liquidez y menor riesgo relativo. La liquidez (10%) actúa como buffer para oportunidades.</div></div>
+      </div></div>
+      <div class="pie-row">
+        <div class="pie-canvas-wrap"><canvas id="pie-ajedrecista"></canvas></div>
+        <div class="pie-legend" id="legend-ajedrecista"></div>
+      </div>
+    </div>
+
+    <!-- PSICOLOGÍA -->
+    <div class="section-label">Psicología del perfil</div>
+    <div class="card-grid">
+      <div class="card"><h4>💪 Fortaleza clave</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">No reacciona ante caídas del −30%. Entiende que la volatilidad es el precio de la oportunidad, no una señal de peligro definitivo.</p></div>
+      <div class="card"><h4>⚠️ Trampa más frecuente</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Ver que una altcoin pequeña sube 400% y querer romper el plan. La disciplina es el activo más valioso del Ajedrecista.</p></div>
+      <div class="card"><h4>📏 Regla operativa</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Revisa el portafolio <strong style="color:var(--txt)">cada 3 meses</strong>. Nunca cambies la estrategia por movimientos de 24 horas ni por grupos de Telegram.</p></div>
+      <div class="card"><h4>🎯 Condición de migración</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">3–6 meses de operación real, sin violar el plan, con comprensión de los ciclos del mercado. Solo entonces considerar Ciclista.</p></div>
+    </div>
+
+    <div class="section-label">Pasos de construcción</div>
+    <ul class="steps-list">
+      <li class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-text"><strong>Define tu monto mensual fijo.</strong> Mínimo 5–10% del ingreso disponible. Este es tu capital de inversión, no el de emergencias.</div></div></li>
+      <li class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-text"><strong>Semana 1 y 3: compra BTC.</strong> Divide el monto en dos partes iguales — DCA semanal para reducir la varianza del precio de compra.</div></div></li>
+      <li class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-text"><strong>Mes 2: agrega ETH.</strong> Una vez tengas una base sólida en BTC (mínimo 50%), empieza a construir la posición en ETH.</div></div></li>
+      <li class="step-item"><div class="step-num">4</div><div class="step-body"><div class="step-text"><strong>Mes 3: incluye 1–2 altcoins fuertes.</strong> SOL, BNB u otras con liquidez alta. Máximo 15% del total del portafolio.</div></div></li>
+      <li class="step-item"><div class="step-num">5</div><div class="step-body"><div class="step-text"><strong>Mantén 10% en liquidez siempre.</strong> Stablecoins (USDT/USDC) o efectivo. No es dinero "muerto" — es pólvora para oportunidades.</div></div></li>
+      <li class="step-item"><div class="step-num">6</div><div class="step-body"><div class="step-text"><strong>Revisión trimestral.</strong> Cada 3 meses: ¿el mercado justifica algún rebalanceo? ¿Estás cerca de los umbrales de migración?</div></div></li>
+    </ul>
+  </div>
+
+  <!-- CICLISTA -->
+  <div class="profile-panel" id="prof-ciclista">
+    <div class="card" style="border-color:rgba(16,185,129,.35)">
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:1.5rem">🚴</span>
+            <div>
+              <div style="font-size:17px;font-weight:600;color:var(--txt)">El Ciclista</div>
+              <div style="font-size:12px;color:var(--txt2)">Moderado · Constante · Equilibrado</div>
+            </div>
+          </div>
+          <p style="font-size:13.5px;color:var(--txt2);line-height:1.65;margin-bottom:.9rem">Constante, equilibrado y disciplinado. Busca <strong style="color:var(--txt)">avanzar con ritmo combinando estabilidad y crecimiento</strong>. Ya entiende los ciclos del mercado y no entra en pánico con las correcciones. Sabe cuándo pedalear fuerte y cuándo guardar energía.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge badge-green">Riesgo Medio</span>
+            <span class="badge badge-green">6–18 meses</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--amber)">35%</div><div class="info-cell-lbl">BTC</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--purple)">25%</div><div class="info-cell-lbl">ETH</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--green)">25%</div><div class="info-cell-lbl">Altcoins fuertes</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--pink)">10%</div><div class="info-cell-lbl">Narrativas</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--txt2)">5%</div><div class="info-cell-lbl">Liquidez</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--green)">~</div><div class="info-cell-lbl">Horizonte</div></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-head">
+        <span class="chart-title">📊 Distribución del portafolio
+          <button class="help-btn" onclick="toggleHelp('h-pie-c')">?</button>
+        </span>
+      </div>
+      <div class="help-wrap"><div class="tooltip-panel" id="h-pie-c">
+        <button class="tooltip-close" onclick="closeHelp('h-pie-c')">✕</button>
+        <div class="tooltip-section"><div class="tooltip-label">Cómo interactuar</div><div class="tooltip-text">Pasa el cursor sobre cada segmento para ver el porcentaje exacto. Compara visualmente cómo este portafolio tiene más diversificación que el Ajedrecista.</div></div>
+        <div class="tooltip-section"><div class="tooltip-label">Cómo interpretar</div><div class="tooltip-text">La reducción de BTC al 35% (desde 50%) libera espacio para Altcoins y Narrativas. El 10% en narrativas emergentes es la apuesta por crecimiento superior, pero limitada. La liquidez baja al 5% porque el operador ya tiene criterio para actuar rápido.</div></div>
+      </div></div>
+      <div class="pie-row">
+        <div class="pie-canvas-wrap"><canvas id="pie-ciclista"></canvas></div>
+        <div class="pie-legend" id="legend-ciclista"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Psicología del perfil</div>
+    <div class="card-grid">
+      <div class="card"><h4>💪 Fortaleza clave</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Combina paciencia con capacidad de aprovechar oportunidades. No entra en pánico ante correcciones y no corre sin criterio detrás de narrativas.</p></div>
+      <div class="card"><h4>⚠️ Trampa más frecuente</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Sobreoperar en las narrativas — asignarles más del 10% creyendo que "esta vez es diferente". El límite del 10% no es arbitrario.</p></div>
+      <div class="card"><h4>📏 Regla operativa</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Si BTC cae −30% desde tu precio de compra, <strong style="color:var(--txt)">pausa y evalúa</strong> antes de agregar más. El semáforo amarillo es tu señal de precaución.</p></div>
+      <div class="card"><h4>🎯 Condición de migración</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">6+ meses operando como Ciclista con resultados documentados, comprensión profunda de narrativas y reglas de salida escritas.</p></div>
+    </div>
+
+    <div class="section-label">Pasos de construcción</div>
+    <ul class="steps-list">
+      <li class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-text"><strong>Consolida 3–6 meses como Ajedrecista.</strong> No es una sugerencia — es el prerrequisito de experiencia real que evita errores costosos.</div></div></li>
+      <li class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-text"><strong>Aumenta exposición a altcoins gradualmente.</strong> De 15% a 25%, distribuido entre 3–5 proyectos con liquidez probada y uso real.</div></div></li>
+      <li class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-text"><strong>Añade 10% en narrativas emergentes.</strong> AI tokens, RWA (Real World Assets), DeFi de nueva generación. Investiga profundamente antes de entrar.</div></div></li>
+      <li class="step-item"><div class="step-num">4</div><div class="step-body"><div class="step-text"><strong>Reduce liquidez al 5% solo en semáforo verde.</strong> Este capital ya no es un buffer sino un fondo de oportunidades tácticas.</div></div></li>
+      <li class="step-item"><div class="step-num">5</div><div class="step-body"><div class="step-text"><strong>Stop mental: BTC −30% desde tu precio = pausa.</strong> No más compras hasta evaluar el contexto macroeconómico y del mercado.</div></div></li>
+      <li class="step-item"><div class="step-num">6</div><div class="step-body"><div class="step-text"><strong>Revisión mensual, rebalanceo trimestral.</strong> Más frecuencia que el Ajedrecista porque la exposición es mayor y el mercado es más relevante.</div></div></li>
+    </ul>
+  </div>
+
+  <!-- PARACAIDISTA -->
+  <div class="profile-panel" id="prof-paracaidista">
+    <div class="card" style="border-color:rgba(239,68,68,.35)">
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:1.5rem">🪂</span>
+            <div>
+              <div style="font-size:17px;font-weight:600;color:var(--txt)">El Paracaidista</div>
+              <div style="font-size:12px;color:var(--txt2)">Agresivo · Oportunista · De alto riesgo</div>
+            </div>
+          </div>
+          <p style="font-size:13.5px;color:var(--txt2);line-height:1.65;margin-bottom:.9rem">Agresivo y oportunista. Tolera mayor volatilidad y busca crecimiento elevado, pero <strong style="color:var(--red)">necesita reglas de entrada y salida muy claras</strong> o perderá todo lo ganado. El paracaídas son sus reglas — sin ellas, es caída libre.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge badge-red">Riesgo Alto</span>
+            <span class="badge badge-red">3–12 meses</span>
+            <span class="badge" style="background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.22)">⚠ Solo inversores con experiencia</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--amber)">20%</div><div class="info-cell-lbl">BTC</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--purple)">20%</div><div class="info-cell-lbl">ETH</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--green)">25%</div><div class="info-cell-lbl">Altcoins fuertes</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--pink)">25%</div><div class="info-cell-lbl">Narrativas</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--txt2)">10%</div><div class="info-cell-lbl">Liquidez</div></div>
+      <div class="info-cell"><div class="info-cell-val" style="color:var(--red)">Alto</div><div class="info-cell-lbl">Riesgo</div></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-head">
+        <span class="chart-title">📊 Distribución del portafolio
+          <button class="help-btn" onclick="toggleHelp('h-pie-p')">?</button>
+        </span>
+      </div>
+      <div class="help-wrap"><div class="tooltip-panel" id="h-pie-p">
+        <button class="tooltip-close" onclick="closeHelp('h-pie-p')">✕</button>
+        <div class="tooltip-section"><div class="tooltip-label">Cómo interactuar</div><div class="tooltip-text">Observa la diferencia visual con los portafolios anteriores — los segmentos están más equilibrados, sin un activo dominante claro.</div></div>
+        <div class="tooltip-section"><div class="tooltip-label">Cómo interpretar</div><div class="tooltip-text">El aumento de Narrativas al 25% refleja la búsqueda de rendimientos exponenciales. Sin embargo, este nivel de exposición requiere conocimiento profundo de cada proyecto. La liquidez sube al 10% porque el Paracaidista necesita capital de reacción rápida.</div></div>
+      </div></div>
+      <div class="pie-row">
+        <div class="pie-canvas-wrap"><canvas id="pie-paracaidista"></canvas></div>
+        <div class="pie-legend" id="legend-paracaidista"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Psicología del perfil</div>
+    <div class="card-grid">
+      <div class="card"><h4>💪 Fortaleza clave</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Alta capacidad de investigación independiente. Lee whitepapers, entiende tokenomics y tiene criterio propio para evaluar proyectos sin depender de influencers.</p></div>
+      <div class="card"><h4>⚠️ Trampa más frecuente</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">FOMO ante narrativas trending sin investigación previa. La velocidad del mercado cripto presiona a actuar antes de pensar — exactamente lo contrario a lo necesario.</p></div>
+      <div class="card"><h4>📏 Regla operativa</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Escribe tus reglas de salida <strong style="color:var(--txt)">ANTES de entrar</strong>. Cuándo tomas ganancias, cuándo cortas pérdidas. Máximo 5% por altcoin de baja capitalización.</p></div>
+      <div class="card"><h4>🚨 Regla absoluta</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Semáforo en ROJO = pausa obligatoria, sin excepciones. Aunque "parezca" la mejor oportunidad de tu vida — si el mercado está en modo pánico, tú también debes detenerte.</p></div>
+    </div>
+
+    <div class="section-label">Pasos de construcción</div>
+    <ul class="steps-list">
+      <li class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-text"><strong>Prerrequisito obligatorio:</strong> 6+ meses operando como Ciclista con resultados reales documentados. No experiencia de bull market, sino de ciclo completo.</div></div></li>
+      <li class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-text"><strong>Escribe tus reglas de salida antes de entrar.</strong> Papel o documento digital: condición de Take Profit, condición de Stop Loss, porcentaje máximo de pérdida aceptable.</div></div></li>
+      <li class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-text"><strong>Investiga cada narrativa en profundidad.</strong> Lee el whitepaper, verifica el equipo, analiza el tokenomics, revisa la comunidad. Si no puedes explicarlo en 5 minutos, no inviertas.</div></div></li>
+      <li class="step-item"><div class="step-num">4</div><div class="step-body"><div class="step-text"><strong>El 10% de liquidez es fondo de oportunidades.</strong> No es colchón emocional para aguantar pérdidas — es capital disponible para reaccionar ante dislocaciones de mercado reales.</div></div></li>
+      <li class="step-item"><div class="step-num">5</div><div class="step-body"><div class="step-text"><strong>Máximo 5% en una sola altcoin de baja cap.</strong> El riesgo de ruina de una posición individual debe estar acotado. Sin diversificación táctica no hay gestión de riesgo real.</div></div></li>
+      <li class="step-item"><div class="step-num">6</div><div class="step-body"><div class="step-text"><strong>Semáforo ROJO = pausa total sin excepciones.</strong> Esta regla salvará tu portafolio más veces de las que la recordarás — hasta el día que la rompes y lo pierdes todo.</div></div></li>
+    </ul>
+  </div>
+
+  <div class="mod-footer">
+    <button class="btn-prev" onclick="setModIdx(0)">← Módulo 1</button>
+    <button class="btn-fwd" onclick="setModIdx(2)">Módulo 3: Arquitectura →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MÓDULO 2 — ARQUITECTURA & MIGRACIÓN
+══════════════════════════════════════ -->
+<div class="section" id="mod-2">
+
+  <div class="hero-pill">🏗️ Módulo 3 · Arquitectura y Migración</div>
+  <div class="display">El camino del <em>Ajedrecista al Paracaidista</em></div>
+  <p class="lead">Construir un portafolio no es una acción única — es un <strong>proceso progresivo y verificable</strong>. Iniciar conservadoramente no es timidez: es la única forma de sobrevivir lo suficiente para aprender.</p>
+
+  <!-- MIGRATION PATH -->
+  <div class="section-label">
+    Ruta de migración entre perfiles
+    <button class="help-btn" onclick="toggleHelp('h-mig')">?</button>
+  </div>
+  <div class="help-wrap"><div class="tooltip-panel" id="h-mig">
+    <button class="tooltip-close" onclick="closeHelp('h-mig')">✕</button>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo leer este diagrama</div><div class="tooltip-text">Lee de izquierda a derecha. Cada círculo es un perfil. Las condiciones bajo las flechas son los prerrequisitos verificables que debes cumplir antes de migrar. La migración no es automática — es una decisión consciente basada en evidencia.</div></div>
+    <div class="tooltip-section"><div class="tooltip-label">Principio central</div><div class="tooltip-text">No existe migración "de vuelta" — si llegas a Paracaidista y decides ser más conservador, es porque el mercado o tus emociones te lo enseñaron con pérdidas. Mejor cumplir los prerrequisitos.</div></div>
+  </div></div>
+
+  <div class="migration-path">
+    <div class="mig-node">
+      <div class="mig-circle" style="border-color:var(--blue);background:rgba(59,122,245,.1);color:var(--blue)">♟</div>
+      <div class="mig-label" style="color:var(--blue)">Ajedrecista</div>
+      <div class="mig-sub">Inicio</div>
+      <div class="mig-cond" style="border-color:rgba(59,122,245,.3);color:var(--blue)">Perfil de entrada</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;padding:0 4px;align-self:center;margin-bottom:28px">
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--txt3);text-align:center;margin-bottom:4px">3–6 meses + sin<br>romper plan</div>
+      <div style="font-size:18px;color:var(--txt3)">→</div>
+    </div>
+    <div class="mig-node">
+      <div class="mig-circle" style="border-color:var(--green);background:rgba(16,185,129,.1);color:var(--green)">🚴</div>
+      <div class="mig-label" style="color:var(--green)">Ciclista</div>
+      <div class="mig-sub">Intermedio</div>
+      <div class="mig-cond" style="border-color:rgba(16,185,129,.3);color:var(--green)">Ciclo de experiencia</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;padding:0 4px;align-self:center;margin-bottom:28px">
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--txt3);text-align:center;margin-bottom:4px">6+ meses + reglas<br>de salida escritas</div>
+      <div style="font-size:18px;color:var(--txt3)">→</div>
+    </div>
+    <div class="mig-node">
+      <div class="mig-circle" style="border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red)">🪂</div>
+      <div class="mig-label" style="color:var(--red)">Paracaidista</div>
+      <div class="mig-sub">Avanzado</div>
+      <div class="mig-cond" style="border-color:rgba(239,68,68,.3);color:var(--red)">Solo con experiencia real</div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVA DE PORTAFOLIOS -->
+  <div class="section-label">
+    Comparativa de asignaciones entre perfiles
+    <button class="help-btn" onclick="toggleHelp('h-bar')">?</button>
+  </div>
+  <div class="help-wrap"><div class="tooltip-panel" id="h-bar">
+    <button class="tooltip-close" onclick="closeHelp('h-bar')">✕</button>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo interactuar</div><div class="tooltip-text">Pasa el cursor sobre las barras para ver los valores exactos por perfil. Cada color corresponde a un activo. Los tres grupos (A/C/P) muestran la evolución de las asignaciones al migrar de perfil.</div></div>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo interpretar</div><div class="tooltip-text">Observa cómo BTC disminuye al ir de Ajedrecista (50%) a Paracaidista (20%), mientras que las Narrativas crecen de 0% a 25%. Esta reconfiguración refleja mayor apetito de riesgo y mayor necesidad de conocimiento técnico.</div></div>
+  </div></div>
+  <div class="chart-wrap">
+    <div class="chart-head">
+      <span class="chart-title">📊 Asignación por activo y perfil</span>
+    </div>
+    <div class="chart-canvas-wrap"><canvas id="barChart"></canvas></div>
+  </div>
+
+  <!-- SEMÁFORO -->
+  <div class="section-label" style="margin-top:1.4rem">
+    Sistema de semáforo de mercado
+    <button class="help-btn" onclick="toggleHelp('h-sem')">?</button>
+  </div>
+  <div class="help-wrap"><div class="tooltip-panel" id="h-sem">
+    <button class="tooltip-close" onclick="closeHelp('h-sem')">✕</button>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo usar el semáforo</div><div class="tooltip-text">El semáforo es un filtro de contexto de mercado que se evalúa mensualmente. Combina indicadores como dominancia de BTC, volatilidad histórica (VIX cripto), sentimiento Fear & Greed y tendencia de precio a 200 días.</div></div>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo interpretar cada estado</div><div class="tooltip-text">VERDE: mercado en tendencia favorable, acumular con el plan. AMARILLO: señales mixtas, reducir cantidad por compra, aumentar frecuencia de revisión. ROJO: mercado en pánico o sobre-euforia extrema, pausar nuevas compras.</div></div>
+  </div></div>
+  <div class="semaforo-row">
+    <div class="sem-card" style="border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.06)">
+      <div class="sem-dot" style="background:var(--green);color:var(--green)"></div>
+      <div class="sem-name" style="color:var(--green)">VERDE</div>
+      <div class="sem-desc">Acumular con normalidad según el plan DCA. Todos los perfiles operan con plena capacidad.</div>
+    </div>
+    <div class="sem-card" style="border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.06)">
+      <div class="sem-dot" style="background:var(--amber);color:var(--amber)"></div>
+      <div class="sem-name" style="color:var(--amber)">AMARILLO</div>
+      <div class="sem-desc">Alta volatilidad o señales mixtas. Acumular con cautela: reducir montos, aumentar frecuencia de revisión.</div>
+    </div>
+    <div class="sem-card" style="border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.06)">
+      <div class="sem-dot" style="background:var(--red);color:var(--red)"></div>
+      <div class="sem-name" style="color:var(--red)">ROJO</div>
+      <div class="sem-desc">Pausar o reducir acumulación. Paracaidistas: pausa obligatoria. Ciclistas: solo liquidez. Ajedrecistas: mantener y esperar.</div>
+    </div>
+  </div>
+
+  <!-- ESTRATEGIA DCA -->
+  <div class="section-label" style="margin-top:1rem">Estrategia de acumulación DCA</div>
+  <div class="card card-accent">
+    <p style="font-size:13.5px;color:var(--txt2);line-height:1.65;margin-bottom:.9rem"><strong style="color:var(--txt)">Dollar Cost Averaging (DCA)</strong> es la estrategia de comprar un monto fijo de forma periódica, independientemente del precio del activo. Su poder no está en predecir — está en eliminar la necesidad de hacerlo.</p>
+    <div class="card-grid" style="margin-bottom:0">
+      <div class="card" style="margin-bottom:0"><h4>Por qué funciona</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Al comprar fijo periódicamente, automáticamente compras más unidades cuando el precio es bajo y menos cuando es alto. El precio promedio siempre resulta menor al precio promedio del mercado.</p></div>
+      <div class="card" style="margin-bottom:0"><h4>El enemigo del DCA</h4><p style="font-size:13px;color:var(--txt2);line-height:1.55">Las emociones. Suspender el DCA en caídas ("está bajando, espero") y aumentarlo en subidas ("está subiendo, compro más") destruye completamente la ventaja matemática del método.</p></div>
+    </div>
+  </div>
+
+  <table class="dca-table">
+    <thead><tr><th>Perfil</th><th>Frecuencia</th><th>Activos prioritarios</th><th>Revisión</th><th>Condición de pausa</th></tr></thead>
+    <tbody>
+      <tr><td>♟ Ajedrecista</td><td>Semanal (BTC)</td><td>BTC → ETH → Altcoins</td><td>Trimestral</td><td>Semáforo ROJO</td></tr>
+      <tr><td>🚴 Ciclista</td><td>Semanal/Quincenal</td><td>BTC + ETH + Altcoins + Narrativas</td><td>Mensual</td><td>BTC −30% o ROJO</td></tr>
+      <tr><td>🪂 Paracaidista</td><td>Táctica (por señal)</td><td>Narrativas + Altcoins + BTC/ETH</td><td>Semanal</td><td>Semáforo ROJO (obligatorio)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="mod-footer">
+    <button class="btn-prev" onclick="setModIdx(1)">← Módulo 2</button>
+    <button class="btn-fwd" onclick="setModIdx(3)">Módulo 4: Calendario →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MÓDULO 3 — CALENDARIO
+══════════════════════════════════════ -->
+<div class="section" id="mod-3">
+
+  <div class="hero-pill">📅 Módulo 4 · Calendario de Acumulación 2026</div>
+  <div class="display">12 meses de estrategia, <em>no de improvisación</em></div>
+  <p class="lead">El Calendario de Acumulación convierte la estrategia abstracta en acciones concretas mes a mes. <strong>La disciplina es el único activo que nunca se deprecia.</strong></p>
+
+  <!-- FASES OVERVIEW -->
+  <div class="section-label">
+    Las 4 fases del año
+    <button class="help-btn" onclick="toggleHelp('h-cal')">?</button>
+  </div>
+  <div class="help-wrap"><div class="tooltip-panel" id="h-cal">
+    <button class="tooltip-close" onclick="closeHelp('h-cal')">✕</button>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo leer las fases</div><div class="tooltip-text">Cada tarjeta es una fase trimestral del año. El color indica el estado operativo esperado: azul = construcción, verde = acumulación, ámbar = vigilancia, púrpura = protección. Los meses en píldoras son los meses que cubre la fase.</div></div>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo usar este calendario</div><div class="tooltip-text">Al inicio de cada mes, consulta en qué fase estás y confirma tu semáforo de mercado. La fase define la intención estratégica; el semáforo define la ejecución táctica.</div></div>
+  </div></div>
+
+  <div class="cal-grid">
+    <div class="cal-phase" style="border-color:rgba(59,122,245,.3);background:rgba(59,122,245,.04)">
+      <div class="cal-phase-header">
+        <div>
+          <div class="cal-phase-title" style="color:var(--blue)">Fase 1</div>
+          <div style="font-size:13px;font-weight:600;color:var(--txt);margin-top:2px">Construcción de base</div>
+        </div>
+        <span class="badge badge-blue">Q1</span>
+      </div>
+      <div class="cal-months">
+        <span class="cal-month">Enero</span><span class="cal-month">Febrero</span><span class="cal-month">Marzo</span>
+      </div>
+      <div class="cal-objective">Organizar el capital, definir el perfil y construir las posiciones principales de BTC y ETH con DCA semanal.</div>
+    </div>
+    <div class="cal-phase" style="border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04)">
+      <div class="cal-phase-header">
+        <div>
+          <div class="cal-phase-title" style="color:var(--green)">Fase 2</div>
+          <div style="font-size:13px;font-weight:600;color:var(--txt);margin-top:2px">Acumulación estratégica</div>
+        </div>
+        <span class="badge badge-green">Q2</span>
+      </div>
+      <div class="cal-months">
+        <span class="cal-month">Abril</span><span class="cal-month">Mayo</span><span class="cal-month">Junio</span>
+      </div>
+      <div class="cal-objective">Mantener disciplina, revisar oportunidades y evitar compras impulsivas. Primer análisis de Altcoins para Ciclistas.</div>
+      <div class="cal-quote">"No toda caída es oportunidad y no toda subida es señal de compra."</div>
+    </div>
+    <div class="cal-phase" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04)">
+      <div class="cal-phase-header">
+        <div>
+          <div class="cal-phase-title" style="color:var(--amber)">Fase 3</div>
+          <div style="font-size:13px;font-weight:600;color:var(--txt);margin-top:2px">Control del riesgo</div>
+        </div>
+        <span class="badge badge-amber">Q3</span>
+      </div>
+      <div class="cal-months">
+        <span class="cal-month">Julio</span><span class="cal-month">Agosto</span><span class="cal-month">Septiembre</span>
+      </div>
+      <div class="cal-objective">Evaluar el avance del portafolio, revisar exposición y ajustar sin salirte del plan. Históricamente, Q3 es volátil.</div>
+      <div class="cal-quote">"Un buen inversionista no solo acumula: también mide, revisa y protege."</div>
+    </div>
+    <div class="cal-phase" style="border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.04)">
+      <div class="cal-phase-header">
+        <div>
+          <div class="cal-phase-title" style="color:var(--purple)">Fase 4</div>
+          <div style="font-size:13px;font-weight:600;color:var(--txt);margin-top:2px">Cierre y planificación</div>
+        </div>
+        <span class="badge badge-purple">Q4</span>
+      </div>
+      <div class="cal-months">
+        <span class="cal-month">Octubre</span><span class="cal-month">Noviembre</span><span class="cal-month">Diciembre</span>
+      </div>
+      <div class="cal-objective">Revisar resultados, cuidar la liquidez y preparar la estrategia del siguiente año. Rebalanceo anual.</div>
+      <div class="cal-quote">"El cierre del año no es solo para mirar ganancias, sino para evaluar decisiones."</div>
+    </div>
+  </div>
+
+  <!-- GRÁFICA DE DISTRIBUCIÓN MENSUAL PARA AJEDRECISTA -->
+  <div class="section-label" style="margin-top:.5rem">
+    Simulación: acumulación mensual Ajedrecista (12 meses)
+    <button class="help-btn" onclick="toggleHelp('h-linecal')">?</button>
+  </div>
+  <div class="help-wrap"><div class="tooltip-panel" id="h-linecal">
+    <button class="tooltip-close" onclick="closeHelp('h-linecal')">✕</button>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo interactuar</div><div class="tooltip-text">Pasa el cursor sobre cualquier punto de las líneas para ver el valor exacto de esa fase. Las líneas representan el valor relativo acumulado de BTC (dorada), ETH (azul) y el total del portafolio (blanca) a lo largo del año.</div></div>
+    <div class="tooltip-section"><div class="tooltip-label">Cómo interpretar</div><div class="tooltip-text">Este no es un pronóstico de precio — es una simulación de composición del portafolio asumiendo DCA constante. Las zonas de color en el fondo indican las 4 fases del calendario. El objetivo no es el máximo en diciembre: es la tendencia ascendente y sostenida.</div></div>
+  </div></div>
+  <div class="chart-wrap">
+    <div class="chart-head">
+      <span class="chart-title">📈 Simulación de acumulación (DCA semanal · $200/semana)</span>
+    </div>
+    <div class="chart-canvas-wrap"><canvas id="lineChart"></canvas></div>
+  </div>
+
+  <!-- CHECKLIST MENSUAL -->
+  <div class="section-label" style="margin-top:.5rem">Checklist mensual del inversor</div>
+  <div class="card-grid">
+    <div class="card">
+      <h3 style="margin-bottom:.6rem">📋 Inicio de mes</h3>
+      <ul class="steps-list">
+        <li class="step-item"><div class="step-num">✓</div><div class="step-body"><div class="step-text">Revisar el semáforo de mercado (Fear & Greed, dominancia BTC)</div></div></li>
+        <li class="step-item"><div class="step-num">✓</div><div class="step-body"><div class="step-text">Confirmar la fase del calendario y el objetivo del trimestre</div></div></li>
+        <li class="step-item"><div class="step-num">✓</div><div class="step-body"><div class="step-text">Programar las compras del mes según el plan DCA</div></div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:.6rem">📊 Fin de mes</h3>
+      <ul class="steps-list">
+        <li class="step-item"><div class="step-num">✓</div><div class="step-body"><div class="step-text">Revisar la distribución actual del portafolio vs. la objetivo</div></div></li>
+        <li class="step-item"><div class="step-num">✓</div><div class="step-body"><div class="step-text">Documentar qué decisiones tomaste y por qué (diario de inversión)</div></div></li>
+        <li class="step-item"><div class="step-num">✓</div><div class="step-body"><div class="step-text">Evaluar si estás cerca de los umbrales de migración de perfil</div></div></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mod-footer">
+    <button class="btn-prev" onclick="setModIdx(2)">← Módulo 3</button>
+    <button class="btn-fwd" onclick="setModIdx(4)">Módulo 5: Evaluación →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MÓDULO 4 — EVALUACIÓN FINAL
+══════════════════════════════════════ -->
+<div class="section" id="mod-4">
+  <div id="quiz-main"></div>
+</div>
+
+</div><!-- .app -->
+
+<script>
+/* ══════════════════════════════════════
+   DATA
+══════════════════════════════════════ */
+const PROFILES_DATA = {
+  ajedrecista: {
+    portfolio:[
+      {name:'BTC',value:50,color:'#F59E0B'},
+      {name:'ETH',value:25,color:'#6366F1'},
+      {name:'Altcoins fuertes',value:15,color:'#10B981'},
+      {name:'Liquidez',value:10,color:'#94A3B8'}
+    ]
+  },
+  ciclista:{
+    portfolio:[
+      {name:'BTC',value:35,color:'#F59E0B'},
+      {name:'ETH',value:25,color:'#6366F1'},
+      {name:'Altcoins fuertes',value:25,color:'#10B981'},
+      {name:'Narrativas',value:10,color:'#EC4899'},
+      {name:'Liquidez',value:5,color:'#94A3B8'}
+    ]
+  },
+  paracaidista:{
+    portfolio:[
+      {name:'BTC',value:20,color:'#F59E0B'},
+      {name:'ETH',value:20,color:'#6366F1'},
+      {name:'Altcoins fuertes',value:25,color:'#10B981'},
+      {name:'Narrativas',value:25,color:'#EC4899'},
+      {name:'Liquidez',value:10,color:'#94A3B8'}
+    ]
+  }
+};
+
+const DIAG_QUESTIONS = [
+  {q:'Si tu inversión cae un 40% en un mes, ¿qué harías?',
+   opts:[{t:'Vendería todo para no perder más',p:1},{t:'Mantendría y esperaría recuperación',p:2},{t:'Compraría más aprovechando el precio bajo',p:3}]},
+  {q:'¿Qué porcentaje de tus ahorros destinarías a cripto?',
+   opts:[{t:'Menos del 10%',p:1},{t:'Entre 10% y 30%',p:2},{t:'Más del 30%',p:3}]},
+  {q:'¿En qué horizonte de tiempo piensas tu inversión?',
+   opts:[{t:'Más de 2 años',p:1},{t:'1 a 2 años',p:2},{t:'Menos de 1 año',p:3}]},
+  {q:'¿Qué activos prefieres?',
+   opts:[{t:'Solo BTC y ETH',p:1},{t:'BTC, ETH y altcoins conocidas',p:2},{t:'Altcoins pequeñas con alto potencial',p:3}]},
+  {q:'¿Con qué frecuencia revisas el mercado?',
+   opts:[{t:'Mensual o trimestral',p:1},{t:'Semanalmente',p:2},{t:'Casi todos los días',p:3}]}
+];
+
+const QUIZ_DATA = [
+  {q:'¿Qué perfil recomienda el taller para un nuevo criptoinversor?',
+   opts:['Paracaidista','Ciclista','Ajedrecista','Los tres por igual'],c:2,
+   fb_ok:'Correcto. El Ajedrecista es el perfil de entrada recomendado porque prioriza la preservación del capital y permite acumular experiencia real antes de asumir mayores riesgos.',
+   fb_bad:'Incorrecto. El taller recomienda comenzar siempre como Ajedrecista (opción C), independientemente del capital. La experiencia real no se puede sustituir con entusiasmo.'},
+  {q:'¿Cuánto porcentaje de BTC tiene el portafolio del Ajedrecista?',
+   opts:['20%','35%','50%','60%'],c:2,
+   fb_ok:'Correcto. El Ajedrecista asigna un 50% de su portafolio a BTC, reflejando el enfoque conservador: mayor ponderación en el activo más líquido y con menor riesgo relativo.',
+   fb_bad:'Incorrecto. El portafolio del Ajedrecista asigna el 50% a BTC (opción C). El 35% es la asignación del Ciclista, y el 20% es la del Paracaidista.'},
+  {q:'¿Qué significa el semáforo en ROJO para el Paracaidista?',
+   opts:['Acumular con normalidad','Acumular con cautela','Pausar toda acumulación obligatoriamente','Invertir el doble aprovechando la oportunidad'],c:2,
+   fb_ok:'Correcto. Semáforo ROJO = pausa obligatoria para el Paracaidista, sin excepciones. Esta regla existe porque el perfil agresivo es el más vulnerable a decisiones emocionales durante pánico de mercado.',
+   fb_bad:'Incorrecto. Para el Paracaidista, el semáforo ROJO significa pausa obligatoria (opción C). No hay excepciones — esta es la regla que más capital salva y más frecuentemente se rompe.'},
+  {q:'¿Cuántas fases tiene el Calendario de Acumulación 2026?',
+   opts:['2','3','4','12'],c:2,
+   fb_ok:'Correcto. El calendario se divide en 4 fases trimestrales: Construcción (Q1), Acumulación (Q2), Control del riesgo (Q3) y Cierre/planificación (Q4).',
+   fb_bad:'Incorrecto. El calendario tiene 4 fases (opción C), una por trimestre del año. Cada fase tiene un objetivo estratégico diferente que va más allá del simple "comprar cada mes".'},
+  {q:'¿Cómo se llama la Fase 1 del Calendario (Enero–Marzo)?',
+   opts:['Acumulación estratégica','Construcción de base','Seguimiento y control del riesgo','Cierre y protección'],c:1,
+   fb_ok:'Correcto. La Fase 1 (Q1) se llama "Construcción de base". Es el trimestre donde se organiza el capital, se confirma el perfil y se establecen las posiciones iniciales en BTC y ETH.',
+   fb_bad:'Incorrecto. La Fase 1 es "Construcción de base" (opción B). "Acumulación estratégica" es la Fase 2, "Control del riesgo" es la Fase 3, y "Cierre y protección" es la Fase 4.'},
+  {q:'El portafolio Ciclista destina a narrativas emergentes:',
+   opts:['0%','5%','10%','25%'],c:2,
+   fb_ok:'Correcto. El Ciclista asigna el 10% a narrativas emergentes (AI, RWA, DeFi). Es una asignación táctica controlada que permite exposición a alto crecimiento sin comprometer la estabilidad del portafolio.',
+   fb_bad:'Incorrecto. El Ciclista asigna el 10% a narrativas (opción C). El 0% es del Ajedrecista, el 25% es del Paracaidista. El límite del 10% para el Ciclista no es arbitrario — protege contra la sobrexposición.'},
+  {q:'¿Qué significa DCA en el contexto de inversión cripto?',
+   opts:['Digital Currency Asset','Comprar un monto fijo de forma periódica independiente del precio','Decisión de Compra Acelerada','Diversificación Con Altcoins'],c:1,
+   fb_ok:'Correcto. DCA (Dollar Cost Averaging) consiste en invertir un monto fijo de forma periódica sin importar el precio. Su ventaja es eliminar la necesidad de predecir el mercado y promediar el precio de compra automáticamente.',
+   fb_bad:'Incorrecto. DCA significa Dollar Cost Averaging (opción B): comprar un monto fijo periódicamente sin importar el precio. Su poder matemático radica en comprar más unidades cuando el precio baja y menos cuando sube.'},
+  {q:'¿Cuál es el objetivo principal de la Fase 4 (Octubre–Diciembre)?',
+   opts:['Comprar al máximo posible antes de que suba','Revisar resultados, proteger liquidez y planificar el siguiente año','Vender todas las altcoins antes del invierno','Ignorar el mercado y descansar'],c:1,
+   fb_ok:'Correcto. La Fase 4 es de cierre y planificación: revisar qué funcionó, proteger la liquidez ante la incertidumbre de cierre de año, y preparar la estrategia para el siguiente ciclo con aprendizaje documentado.',
+   fb_bad:'Incorrecto. La Fase 4 (opción B) es para revisar resultados, proteger liquidez y planificar el año siguiente. No es para compras agresivas ni para rendirse — es para aprender y proyectar con criterio.'},
+  {q:'¿Cuánto asigna el Paracaidista a Narrativas?',
+   opts:['0%','10%','15%','25%'],c:3,
+   fb_ok:'Correcto. El Paracaidista asigna el 25% a narrativas emergentes, la mayor exposición entre los tres perfiles. Esto requiere conocimiento profundo de cada proyecto y reglas de salida previamente definidas.',
+   fb_bad:'Incorrecto. El Paracaidista asigna el 25% a narrativas (opción D). Este es el aspecto más diferenciador de su portafolio respecto a los demás perfiles — y el que mayor conocimiento técnico requiere.'},
+  {q:'¿Cuál es la diferencia principal entre Ajedrecista y Paracaidista?',
+   opts:['El tiempo que invierten diariamente','La tolerancia al riesgo y el tipo de activos que pueden sostener','El capital inicial requerido para empezar','El país de residencia del inversor'],c:1,
+   fb_ok:'Correcto. La diferencia fundamental es la tolerancia al riesgo y el tipo de activos. El Ajedrecista domina con BTC (50%), el Paracaidista con activos más volátiles (narrativas 25%). El capital inicial o el tiempo diario son secundarios.',
+   fb_bad:'Incorrecto. La diferencia principal es la tolerancia al riesgo y el tipo de activos (opción B). Cualquiera puede ser cualquier perfil con cualquier capital — lo que los diferencia es la psicología y la experiencia, no el dinero.'},
+  {q:'¿Con qué frecuencia debe revisar su portafolio un Ajedrecista?',
+   opts:['Cada día','Cada semana','Cada 3 meses','Solo en diciembre'],c:2,
+   fb_ok:'Correcto. El Ajedrecista revisa su portafolio cada 3 meses. Las revisiones frecuentes generan sobrereacción a movimientos de corto plazo, lo que es exactamente lo que el perfil conservador debe evitar.',
+   fb_bad:'Incorrecto. El Ajedrecista revisa cada 3 meses (opción C). La revisión diaria genera ansiedad y decisiones impulsivas. La revisión semanal es para el Ciclista. La disciplina del Ajedrecista incluye resistir el impulso de mirar constantemente.'},
+  {q:'El semáforo AMARILLO indica que el inversor debe:',
+   opts:['Acumular con normalidad total','Acumular con cautela por alta volatilidad o señales mixtas','Salir del mercado completamente','Duplicar todas sus posiciones'],c:1,
+   fb_ok:'Correcto. El semáforo AMARILLO significa acumular con cautela: reducir los montos por compra, aumentar la frecuencia de revisión y evitar exposición adicional a activos de alto riesgo hasta que las señales se aclaren.',
+   fb_bad:'Incorrecto. El semáforo AMARILLO indica cautela (opción B): no se detiene el plan, pero se ajusta el tamaño de las compras y se aumenta la frecuencia de revisión. No es ni semáforo VERDE (normalidad) ni ROJO (pausa).'},
+  {q:'La liquidez en el portafolio del Ciclista es de:',
+   opts:['0%','5%','10%','15%'],c:1,
+   fb_ok:'Correcto. El Ciclista mantiene el 5% en liquidez — suficiente para reaccionar tácticamente sin sacrificar rendimiento. Es menor que el Ajedrecista (10%) porque el Ciclista tiene más criterio para actuar cuando surge una oportunidad.',
+   fb_bad:'Incorrecto. La liquidez del Ciclista es el 5% (opción B). El 10% es la liquidez del Ajedrecista (y del Paracaidista como fondo de oportunidades). La reducción al 5% refleja mayor confianza operativa del Ciclista.'},
+  {q:'¿Cuándo debe un Ciclista considerar migrar a Paracaidista?',
+   opts:['Desde el primer mes si tiene capital suficiente','Después de 6+ meses de experiencia real como Ciclista con resultados documentados','Cuando BTC suba 100% en un mes','Nunca, los perfiles son permanentes'],c:1,
+   fb_ok:'Correcto. La migración de Ciclista a Paracaidista requiere 6+ meses de operación real como Ciclista con resultados documentados. No es tiempo en el mercado en general — es tiempo siguiendo el perfil específico con disciplina comprobada.',
+   fb_bad:'Incorrecto. Se requieren 6+ meses como Ciclista con resultados documentados (opción B). El capital no es el criterio — la experiencia real y comprobable sí lo es. Los perfiles no son permanentes, pero la migración sin criterio es el camino hacia pérdidas significativas.'},
+  {q:'El principio central del Calendario de Acumulación es:',
+   opts:['Comprar siempre en el máximo histórico para no perderse subidas','Diversificar en cientos de monedas para reducir el riesgo','Acumular con disciplina según perfil, sin permitir que la emoción dicte las decisiones','Predecir el precio exacto del mercado usando análisis técnico avanzado'],c:2,
+   fb_ok:'Correcto. El principio central es acumular con disciplina según perfil, eliminando la emoción del proceso de decisión. El DCA, el semáforo y el calendario son herramientas que existen para operacionalizar esa disciplina.',
+   fb_bad:'Incorrecto. El principio central es disciplina sin emoción (opción C). No se trata de predecir precios ni de diversificación extrema — se trata de tener un sistema y seguirlo con consistencia, independientemente de lo que el mercado haga en el corto plazo.'}
+];
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let currentMod = 0;
+let activeProfile = 'ajedrecista';
+let diagAnswers = {};
+let quizAnswers = {};
+let quizIdx = 0;
+let quizStarted = false;
+let quizDone = false;
+let chartsBuilt = {};
+
+/* ══════════════════════════════════════
+   MODULE NAV
+══════════════════════════════════════ */
+function setMod(idx, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('mod-' + idx).classList.add('active');
+  document.querySelectorAll('.mod-tab,.tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else { const t=document.querySelectorAll('.mod-tab')[idx]; if(t)t.classList.add('active'); }
+  currentMod = idx;
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (idx === 1 && !chartsBuilt.pies) { buildPieCharts(); chartsBuilt.pies = true; }
+  if (idx === 2 && !chartsBuilt.bar)  { buildBarChart();  chartsBuilt.bar  = true; }
+  if (idx === 3 && !chartsBuilt.line) { buildLineChart();  chartsBuilt.line = true; }
+  if (idx === 4 && !quizStarted) { renderQuizIntro(); }
+}
+function setModIdx(idx) {
+  setMod(idx, document.querySelectorAll('.mod-tab')[idx]);
+}
+
+/* ══════════════════════════════════════
+   HELP TOOLTIPS
+══════════════════════════════════════ */
+function toggleHelp(id) {
+  const panel = document.getElementById(id);
+  if (!panel) return;
+  const isOpen = panel.classList.contains('open');
+  document.querySelectorAll('.tooltip-panel').forEach(p => { p.classList.remove('open'); });
+  document.querySelectorAll('.help-btn').forEach(b => b.classList.remove('open'));
+  if (!isOpen) { panel.classList.add('open'); panel.previousElementSibling?.classList?.add('open'); }
+}
+function closeHelp(id) {
+  document.getElementById(id)?.classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.help-wrap') && !e.target.classList.contains('help-btn')) {
+    document.querySelectorAll('.tooltip-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.help-btn').forEach(b => b.classList.remove('open'));
+  }
+});
+
+/* ══════════════════════════════════════
+   PROFILE SELECTOR
+══════════════════════════════════════ */
+function setProfile(name, btn, activeClass, color) {
+  document.querySelectorAll('.profile-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.p-tab').forEach(t => { t.className = 'p-tab'; });
+  document.getElementById('prof-' + name).classList.add('active');
+  btn.classList.add(activeClass);
+  activeProfile = name;
+}
+
+/* ══════════════════════════════════════
+   DIAG TEST (MOD 0)
+══════════════════════════════════════ */
+function buildDiagTest() {
+  const wrap = document.getElementById('diagTest');
+  wrap.innerHTML = DIAG_QUESTIONS.map((item, qi) => `
+    <div class="card" style="margin-bottom:.7rem">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:.6rem">
+        <p style="font-size:13.5px;font-weight:500;color:var(--txt);line-height:1.5;margin:0">${qi+1}. ${item.q}</p>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--txt3);flex-shrink:0;padding-top:3px">${qi+1}/5</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${item.opts.map((opt, oi) => `
+          <button onclick="selectDiag(${qi},${oi},${opt.p})" id="dopt-${qi}-${oi}"
+            style="text-align:left;padding:9px 12px;border-radius:var(--r8);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .18s;width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--txt2);display:flex;align-items:center;gap:8px">
+            <span style="width:18px;height:18px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:9px;flex-shrink:0">${['A','B','C'][oi]}</span>
+            ${opt.t}
+          </button>`).join('')}
+      </div>
+    </div>`).join('') +
+    `<button id="diagSubmit" onclick="submitDiag()" disabled
+      style="padding:10px 20px;background:var(--surface3);color:var(--txt3);border:none;border-radius:var(--r8);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:not-allowed;transition:all .2s;margin-top:.4rem">
+      Ver mi perfil →</button>`;
+}
+
+function selectDiag(qi, oi, pts) {
+  diagAnswers[qi] = { oi, pts };
+  document.querySelectorAll(`[id^="dopt-${qi}-"]`).forEach((b, i) => {
+    const sel = i === oi;
+    b.style.borderColor = sel ? 'var(--gold)' : 'var(--border)';
+    b.style.background = sel ? 'var(--gold-dim)' : 'var(--surface2)';
+    b.style.color = sel ? 'var(--gold)' : 'var(--txt2)';
+  });
+  if (Object.keys(diagAnswers).length === DIAG_QUESTIONS.length) {
+    const btn = document.getElementById('diagSubmit');
+    btn.disabled = false;
+    btn.style.background = 'var(--gold)';
+    btn.style.color = '#000';
+    btn.style.cursor = 'pointer';
+  }
+}
+
+function submitDiag() {
+  const total = Object.values(diagAnswers).reduce((s, v) => s + v.pts, 0);
+  const profile = total <= 8 ? 'Ajedrecista' : total <= 11 ? 'Ciclista' : 'Paracaidista';
+  const color = total <= 8 ? 'var(--blue)' : total <= 11 ? 'var(--green)' : 'var(--red)';
+  const emoji = total <= 8 ? '♟' : total <= 11 ? '🚴' : '🪂';
+  const desc = {
+    'Ajedrecista': 'Tu perfil ideal de entrada es el Ajedrecista. Prioriza capital seguro en BTC y ETH, construye con paciencia y no te saltes etapas.',
+    'Ciclista': 'Tu perfil corresponde al Ciclista. Tienes equilibrio entre estabilidad y apetito de crecimiento. Asegúrate de haber operado al menos 3–6 meses antes de adoptar este portafolio.',
+    'Paracaidista': 'Tu perfil orientativo es el Paracaidista. Alta tolerancia al riesgo. Sin embargo, te recomendamos empezar como Ajedrecista para construir la experiencia que este perfil exige.'
+  };
+  const wrap = document.getElementById('diagResult');
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div class="card" style="border-color:${color}40;background:${color}06;margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:.7rem">
+        <span style="font-size:1.8rem">${emoji}</span>
+        <div>
+          <div style="font-size:11px;font-family:var(--font-mono);color:var(--txt2);letter-spacing:.08em;margin-bottom:2px">TU PERFIL ORIENTATIVO</div>
+          <div style="font-size:20px;font-weight:600;color:${color}">${profile}</div>
+        </div>
+        <div style="margin-left:auto;font-family:var(--font-mono);font-size:.9rem;color:${color};background:${color}15;border:1px solid ${color}30;padding:4px 10px;border-radius:20px">${total}/15 pts</div>
+      </div>
+      <p style="font-size:13.5px;color:var(--txt2);line-height:1.65;margin-bottom:.8rem">${desc[profile]}</p>
+      <a href="https://diagnosticofinanciero.lovable.app" target="_blank" class="cta cta-outline" style="font-size:12.5px">Realizar el diagnóstico completo ↗</a>
+    </div>`;
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ══════════════════════════════════════
+   PIE CHARTS
+══════════════════════════════════════ */
+function buildPieChart(canvasId, legendId, data) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: data.map(d => d.name),
+      datasets: [{ data: data.map(d => d.value), backgroundColor: data.map(d => d.color), borderColor: '#12151C', borderWidth: 3, hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` }, backgroundColor: '#1A1E28', borderColor: '#2A2F3E', borderWidth: 1, titleColor: '#E8EAF0', bodyColor: '#8B90A0', padding: 10 }
+      }
+    }
+  });
+  const legend = document.getElementById(legendId);
+  if (legend) {
+    legend.innerHTML = data.map(d => `
+      <div class="legend-item">
+        <div class="legend-dot" style="background:${d.color}"></div>
+        <span>${d.name}</span>
+        <span class="legend-pct">${d.value}%</span>
+      </div>`).join('');
+  }
+}
+
+function buildPieCharts() {
+  Object.entries(PROFILES_DATA).forEach(([key, val]) => {
+    buildPieChart('pie-' + key, 'legend-' + key, val.portfolio);
+  });
+}
+
+/* ══════════════════════════════════════
+   BAR CHART (MOD 2)
+══════════════════════════════════════ */
+function buildBarChart() {
+  const ctx = document.getElementById('barChart');
+  if (!ctx) return;
+  const labels = ['BTC', 'ETH', 'Altcoins fuertes', 'Narrativas', 'Liquidez'];
+  const datasets = [
+    { label: '♟ Ajedrecista', data: [50, 25, 15, 0, 10], backgroundColor: 'rgba(59,122,245,.7)', borderColor: '#3B7AF5', borderWidth: 1.5, borderRadius: 4 },
+    { label: '🚴 Ciclista',   data: [35, 25, 25, 10, 5],  backgroundColor: 'rgba(16,185,129,.7)', borderColor: '#10B981', borderWidth: 1.5, borderRadius: 4 },
+    { label: '🪂 Paracaidista',data: [20, 20, 25, 25, 10], backgroundColor: 'rgba(239,68,68,.7)',   borderColor: '#EF4444', borderWidth: 1.5, borderRadius: 4 }
+  ];
+  new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#8B90A0', boxWidth: 10, boxHeight: 10, font: { family: "'DM Sans',sans-serif", size: 11 } } },
+        tooltip: { backgroundColor: '#1A1E28', borderColor: '#2A2F3E', borderWidth: 1, titleColor: '#E8EAF0', bodyColor: '#8B90A0', callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y}%` } }
+      },
+      scales: {
+        x: { ticks: { color: '#8B90A0', font: { size: 11 } }, grid: { color: '#1A1E28' } },
+        y: { ticks: { color: '#8B90A0', callback: v => v + '%', font: { size: 11 } }, grid: { color: '#2A2F3E', lineWidth: .5 }, max: 60 }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════
+   LINE CHART (MOD 3)
+══════════════════════════════════════ */
+function buildLineChart() {
+  const ctx = document.getElementById('lineChart');
+  if (!ctx) return;
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const btc  = [800, 1700, 2800, 3800, 5200, 6100, 6800, 7500, 9100, 10200, 11000, 12800];
+  const eth  = [0,   0,    400,  900,  1600, 2100, 2500, 2900, 3600, 4200,  4800,  5600];
+  const total= btc.map((b, i) => b + eth[i] + (i >= 2 ? (i - 1) * 120 : 0));
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        { label: 'BTC acumulado ($)',   data: btc,   borderColor: '#F59E0B', backgroundColor: 'rgba(245,158,11,.08)', tension: .4, pointRadius: 3, fill: true },
+        { label: 'ETH acumulado ($)',   data: eth,   borderColor: '#6366F1', backgroundColor: 'rgba(99,102,241,.06)', tension: .4, pointRadius: 3, fill: true },
+        { label: 'Total portafolio ($)',data: total, borderColor: '#E8EAF0', backgroundColor: 'transparent', tension: .4, pointRadius: 3, borderWidth: 2, borderDash: [4,3] }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8B90A0', boxWidth: 10, font: { family: "'DM Sans',sans-serif", size: 11 } } },
+        tooltip: { backgroundColor: '#1A1E28', borderColor: '#2A2F3E', borderWidth: 1, titleColor: '#E8EAF0', bodyColor: '#8B90A0', callbacks: { label: c => ` ${c.dataset.label}: $${c.parsed.y.toLocaleString()}` } }
+      },
+      scales: {
+        x: { ticks: { color: '#8B90A0', font: { size: 11 } }, grid: { color: '#1A1E28' } },
+        y: { ticks: { color: '#8B90A0', callback: v => '$' + v.toLocaleString(), font: { size: 11 } }, grid: { color: '#2A2F3E', lineWidth: .5 } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════
+   QUIZ ENGINE
+══════════════════════════════════════ */
+function renderQuizIntro() {
+  quizStarted = false; quizDone = false; quizAnswers = {}; quizIdx = 0;
+  document.getElementById('quiz-main').innerHTML = `
+    <div class="hero-pill">🎯 Módulo 5 · Evaluación Final</div>
+    <div class="display">Demuestra lo que <em>aprendiste</em></div>
+    <p class="lead">15 preguntas de opción múltiple que cubren los 4 módulos del taller. Cada pregunta correcta vale <strong>6.67 puntos</strong> sobre 100. Necesitas 60+ para obtener la calificación de aprobado.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">15</div><div class="stat-lbl">Preguntas</div></div>
+      <div class="stat"><div class="stat-val">100</div><div class="stat-lbl">Puntos totales</div></div>
+      <div class="stat"><div class="stat-val">60+</div><div class="stat-lbl">Para aprobar</div></div>
+      <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">Módulos cubiertos</div></div>
+    </div>
+    <div class="card" style="margin-bottom:1.2rem;border-color:rgba(201,162,39,.3)">
+      <h3 style="margin-bottom:.4rem">📋 Instrucciones</h3>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+        <li style="font-size:13px;color:var(--txt2);display:flex;gap:8px"><span style="color:var(--gold)">•</span> Selecciona la respuesta que consideres correcta haciendo clic sobre ella.</li>
+        <li style="font-size:13px;color:var(--txt2);display:flex;gap:8px"><span style="color:var(--gold)">•</span> Recibirás retroalimentación inmediata con la justificación de la respuesta.</li>
+        <li style="font-size:13px;color:var(--txt2);display:flex;gap:8px"><span style="color:var(--gold)">•</span> Puedes navegar hacia atrás pero no cambiar respuestas ya confirmadas.</li>
+        <li style="font-size:13px;color:var(--txt2);display:flex;gap:8px"><span style="color:var(--gold)">•</span> Al finalizar verás tu puntaje y el desglose de aciertos y errores.</li>
+      </ul>
+    </div>
+    <button onclick="startQuiz()" class="cta">▶ Iniciar evaluación</button>`;
+}
+
+function startQuiz() {
+  quizStarted = true;
+  quizIdx = 0;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (quizDone) { renderResult(); return; }
+  const q = QUIZ_DATA[quizIdx];
+  const pct = Math.round((quizIdx / 15) * 100);
+  const answered = quizAnswers[quizIdx] !== undefined;
+  const mods = ['Módulo 1 · Diagnóstico','Módulo 2 · Perfiles','Módulo 3 · Arquitectura','Módulo 4 · Calendario'];
+  const modTag = quizIdx < 4 ? mods[0] : quizIdx < 8 ? mods[1] : quizIdx < 11 ? mods[2] : mods[3];
+  const dots = Array.from({length:15},(_,i)=>`<div style="width:${100/15}%;height:100%;background:${i<quizIdx?'var(--green)':i===quizIdx?'var(--gold)':'var(--surface3)'};border-radius:3px;transition:background .3s"></div>`).join('');
+
+  document.getElementById('quiz-main').innerHTML = `
+    <div class="hero-pill">🎯 Evaluación Final</div>
+    <div class="quiz-counter">Pregunta ${quizIdx + 1} de 15 · Puntaje actual: ${Math.round(Object.values(quizAnswers).filter((_,i)=>QUIZ_DATA[i]&&quizAnswers[i]===QUIZ_DATA[i].c).length * 100 / 15)} / 100</div>
+    <div style="display:flex;gap:2px;margin-bottom:1rem;height:6px">${dots}</div>
+
+    <div class="quiz-q-box">
+      <div class="quiz-q-mod">${modTag}</div>
+      <div class="quiz-q-text" style="margin-top:6px">${quizIdx+1}. ${q.q}</div>
+    </div>
+
+    <div class="quiz-opts">
+      ${q.opts.map((opt, i) => {
+        let cls = 'quiz-opt';
+        if (answered) {
+          cls += ' locked';
+          if (i === q.c) cls += ' correct';
+          else if (quizAnswers[quizIdx] === i) cls += ' wrong';
+          else cls += ' dimmed';
+        } else {
+          if (quizAnswers[quizIdx] === i) cls += ' selected';
+        }
+        return `<button class="${cls}" onclick="selectAnswer(${i})" ${answered ? 'disabled' : ''}>
+          <span class="opt-key">${['A','B','C','D'][i]}</span>${opt}
+        </button>`;
+      }).join('')}
+    </div>
+
+    ${answered ? `<div class="quiz-feedback show ${quizAnswers[quizIdx] === q.c ? 'ok' : 'bad'}">
+      <strong>${quizAnswers[quizIdx] === q.c ? '✅ Correcto' : '❌ Incorrecto'}</strong>
+      ${quizAnswers[quizIdx] === q.c ? q.fb_ok : q.fb_bad}
+    </div>` : ''}
+
+    <div class="quiz-nav">
+      <button class="quiz-btn quiz-btn-prev" onclick="quizPrev()" ${quizIdx === 0 ? 'disabled' : ''}>← Anterior</button>
+      ${quizIdx < 14
+        ? `<button class="quiz-btn quiz-btn-next" onclick="quizNext()" ${!answered ? 'disabled' : ''}>Siguiente →</button>`
+        : `<button class="quiz-btn quiz-btn-next" onclick="finishQuiz()" ${!answered ? 'disabled' : ''}>Finalizar evaluación ✓</button>`
+      }
+    </div>`;
+}
+
+function selectAnswer(i) {
+  if (quizAnswers[quizIdx] !== undefined) return;
+  quizAnswers[quizIdx] = i;
+  renderQuestion();
+}
+function quizNext() { if (quizIdx < 14) { quizIdx++; renderQuestion(); } }
+function quizPrev() { if (quizIdx > 0)  { quizIdx--; renderQuestion(); } }
+function finishQuiz() { quizDone = true; renderResult(); }
+
+function renderResult() {
+  const total = QUIZ_DATA.length;
+  const correct = QUIZ_DATA.filter((q, i) => quizAnswers[i] === q.c).length;
+  const score = Math.round(correct * 100 / total);
+  const stars = score >= 90 ? 5 : score >= 80 ? 4 : score >= 60 ? 3 : score >= 40 ? 2 : 1;
+  const starStr = '⭐'.repeat(stars) + '☆'.repeat(5-stars);
+  const levels = [
+    [90, '#F59E0B', '🏆 Experto', 'Dominas la arquitectura de portafolios cripto. Tienes criterio para operar con cualquier perfil y construir estrategias sólidas.'],
+    [80, '#10B981', '🥇 Avanzado', 'Excelente comprensión del taller. Pequeñas brechas en conceptos específicos que puedes cerrar repasando los módulos donde fallaste.'],
+    [60, '#C9A227', '📈 Aprobado', 'Comprensión sólida de los fundamentos. Revisa las preguntas incorrectas — cada error señala un concepto que puede costar dinero en el mercado real.'],
+    [0,  '#EF4444', '📚 En desarrollo', 'Necesitas repasar los módulos antes de aplicar el taller. El conocimiento incompleto en inversiones es más peligroso que el desconocimiento total.']
+  ];
+  const [,color,level,msg] = levels.find(([min]) => score >= min);
+
+  document.getElementById('quiz-main').innerHTML = `
+    <div class="hero-pill">📊 Resultado de la evaluación</div>
+    <div class="result-score">
+      <div class="score-num" style="color:${color}">${score}</div>
+      <div class="score-label">puntos sobre 100 · ${correct} de ${total} correctas</div>
+      <div class="score-stars">${starStr}</div>
+      <div style="font-size:18px;font-weight:600;color:${color};margin-bottom:.5rem">${level}</div>
+      <div class="score-msg">${msg}</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button onclick="retryQuiz()" class="cta" style="font-size:12.5px">↺ Intentar de nuevo</button>
+        <button onclick="setModIdx(0)" class="cta cta-outline" style="font-size:12.5px">⬅ Volver al inicio</button>
+      </div>
+    </div>
+
+    <div class="section-label">Desglose por pregunta</div>
+    <div class="result-detail">
+      ${QUIZ_DATA.map((q, i) => {
+        const ok = quizAnswers[i] === q.c;
+        return `<div class="result-item">
+          <div class="result-icon">${ok ? '✅' : '❌'}</div>
+          <div class="result-q"><strong style="color:var(--txt)">${i+1}. ${q.q}</strong><br>
+          ${!ok ? `<span style="font-size:11.5px;color:var(--txt3)">Tu respuesta: "${q.opts[quizAnswers[i]] ?? 'Sin responder'}" · Correcta: "${q.opts[q.c]}"</span>` : ''}
+          </div>
+          <div class="result-status" style="color:${ok?'var(--green)':'var(--red)'}">${ok?'+6.67':'+0'}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function retryQuiz() {
+  quizAnswers = {}; quizIdx = 0; quizDone = false; quizStarted = false;
+  renderQuizIntro();
+}
+
+/* ══════════════════════════════════════
+   HERO NAV & PROGRESS
+══════════════════════════════════════ */
+function goHero(){
+  document.getElementById('scr-hero').classList.add('on');
+  document.getElementById('scr-content').classList.remove('on');
+  document.getElementById('pbar').style.width='0%';
+  document.getElementById('pct').textContent='0%';
+  document.getElementById('nbadge').textContent='Bienvenida';
+}
+function goContent(){
+  document.getElementById('scr-hero').classList.remove('on');
+  document.getElementById('scr-content').classList.add('on');
+  document.getElementById('pbar').style.width='0%';
+  document.getElementById('pct').textContent='0%';
+  document.getElementById('nbadge').textContent='Módulo 1 — Diagnóstico';
+}
+// Patch setMod to update progress + badge
+const _origSetMod = setMod;
+setMod = function(idx, btn) {
+  _origSetMod(idx, btn);
+  const labels=['Módulo 1 — Diagnóstico','Módulo 2 — Perfiles','Módulo 3 — Arquitectura','Módulo 4 — Calendario','Módulo 5 — Evaluación'];
+  const pct=Math.round(idx/4*80);
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('pct').textContent=pct+'%';
+  document.getElementById('nbadge').textContent=labels[idx]||'';
+};
+// Patch setModIdx to use mod-tab selector
+setModIdx = function(idx) {
+  const tabs=document.querySelectorAll('.mod-tab');
+  setMod(idx, tabs[idx]);
+};
+
+/* ══════════════════════════════════════
+   HERO COUNTERS
+══════════════════════════════════════ */
+function countUp(el,n,d){
+  if(!el)return;d=d||1100;let s=null;
+  function f(ts){if(!s)s=ts;const p=Math.min((ts-s)/d,1);el.textContent=Math.round(p*n);if(p<1)requestAnimationFrame(f);else el.textContent=n;}
+  requestAnimationFrame(f);
+}
+setTimeout(function(){
+  countUp(document.getElementById('kn1'),4);
+  countUp(document.getElementById('kn2'),3,1200);
+  countUp(document.getElementById('kn3'),15,1400);
+  countUp(document.getElementById('kn4'),4,1600);
+},400);
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+buildDiagTest();
+renderQuizIntro();
+
+/* ══════════════════════════════════════
+   PARTICLES
+══════════════════════════════════════ */
+(function(){
+  var c=document.getElementById('cvs'),ctx=c.getContext('2d');
+  var W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  function P(){this.reset(true);}
+  P.prototype.reset=function(r){this.x=Math.random()*W;this.y=r?Math.random()*H:H+5;
+    this.vx=(Math.random()-.5)*.2;this.vy=-(Math.random()*.3+.07);
+    this.r=Math.random()*1.2+.28;this.a=Math.random()*.38+.08;this.da=(Math.random()-.5)*.0032;};
+  P.prototype.update=function(){this.x+=this.vx;this.y+=this.vy;this.a+=this.da;
+    if(this.a<.05)this.da=Math.abs(this.da);if(this.a>.62)this.da=-Math.abs(this.da);
+    if(this.y<-5||this.x<-10||this.x>W+10)this.reset(false);};
+  P.prototype.draw=function(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle='rgba(201,162,39,'+this.a+')';ctx.fill();};
+  for(var i=0;i<80;i++)pts.push(new P());
+  function lines(){for(var i=0;i<pts.length;i++)for(var j=i+1;j<pts.length;j++){
+    var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<95){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+      ctx.strokeStyle='rgba(201,162,39,'+(0.09*(1-d/95))+')';ctx.lineWidth=.3;ctx.stroke();}}}
+  function loop(){ctx.clearRect(0,0,W,H);pts.forEach(function(p){p.update();p.draw();});lines();requestAnimationFrame(loop);}
+  loop();
+})();
+</script>
+</div>
+</div>
+</div>
+</body>
+</html>
