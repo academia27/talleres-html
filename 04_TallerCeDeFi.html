@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Taller CeDeFi — Estrategias desde el Exchange 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;--gold-b:#F0C040;--gold-dim:#8A6A20;
+  --bcard:#0D0D0D;--bp2:#161616;--bp3:#1C1C1C;
+  --bg:rgba(201,168,76,.22);
+  --tgold:#C9A84C;--tgoldb:#F0C040;--tmuted:rgba(201,168,76,.5);
+  --tw:rgba(255,255,255,.93);--tdim:rgba(255,255,255,.62);
+  --red:#E05050;--green:#50C878;--blue:#4A9EFF;--purple:#A070FF;--cyan:#00D4FF;--amber:#F59E0B;
+}
+html,body{width:100%;min-height:100vh;background:#000;overflow-x:hidden;font-family:'Rajdhani',sans-serif;color:var(--tw);line-height:1.65}
+#cvs{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.28}
+.gb{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(201,168,76,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.025) 1px,transparent 1px);background-size:55px 55px}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.8rem;border-bottom:1px solid var(--bg);background:rgba(0,0,0,.88);backdrop-filter:blur(18px);position:sticky;top:0;z-index:200;gap:1rem;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:.75rem;cursor:pointer;flex-shrink:0}
+.logo-ring{width:38px;height:38px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:glow 4s ease infinite}
+@keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 14px rgba(201,168,76,.4)}}
+.logo-txt{font-family:'Orbitron',sans-serif;font-size:.6rem;color:var(--tgold);letter-spacing:.1em;text-transform:uppercase;line-height:1.4}
+.logo-txt b{display:block;font-size:.48rem;color:var(--tmuted);letter-spacing:.16em;font-weight:400}
+.nav-prog{flex:1;max-width:260px}
+.plbl{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:4px}
+.ptrack{height:2px;background:rgba(201,168,76,.1);border-radius:2px}
+.pbar{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease;width:0%}
+.nbadge{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.09em;padding:.28rem .75rem;border:1.5px solid rgba(240,192,64,.5);color:var(--tgoldb);text-transform:uppercase;background:rgba(201,168,76,.06);white-space:nowrap}
+
+/* SCREENS */
+.scr{display:none;flex-direction:column;flex:1;animation:fup .45s ease both}
+.scr.on{display:flex}
+@keyframes fup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:2.5rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+.hdline{position:absolute;top:50%;left:50%;width:700px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.09),transparent);transform:translate(-50%,-50%) rotate(var(--r));animation:lf 7s ease infinite;animation-delay:var(--d)}
+@keyframes lf{0%,100%{opacity:0}50%{opacity:1}}
+.emblem{position:relative;width:200px;height:200px;margin:0 auto 1.8rem;flex-shrink:0}
+.er{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.15);animation:rp 4.5s ease infinite}
+.er:nth-child(1){inset:0}.er:nth-child(2){inset:-18px;animation-delay:.7s;border-color:rgba(201,168,76,.08)}.er:nth-child(3){inset:-36px;animation-delay:1.4s;border-color:rgba(201,168,76,.04)}
+@keyframes rp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.55}}
+.ecore{position:absolute;inset:12px;border-radius:50%;border:2px solid rgba(201,168,76,.5);background:radial-gradient(circle at 35% 30%,rgba(201,168,76,.15),rgba(0,0,0,.9));display:flex;align-items:center;justify-content:center}
+.hero-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.22em;color:var(--gold);border:1px solid var(--bg);padding:.32rem 1rem;text-transform:uppercase;margin-bottom:1.5rem;display:inline-block;animation:bp 3s ease infinite}
+@keyframes bp{0%,100%{border-color:rgba(201,168,76,.2)}50%{border-color:rgba(240,192,64,.6);box-shadow:0 0 12px rgba(201,168,76,.16)}}
+.hero h1{font-family:'Cinzel',serif;font-size:clamp(1.8rem,4.5vw,3rem);color:#fff;line-height:1.05;font-weight:700;margin-bottom:.4rem}
+.hero h1 span{color:var(--gold-b);display:block}
+.hero-sub{font-size:1rem;color:var(--tdim);margin-bottom:1.8rem;max-width:480px;line-height:1.7;font-weight:300}
+.hero-sub strong{color:var(--tgold);font-weight:600}
+.hero-kpis{display:flex;gap:1.8rem;margin-bottom:2.2rem;flex-wrap:wrap;justify-content:center}
+.kpi{text-align:center}.kpi-n{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;color:var(--gold-b);line-height:1}
+.kpi-l{font-size:.62rem;letter-spacing:.11em;color:var(--tmuted);text-transform:uppercase;margin-top:.2rem}
+.ksep{width:1px;background:var(--bg);align-self:stretch}
+.btn-go{font-family:'Orbitron',sans-serif;font-size:.7rem;letter-spacing:.17em;padding:.9rem 2.2rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;border:none;cursor:pointer;font-weight:700;transition:all .3s;position:relative;overflow:hidden}
+.btn-go::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-120%);transition:transform .5s}
+.btn-go:hover::after{transform:translateX(120%)}
+.btn-go:hover{box-shadow:0 0 26px rgba(201,168,76,.4);transform:translateY(-2px)}
+
+/* MENU */
+.menu-wrap{padding:2rem 1.8rem 3rem;max-width:1060px;margin:0 auto;width:100%}
+.sec-hdr{border-left:3px solid var(--gold);padding-left:1rem;margin-bottom:1.8rem}
+.sec-hdr h2{font-family:'Cinzel',serif;font-size:1.4rem;color:#fff;font-weight:600}
+.sec-hdr p{font-size:.86rem;color:var(--tmuted);margin-top:.22rem}
+.mgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;margin-bottom:1.4rem}
+@media(max-width:560px){.mgrid{grid-template-columns:1fr}}
+.mcard{background:var(--bcard);border:1px solid var(--bg);padding:1.4rem 1.2rem;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.6rem}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .4s}
+.mcard:hover::before,.mcard.mdone::before{transform:scaleX(1)}
+.mcard:hover{border-color:rgba(240,192,64,.42);background:#0f0f0f;transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.mcard.mdone{border-color:rgba(80,200,120,.22)}
+.mcard.mdone::before{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.mn{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.16em;color:var(--tmuted);text-transform:uppercase}
+.mico{width:48px;height:48px;border:1px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.mtit{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold-b);font-weight:600;line-height:1.3}
+.mdesc{font-size:.83rem;color:var(--tdim);line-height:1.55}
+.mtag{font-size:.56rem;letter-spacing:.08em;padding:.16rem .5rem;border:1px solid var(--bg);color:var(--tmuted);text-transform:uppercase;font-family:'Orbitron',sans-serif;align-self:flex-start}
+.mchk{position:absolute;top:.7rem;right:.7rem;width:20px;height:20px;border-radius:50%;background:var(--green);display:none;align-items:center;justify-content:center}
+.mcard.mdone .mchk{display:flex}
+.menu-btns{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn-s{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.1em;padding:.62rem 1.4rem;border:1.5px solid rgba(201,168,76,.45);color:var(--tgoldb);text-transform:uppercase;background:rgba(201,168,76,.08);cursor:pointer;transition:all .22s;font-weight:600}
+.btn-s:hover{border-color:var(--gold-b);color:var(--gold-b);background:rgba(201,168,76,.15)}
+
+/* CONTENT */
+.cwrap{max-width:960px;margin:0 auto;padding:1.8rem;width:100%}
+.back{display:inline-flex;align-items:center;gap:.4rem;font-size:.6rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;cursor:pointer;border:none;background:none;font-family:'Orbitron',sans-serif;transition:color .2s;margin-bottom:1.6rem;padding:0}
+.back:hover{color:var(--gold)}
+.phdr{display:flex;align-items:flex-start;gap:1.2rem;margin-bottom:1.8rem;padding-bottom:1.6rem;border-bottom:1px solid var(--bg)}
+.pico2{width:64px;height:64px;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:rgba(201,168,76,.06)}
+.phnum{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.18em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.3rem}
+.phtit{font-family:'Cinzel',serif;font-size:1.65rem;color:#fff;font-weight:700;line-height:1.1;margin-bottom:.25rem}
+.phtit em{font-style:normal;color:var(--gold-b)}
+.phsub{font-size:.88rem;color:var(--tdim);line-height:1.5}
+
+/* BLOCKS */
+.blk{margin-bottom:1.8rem}
+.blk-lbl{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:.42rem}
+.blk-lbl::after{content:'';flex:1;height:1px;background:var(--bg)}
+
+/* CONCEPT BOX */
+.concept-box{background:rgba(201,168,76,.04);border:1px solid var(--bg);border-left:4px solid var(--gold);padding:1rem 1.2rem;margin-bottom:.9rem}
+.concept-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.13em;color:var(--gold);text-transform:uppercase;margin-bottom:.35rem;display:flex;align-items:center;gap:.38rem}
+.concept-tag::before{content:'💡';font-size:.8rem}
+.concept-box p{font-size:.91rem;color:rgba(255,220,140,.8);line-height:1.7}
+.concept-box strong{color:var(--tgoldb)}
+
+/* ACADEMIC */
+.academic-box{background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.18);border-left:4px solid var(--blue);padding:1rem 1.2rem;margin-bottom:.9rem}
+.academic-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.13em;color:var(--blue);text-transform:uppercase;margin-bottom:.35rem;display:flex;align-items:center;gap:.38rem}
+.academic-tag::before{content:'📚';font-size:.8rem}
+.academic-box p{font-size:.91rem;color:rgba(180,210,255,.8);line-height:1.7}
+.academic-box strong{color:rgba(150,200,255,.92)}
+
+/* WARNING */
+.warn-box{display:flex;align-items:flex-start;gap:.6rem;padding:.75rem .95rem;background:rgba(224,80,80,.06);border:1px solid rgba(224,80,80,.2);border-left:4px solid var(--red);font-size:.87rem;color:rgba(255,200,200,.8);line-height:1.65;margin-bottom:.9rem}
+
+/* ALERT */
+.alert-box{background:rgba(50,120,50,.07);border:1px solid rgba(80,180,80,.18);border-left:4px solid #50C050;padding:.85rem 1rem;font-size:.87rem;color:rgba(175,235,175,.75);line-height:1.6;margin-bottom:.9rem}
+.alert-box strong{color:#80D080}
+
+/* INFO GRID */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+@media(max-width:560px){.info-grid{grid-template-columns:1fr}}
+.info-card{background:var(--bp2);border:1px solid rgba(201,168,76,.12);padding:1rem}
+.info-card-ico{font-size:1.4rem;margin-bottom:.5rem}
+.info-card-t{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.4rem}
+.info-card-d{font-size:.88rem;color:var(--tdim);line-height:1.65}
+.info-card-d strong{color:var(--tgold)}
+
+/* LINKS */
+.ext-link{display:flex;align-items:center;gap:1rem;padding:.9rem 1.1rem;border:1.5px solid rgba(201,168,76,.3);background:rgba(201,168,76,.05);text-decoration:none;transition:all .22s;margin-bottom:.65rem;position:relative;overflow:hidden}
+.ext-link:hover{border-color:var(--gold);background:rgba(201,168,76,.1);transform:translateX(3px)}
+.ext-link-ico{font-size:1.3rem;flex-shrink:0}
+.ext-link-name{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.08em;color:var(--gold-b);text-transform:uppercase;margin-bottom:.18rem}
+.ext-link-desc{font-size:.82rem;color:var(--tdim);line-height:1.4}
+.ext-link-arrow{margin-left:auto;color:var(--tmuted);font-size:.7rem;font-family:'Orbitron',sans-serif}
+
+/* STEPS */
+.steps-wrap{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1rem}
+.step-card{background:var(--bp2);border:1px solid rgba(201,168,76,.1);border-left:3px solid var(--gold-dim);overflow:hidden;transition:all .25s}
+.step-card.done-s{border-left-color:var(--green)}
+.step-hdr{display:flex;align-items:center;gap:.85rem;padding:.82rem .95rem;cursor:pointer;user-select:none}
+.step-hdr:hover{background:rgba(201,168,76,.04)}
+.step-num{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--gold);flex-shrink:0;transition:all .3s}
+.step-card.done-s .step-num{background:var(--green);border-color:var(--green);color:#000}
+.step-title{flex:1;font-size:.91rem;color:var(--tgoldb);font-weight:600}
+.step-arr{font-size:.62rem;color:var(--tmuted);transition:transform .28s;font-family:'Orbitron',sans-serif}
+.step-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1)}
+.step-body.open{max-height:1200px}
+.step-inner{padding:.2rem .95rem .95rem 2.6rem}
+.step-path{background:rgba(0,0,0,.45);border:1px solid rgba(201,168,76,.18);padding:.6rem .9rem;margin-bottom:.75rem;font-size:.78rem;line-height:1.7;color:rgba(201,168,76,.7);font-family:'Orbitron',sans-serif;letter-spacing:.04em}
+.step-desc{font-size:.88rem;color:var(--tdim);line-height:1.7;margin-bottom:.75rem}
+.step-tips{display:flex;flex-direction:column;gap:.38rem;margin-bottom:.75rem}
+.step-tip{display:flex;align-items:flex-start;gap:.52rem;font-size:.85rem;color:var(--tdim);line-height:1.6;padding:.5rem .72rem;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.07)}
+.step-tip::before{content:'▸';color:var(--gold);flex-shrink:0;margin-top:.12rem;font-size:.7rem}
+.step-tip strong{color:var(--tgold)}
+.step-done-btn{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.1em;padding:.48rem 1.1rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .22s}
+.step-done-btn:hover:not(.already){box-shadow:0 0 14px rgba(201,168,76,.25);transform:translateY(-1px)}
+.step-done-btn.already{background:rgba(80,200,120,.12);color:var(--green);border:1px solid rgba(80,200,120,.26);cursor:default}
+
+/* PROGRESS */
+.mod-progress{display:flex;align-items:center;gap:.85rem;margin-bottom:1.4rem;padding:.85rem 1rem;background:var(--bp2);border:1px solid rgba(201,168,76,.1)}
+.mp-lbl{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;min-width:75px}
+.mp-track{flex:1;height:2px;background:rgba(201,168,76,.08);border-radius:2px}
+.mp-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease}
+.mp-count{font-family:'Orbitron',sans-serif;font-size:.63rem;color:var(--gold-b);font-weight:700;min-width:36px;text-align:right}
+
+/* CHART SECTION */
+.chart-section{background:var(--bcard);border:1px solid var(--bg);padding:1.2rem;margin-bottom:1rem}
+.chart-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;gap:.8rem;flex-wrap:wrap}
+.ctit{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.2rem;display:flex;align-items:center;gap:.42rem}
+.ctit span{color:var(--gold);font-size:.72rem}
+.chart-sub{font-size:.82rem;color:var(--tdim);line-height:1.5}
+.ceb{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.09em;padding:.32rem .8rem;border:1px solid rgba(201,168,76,.28);color:var(--tmuted);background:none;cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.ceb:hover,.ceb.open{border-color:var(--gold-b);color:var(--gold-b);background:rgba(201,168,76,.06)}
+.ce{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.ce.open{max-height:500px}
+.ce-inner{border-top:1px solid rgba(201,168,76,.1);padding:.75rem 0 .1rem}
+.ce-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.65rem}
+@media(max-width:520px){.ce-grid{grid-template-columns:1fr}}
+.ce-item{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.1);padding:.6rem .75rem}
+.ce-item-lbl{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.28rem}
+.ce-item-txt{font-size:.84rem;color:var(--tdim);line-height:1.6}
+.ce-item-txt strong{color:var(--tgold)}
+.ce-tip{background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.15);border-left:3px solid var(--blue);padding:.6rem .85rem;font-size:.83rem;color:rgba(180,210,255,.78);line-height:1.6}
+
+/* CHECKLIST */
+.checklist{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.chk-item{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem .9rem;background:var(--bp2);border:1px solid rgba(201,168,76,.09);cursor:pointer;transition:all .18s;user-select:none}
+.chk-item:hover{background:rgba(201,168,76,.04);border-color:rgba(201,168,76,.2)}
+.chk-item.chk-done{border-color:rgba(80,200,120,.25);background:rgba(80,200,120,.04)}
+.chk-box{width:20px;height:20px;border:1.5px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;transition:all .2s;font-size:.7rem;color:transparent}
+.chk-item.chk-done .chk-box{background:var(--green);border-color:var(--green);color:#000}
+.chk-text{font-size:.88rem;color:var(--tdim);line-height:1.55}
+.chk-text strong{color:var(--tgold)}
+.chk-item.chk-done .chk-text{color:rgba(80,200,120,.7);text-decoration:line-through;text-decoration-color:rgba(80,200,120,.3)}
+.chk-progress-wrap{display:flex;align-items:center;gap:.75rem;padding:.65rem .9rem;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.1);margin-bottom:.75rem}
+.chk-prog-track{flex:1;height:3px;background:rgba(201,168,76,.1);border-radius:3px}
+.chk-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:3px;transition:width .4s ease}
+.chk-prog-lbl{font-family:'Orbitron',sans-serif;font-size:.55rem;color:var(--gold-b);font-weight:700;min-width:30px;text-align:right}
+
+/* COMPARISON TABLE */
+.comp-tbl{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:.9rem;overflow-x:auto;display:block}
+.comp-tbl th{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;padding:.5rem .7rem;border-bottom:1px solid var(--bg);text-align:left;font-weight:400;white-space:nowrap}
+.comp-tbl td{padding:.6rem .7rem;border-bottom:1px solid rgba(201,168,76,.05);color:var(--tdim);vertical-align:top;line-height:1.45}
+.comp-tbl td:first-child{color:var(--gold-b);font-weight:600}
+.comp-tbl tr:hover td{background:rgba(201,168,76,.025)}
+.comp-tbl .good{color:var(--green)}.comp-tbl .bad{color:var(--red)}.comp-tbl .warn{color:var(--amber)}
+
+/* SCENARIO CARDS */
+.scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+@media(max-width:560px){.scenario-grid{grid-template-columns:1fr}}
+.scenario-card{padding:1rem;border:1.5px solid;border-radius:2px;position:relative;overflow:hidden}
+.scenario-card.bull{border-color:rgba(80,200,120,.35);background:rgba(80,200,120,.04)}
+.scenario-card.bear{border-color:rgba(224,80,80,.35);background:rgba(224,80,80,.04)}
+.scenario-card.neutral{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.04)}
+.sc-tag{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;font-weight:700}
+.scenario-card.bull .sc-tag{color:var(--green)}.scenario-card.bear .sc-tag{color:var(--red)}.scenario-card.neutral .sc-tag{color:var(--amber)}
+.sc-title{font-size:.92rem;font-weight:600;color:var(--tw);margin-bottom:.4rem}
+.sc-desc{font-size:.83rem;color:var(--tdim);line-height:1.6}
+
+/* WIDGET */
+.wbox{background:var(--bcard);border:1px solid var(--bg);padding:1.1rem;margin-bottom:1rem}
+.wrow{display:flex;align-items:center;gap:.9rem;margin-bottom:.85rem;flex-wrap:wrap}
+.wlbl{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;min-width:110px;line-height:1.4}
+.wslider{flex:1;min-width:100px;-webkit-appearance:none;height:3px;background:rgba(201,168,76,.14);outline:none;border-radius:2px;cursor:pointer}
+.wslider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold-b);cursor:pointer;box-shadow:0 0 7px rgba(240,192,64,.42)}
+.wval{font-family:'Orbitron',sans-serif;font-size:.7rem;color:var(--gold-b);min-width:60px;text-align:right;font-weight:700}
+.wres{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-top:.85rem}
+@media(max-width:480px){.wres{grid-template-columns:1fr 1fr}}
+.wr{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12);padding:.72rem;text-align:center}
+.wr-l{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.08em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.38rem}
+.wr-v{font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:700;color:var(--gold-b)}
+.wr-v.g{color:var(--green)}.wr-v.r{color:var(--red)}
+
+/* RULE BOX */
+.rule-box{background:rgba(201,168,76,.04);border:1px solid var(--bg);border-left:4px solid var(--gold);padding:.9rem 1.1rem;margin-bottom:.9rem}
+.rule-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;margin-bottom:.3rem}
+.rule-box p{font-size:.96rem;color:var(--tgoldb);font-weight:500;line-height:1.65}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid rgba(201,168,76,.1);overflow:hidden}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:.8rem .2rem;cursor:pointer;user-select:none;gap:.8rem}
+.faq-q:hover{color:var(--tgoldb)}
+.faq-q-txt{font-size:.9rem;font-weight:600;color:var(--tgoldb);flex:1;line-height:1.45}
+.faq-arr{font-family:'Orbitron',sans-serif;font-size:.6rem;color:var(--tmuted);transition:transform .25s;flex-shrink:0}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+.faq-a.open{max-height:300px}
+.faq-a-inner{padding:.2rem 0 .9rem;font-size:.87rem;color:var(--tdim);line-height:1.7}
+.faq-a-inner strong{color:var(--tgold)}
+
+/* FOOTER */
+.pfooter{display:flex;justify-content:space-between;align-items:center;margin-top:1.8rem;padding-top:1.2rem;border-top:1px solid var(--bg);flex-wrap:wrap;gap:.75rem}
+.btn-next{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.7rem 1.7rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;border:none;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:.38rem;transition:all .3s}
+.btn-next:hover{box-shadow:0 0 20px rgba(201,168,76,.32);transform:translateY(-1px)}
+
+/* QUIZ */
+.quiz-wrap{max-width:760px;margin:0 auto;padding:1.8rem;width:100%}
+.quiz-hero{text-align:center;padding:1.8rem 1rem 2.2rem;border-bottom:1px solid var(--bg);margin-bottom:1.8rem}
+.quiz-hero h2{font-family:'Cinzel',serif;font-size:clamp(1.5rem,3.5vw,2.2rem);color:#fff;margin-bottom:.55rem}
+.quiz-hero p{font-size:.9rem;color:var(--tdim);line-height:1.7;max-width:480px;margin:0 auto 1.4rem}
+.qm-pill{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.09em;color:var(--tmuted);padding:.28rem .75rem;border:1px solid rgba(201,168,76,.18);margin:.15rem;display:inline-block}
+.q-prog-wrap{margin-bottom:1.4rem}
+.q-prog-hdr{display:flex;justify-content:space-between;margin-bottom:.45rem}
+.q-prog-lbl{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.q-prog-score{font-family:'Orbitron',sans-serif;font-size:.52rem;color:var(--tmuted)}
+.q-prog-score span{color:var(--gold-b);font-weight:700}
+.q-prog-track{height:2px;background:rgba(201,168,76,.1);border-radius:2px;margin-bottom:.65rem}
+.q-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease}
+.q-dots{display:flex;gap:3px}
+.qdot{width:20px;height:3px;border-radius:2px;background:rgba(201,168,76,.12);transition:background .3s}
+.qdot.done{background:var(--green)}.qdot.active{background:var(--gold-b)}
+.q-card{background:var(--bcard);border:1px solid var(--bg);border-top:3px solid var(--gold);padding:1.4rem 1.2rem}
+.q-mod-tag{display:inline-flex;align-items:center;gap:.38rem;font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.12em;color:var(--gold-b);text-transform:uppercase;padding:.26rem .7rem;background:rgba(240,192,64,.07);border:1px solid rgba(240,192,64,.17);margin-bottom:.85rem}
+.q-title{font-family:'Cinzel',serif;font-size:1rem;color:#fff;margin-bottom:.85rem;line-height:1.35}
+.q-scenario{background:rgba(0,0,0,.35);border-left:3px solid var(--gold-dim);padding:.85rem 1.05rem;margin-bottom:1.1rem;font-size:.89rem;color:var(--tdim);line-height:1.75}
+.q-scenario strong{color:var(--tgold)}
+.q-opts{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.9rem}
+.q-opt{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem .9rem;background:var(--bp2);border:1.5px solid rgba(201,168,76,.09);cursor:pointer;transition:all .18s;font-size:.88rem;color:var(--tdim);line-height:1.52;text-align:left;width:100%}
+.q-opt:hover:not(.qlocked){border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.04);transform:translateX(2px)}
+.q-key{min-width:23px;height:23px;border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;color:var(--tmuted);flex-shrink:0;margin-top:.06rem}
+.q-opt.qcorrect{border-color:var(--green);background:rgba(80,200,120,.07)}
+.q-opt.qcorrect .q-key{background:var(--green);border-color:var(--green);color:#000}
+.q-opt.qwrong{border-color:var(--red);background:rgba(224,80,80,.07)}
+.q-opt.qwrong .q-key{background:var(--red);border-color:var(--red);color:#fff}
+.q-opt.qdim{opacity:.28;cursor:default}.q-opt.qlocked{cursor:default}
+.q-fb{display:none;gap:.85rem;align-items:flex-start;padding:.85rem .95rem;margin-bottom:.85rem;font-size:.87rem;line-height:1.7}
+.q-fb.show{display:flex;animation:fup .3s ease both}
+.q-fb.fc{background:rgba(80,200,120,.06);border:1px solid rgba(80,200,120,.18);border-left:3px solid var(--green);color:rgba(175,235,175,.85)}
+.q-fb.fw{background:rgba(224,80,80,.06);border:1px solid rgba(224,80,80,.18);border-left:3px solid var(--red);color:rgba(255,190,200,.85)}
+.q-fb strong{display:block;margin-bottom:.2rem;font-size:.91rem}
+.q-fb.fc strong{color:#80D890}.q-fb.fw strong{color:#FF7090}
+.q-nav{display:flex;justify-content:flex-end}
+.q-btn-next{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.11em;padding:.6rem 1.4rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .25s}
+.q-btn-next:hover:not(:disabled){box-shadow:0 0 16px rgba(201,168,76,.3);transform:translateY(-1px)}
+.q-btn-next:disabled{opacity:.26;cursor:not-allowed}
+
+/* RESULT */
+.result-hero{text-align:center;padding:2rem 1rem}
+.result-badge{width:110px;height:110px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1.3rem;font-size:3rem;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 70%);animation:rp 3s ease infinite}
+.result-score{font-family:'Orbitron',sans-serif;font-size:3.8rem;font-weight:700;background:linear-gradient(135deg,var(--gold-dim),var(--gold-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:.3rem}
+.result-stars{font-size:1.6rem;margin-bottom:1rem;letter-spacing:.28rem}
+.result-msg{font-size:.9rem;color:var(--tdim);line-height:1.75;max-width:440px;margin:.85rem auto 1.4rem;padding:.85rem .95rem;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12)}
+.result-breakdown{background:var(--bcard);border:1px solid var(--bg);padding:1.1rem;max-width:580px;margin:0 auto 1.4rem}
+.rb-title{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.13em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.9rem}
+.rb-row{display:flex;align-items:center;gap:.75rem;padding:.45rem 0;border-bottom:1px solid rgba(201,168,76,.05)}
+.rb-row:last-child{border-bottom:none}
+.rb-mod{font-size:.8rem;color:var(--tdim);flex:1}
+.result-actions{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap}
+.btn-restart{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.68rem 1.6rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .25s}
+.btn-restart:hover{box-shadow:0 0 20px rgba(201,168,76,.35);transform:translateY(-2px)}
+.btn-menu2{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.68rem 1.6rem;border:1px solid var(--bg);color:var(--tmuted);background:none;cursor:pointer;text-transform:uppercase;transition:all .22s}
+.btn-menu2:hover{border-color:var(--gold);color:var(--gold)}
+
+/* CERT */
+.cert{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:2.5rem 1.5rem;text-align:center}
+.cert-badge{width:140px;height:140px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.6rem;background:radial-gradient(circle,rgba(201,168,76,.1),transparent 70%)}
+.cert-mods{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;max-width:460px;margin:0 auto 1.6rem}
+.cert-mod{padding:.7rem;border:1px solid var(--bg);background:rgba(201,168,76,.04);font-size:.62rem;color:var(--gold);letter-spacing:.06em;font-family:'Orbitron',sans-serif;text-align:center}
+
+/* GLOSARIO */
+.glos-filter-btn{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.08em;padding:.28rem .75rem;border:1px solid var(--border-col,rgba(201,168,76,.2));color:var(--text-col,var(--tmuted));background:var(--bg-col,none);cursor:pointer;transition:all .2s;text-transform:uppercase;border-radius:2px}
+.glos-filter-btn.active{background:var(--active-bg);border-color:var(--active-border);color:var(--active-text)}
+.glos-card{background:var(--bp2);border:1px solid rgba(201,168,76,.1);border-left:3px solid var(--term-color,var(--gold-dim));margin-bottom:.6rem;overflow:hidden;transition:border-color .2s}
+.glos-card:hover{border-color:rgba(201,168,76,.25)}
+.glos-card-hdr{display:flex;align-items:center;gap:.75rem;padding:.75rem .95rem;cursor:pointer;user-select:none}
+.glos-card-hdr:hover{background:rgba(201,168,76,.03)}
+.glos-term{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.06em;color:var(--term-color,var(--gold-b));flex:1}
+.glos-eng{font-size:.7rem;color:var(--tmuted);font-style:italic;font-family:'Rajdhani',sans-serif}
+.glos-cat-badge{font-family:'Orbitron',sans-serif;font-size:.46rem;letter-spacing:.08em;padding:.15rem .55rem;border:1px solid;text-transform:uppercase;flex-shrink:0}
+.glos-arr{font-family:'Orbitron',sans-serif;font-size:.6rem;color:var(--tmuted);transition:transform .25s}
+.glos-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+.glos-body.open{max-height:400px}
+.glos-def{padding:.3rem .95rem .85rem .95rem}
+.glos-def-main{font-size:.9rem;color:var(--tdim);line-height:1.7;margin-bottom:.55rem}
+.glos-def-main strong{color:var(--tgold)}
+.glos-example{background:rgba(0,0,0,.3);border-left:2px solid var(--term-color,var(--gold-dim));padding:.5rem .75rem;font-size:.83rem;color:rgba(201,168,76,.7);line-height:1.6;font-style:italic;margin-bottom:.5rem}
+.glos-tip{display:flex;align-items:flex-start;gap:.45rem;font-size:.83rem;color:var(--tdim);padding:.4rem .65rem;background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.12);line-height:1.55}
+.glos-tip::before{content:'💡';font-size:.75rem;flex-shrink:0;margin-top:.1rem}
+.glos-no-results{text-align:center;padding:2rem;color:var(--tmuted);font-family:'Orbitron',sans-serif;font-size:.62rem;letter-spacing:.1em}
+
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
+@media(max-width:580px){.cwrap{padding:1.3rem .9rem}.step-inner{padding-left:1rem}.wres{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<canvas id="cvs"></canvas>
+<div class="gb"></div>
+<div class="app">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo" onclick="goScr('hero')">
+    <div class="logo-ring">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#C9A84C" stroke-width="1.4" fill="rgba(201,168,76,.1)"/>
+        <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#C9A84C" stroke-width="1.4"/>
+      </svg>
+    </div>
+    <div class="logo-txt">Taller CeDeFi <b>Estrategias desde el Exchange · 2026</b></div>
+  </div>
+  <div class="nav-prog">
+    <div class="plbl"><span>Progreso</span><span id="pct">0%</span></div>
+    <div class="ptrack"><div class="pbar" id="pbar"></div></div>
+  </div>
+  <div class="nbadge" id="nbadge">Bienvenida</div>
+</nav>
+
+<!-- HERO -->
+<div class="scr on" id="scr-hero">
+<div class="hero">
+  <div style="position:absolute;inset:0;pointer-events:none">
+    <div class="hdline" style="--r:-22deg;--d:0s"></div>
+    <div class="hdline" style="--r:22deg;--d:2.5s"></div>
+    <div class="hdline" style="--r:0deg;--d:5s"></div>
+  </div>
+  <div class="hero-tag">Taller Profesional · Edición 2026</div>
+  <div class="emblem"><div class="er"></div><div class="er"></div><div class="er"></div>
+    <div class="ecore">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="28" stroke="#C9A84C" stroke-width="1" stroke-dasharray="4 3" opacity=".4"/>
+        <circle cx="40" cy="40" r="16" stroke="#C9A84C" stroke-width="1.5" opacity=".7"/>
+        <circle cx="40" cy="40" r="6" fill="#F0C040" opacity=".9"/>
+        <line x1="40" y1="24" x2="40" y2="14" stroke="#C9A84C" stroke-width="1.5" opacity=".7"/>
+        <line x1="40" y1="56" x2="40" y2="66" stroke="#C9A84C" stroke-width="1.5" opacity=".7"/>
+        <line x1="24" y1="40" x2="14" y2="40" stroke="#C9A84C" stroke-width="1.5" opacity=".7"/>
+        <line x1="56" y1="40" x2="66" y2="40" stroke="#C9A84C" stroke-width="1.5" opacity=".7"/>
+        <circle cx="40" cy="14" r="2.5" fill="#C9A84C"/><circle cx="40" cy="66" r="2.5" fill="#C9A84C"/>
+        <circle cx="14" cy="40" r="2.5" fill="#C9A84C"/><circle cx="66" cy="40" r="2.5" fill="#C9A84C"/>
+      </svg>
+    </div>
+  </div>
+  <h1>ESTRATEGIAS DE <span>CeDeFi DESDE EL EXCHANGE</span></h1>
+  <p class="hero-sub">4 módulos teórico-prácticos: desde los fundamentos del modelo híbrido hasta la <strong>Inversión Dual con bloques de órdenes institucionales</strong>.</p>
+  <div class="hero-kpis">
+    <div class="kpi"><div class="kpi-n" id="kn1">0</div><div class="kpi-l">Módulos</div></div>
+    <div class="ksep"></div>
+    <div class="kpi"><div class="kpi-n" id="kn2">0</div><div class="kpi-l">Estrategias</div></div>
+    <div class="ksep"></div>
+    <div class="kpi"><div class="kpi-n" id="kn3">0</div><div class="kpi-l">Preguntas</div></div>
+    <div class="ksep"></div>
+    <div class="kpi"><div class="kpi-n" id="kn4">0</div><div class="kpi-l">Checklists</div></div>
+  </div>
+  <button class="btn-go" onclick="goScr('menu');renderMenu()">▶ &nbsp;INICIAR TALLER</button>
+</div>
+</div>
+
+<!-- MENU -->
+<div class="scr" id="scr-menu">
+<div class="menu-wrap">
+  
+<!-- RESUME BANNER -->
+<div id="resume-banner" style="display:none;margin:-1rem -1.8rem 1.4rem;padding:.85rem 1.8rem;background:rgba(80,200,120,.07);border-bottom:1px solid rgba(80,200,120,.22);display:none;align-items:center;gap:.9rem;flex-wrap:wrap">
+  <span style="font-size:1.2rem">✅</span>
+  <div style="flex:1">
+    <div style="font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.09em;color:#50C878;text-transform:uppercase;margin-bottom:.15rem">Progreso guardado</div>
+    <div id="resume-text" style="font-size:.83rem;color:rgba(80,200,120,.75);line-height:1.4"></div>
+  </div>
+  <button onclick="clearProgress()" style="font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.08em;padding:.3rem .75rem;border:1px solid rgba(224,80,80,.35);color:rgba(224,80,80,.7);background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0">↺ Reiniciar</button>
+</div>
+<div class="sec-hdr">
+    <h2>Los 4 Módulos del Taller CeDeFi</h2>
+    <p>Cada módulo combina teoría institucional, gráficas interactivas, checklists operativos y acceso directo al exchange.</p>
+  </div>
+  <div class="mgrid" id="mgrid"></div>
+  <div class="menu-btns">
+    <button class="btn-s" onclick="openQuiz()">🎯 Evaluación Final (15 preguntas)</button>
+    <button class="btn-s" onclick="clearProgress()" style="border-color:rgba(224,80,80,.35);color:rgba(224,80,80,.7);font-size:.52rem">↺ Reiniciar mi progreso</button>
+    <button class="btn-s" onclick="openGlosario()" style="border-color:rgba(74,158,255,.45);color:#4A9EFF;background:rgba(74,158,255,.07)">📖 Glosario CeDeFi</button>
+  </div>
+</div>
+</div>
+
+<!-- CONTENT -->
+<div class="scr" id="scr-content"><div class="cwrap" id="ci"></div></div>
+
+<!-- QUIZ -->
+<div class="scr" id="scr-quiz"><div class="quiz-wrap" id="quiz-container"></div></div>
+
+<!-- RESULT -->
+<div class="scr" id="scr-result"><div class="quiz-wrap" id="result-container"></div></div>
+
+<!-- GLOSARIO -->
+<div class="scr" id="scr-glosario">
+<div class="cwrap" style="max-width:960px">
+  <button class="back" onclick="goScr('menu')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver al menú
+  </button>
+  <div class="phdr">
+    <div class="pico2" style="font-size:1.8rem">📖</div>
+    <div>
+      <div class="phnum">Recurso de Apoyo · CeDeFi 2026</div>
+      <div class="phtit"><em>Glosario</em> de Términos</div>
+      <div class="phsub">Vocabulario esencial del ecosistema CeDeFi, DeFi y finanzas estructuradas. Haz clic en cualquier categoría para filtrar.</div>
+    </div>
+  </div>
+
+  <!-- Filtros por categoría -->
+  <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1.4rem" id="glos-filters"></div>
+
+  <!-- Búsqueda -->
+  <div style="position:relative;margin-bottom:1.2rem">
+    <input type="text" id="glos-search" placeholder="Buscar término..." oninput="filterGlosario()"
+      style="width:100%;background:var(--bp2);border:1.5px solid rgba(201,168,76,.25);color:var(--tw);padding:.7rem 1rem .7rem 2.4rem;font-family:'Rajdhani',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s"
+      onfocus="this.style.borderColor='rgba(201,168,76,.6)'" onblur="this.style.borderColor='rgba(201,168,76,.25)'">
+    <span style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);font-size:.9rem;opacity:.5">🔍</span>
+  </div>
+
+  <!-- Contador -->
+  <div id="glos-count" style="font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;margin-bottom:1rem"></div>
+
+  <!-- Términos -->
+  <div id="glos-list"></div>
+</div>
+</div>
+
+<!-- CERT -->
+<div class="scr" id="scr-cert">
+  <div class="cert">
+    <div class="cert-badge"><span style="font-size:2.8rem">🏛️</span></div>
+    <div style="font-family:'Cinzel',serif;font-size:1.8rem;color:#fff;margin-bottom:.35rem">Taller <span style="color:var(--gold-b)">Completado</span></div>
+    <div style="font-size:.82rem;color:var(--tmuted);letter-spacing:.09em;margin-bottom:1.3rem">CeDeFi · Estrategias desde el Exchange · 2026</div>
+    <div style="width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.3rem"></div>
+    <div class="cert-mods" id="cert-mods"></div>
+    <p style="font-size:.86rem;color:var(--tmuted);max-width:340px;line-height:1.72;margin-bottom:1.8rem">Has completado los 4 módulos del Taller CeDeFi. Ahora tienes las herramientas para generar rendimiento pasivo e inteligente desde el exchange.</p>
+    <button class="btn-go" onclick="restartApp()">↺ &nbsp;REINICIAR TALLER</button>
+  </div>
+</div>
+
+</div>
+<script>
+/* ═══════════ MODULES ═══════════ */
+const MODULES=[
+  {id:0,ico:'🏛️',num:'Módulo I',  title:'¿Qué es CeDeFi?',          tag:'Introducción & Entorno',  desc:'Qué es este modelo, cómo funciona desde el exchange y cómo entrar a la sección Earn paso a paso.'},
+  {id:1,ico:'💧',num:'Módulo II', title:'Ganar con Stablecoins',    tag:'Interés Diario',           desc:'Cómo poner tus dólares digitales a generar interés todos los días de forma sencilla y segura.'},
+  {id:2,ico:'🔗',num:'Módulo III',title:'Liquid Staking de ETH',    tag:'ETH que genera solo',      desc:'Cómo hacer que tu Ethereum genere rendimiento automáticamente sin bloquearlo ni perder acceso.'},
+  {id:3,ico:'⚔️',num:'Módulo IV', title:'Inversión Dual',           tag:'Comprar bajo · Vender alto', desc:'Cómo ganar un interés extra por comprometerte a comprar o vender cripto a un precio que tú eliges.'}
+];
+
+/* ═══════════ STEPS ═══════════ */
+const STEPS={
+  m0:[
+    {title:'Paso 1 — Entrar al exchange y buscar la sección Earn',
+     path:'Exchange → Menú Superior → "Earn" / "Finanzas" / "Inversión" → Explorar productos',
+     desc:'La sección Earn (o Finanzas) es donde el exchange tiene todos los productos para hacer que tu dinero trabaje. Es como una vitrina de opciones de inversión dentro del mismo exchange que ya usas. No necesitas salir a ningún lado ni crear cuentas nuevas.',
+     tips:['<strong>Binance:</strong> menú superior → Earn → Simple Earn',
+           '<strong>Bybit:</strong> menú superior → Earn → Explorar',
+           '<strong>OKX:</strong> menú superior → Earn → Simple Earn',
+           '<strong>Importante:</strong> asegúrate de tener el doble factor de autenticación (2FA) activo antes de mover dinero. Es tu candado de seguridad.'],
+     warn:'Antes de usar cualquier producto, fíjate qué plataforma maneja el dinero por debajo (por ejemplo Aave o Curve). Si el exchange no lo muestra claramente, es mejor no usarlo.'},
+    {title:'Paso 2 — Entender qué pasa con tu dinero adentro',
+     path:'Earn → Ver detalle del producto → Leer descripción → Revisar plataforma subyacente',
+     desc:'Cuando depositas dinero en Earn, el exchange lo junta con el de miles de personas y lo pone a trabajar en plataformas de préstamos o inversión. Tú recibes el interés, el exchange se queda una pequeña comisión por hacer ese trabajo. La ventaja es que no pagas comisiones por transacción ni necesitas hacer nada técnico.',
+     tips:['<strong>Plataformas confiables conocidas:</strong> Aave (préstamos), Curve (intercambio de stablecoins), Lido (staking de ETH)',
+           '<strong>Señal de alerta:</strong> si prometen más del 25% anual en stablecoins sin razón clara, desconfía.',
+           '<strong>Regla de oro:</strong> nunca pongas más del 30% de tu capital en un solo producto, así reduces el riesgo.'],
+     warn:'Si el exchange tiene problemas o quiebra, tu dinero en Earn también queda atrapado. Por eso es importante usar exchanges conocidos y no poner todos los huevos en la misma canasta.'},
+    {title:'Paso 3 — Hacer una prueba pequeña antes de meter más dinero',
+     path:'Earn → Producto Flexible → Ingresar monto pequeño → Confirmar → Verificar saldo',
+     desc:'Antes de depositar un monto grande, haz una prueba con $10 o $20. Así verificas que el proceso funciona, cuánto tiempo tarda en aparecer el interés y cómo se retira el dinero de vuelta. Es la forma más inteligente de aprender sin arriesgar.',
+     tips:['<strong>Flexible = puedes retirar cuando quieras</strong>, en pocas horas. Ideal para empezar.',
+           '<strong>Bloqueado = mejor tasa pero sin poder tocar el dinero</strong> hasta la fecha de vencimiento. Para cuando ya tengas más experiencia.',
+           '<strong>Prueba práctica:</strong> deposita $20, espera 24 horas y verifica si aparecieron intereses en tu cuenta. Si todo funciona, puedes aumentar el monto.']}
+  ],
+  m1:[
+    {title:'Paso 1 — Elegir con qué moneda empezar',
+     path:'Earn → Simple Earn → USDT o USDC → Ver tasa disponible → Comparar Flexible vs Bloqueado',
+     desc:'Las stablecoins como USDT y USDC son dólares digitales — siempre valen aproximadamente $1. Son perfectas para ganar intereses porque no suben ni bajan de precio como el Bitcoin. Es la opción más tranquila para empezar a generar rendimiento.',
+     tips:['<strong>USDT:</strong> el más usado y con más liquidez en todos los exchanges.',
+           '<strong>USDC:</strong> un poco más transparente porque publica auditorías mensuales de sus reservas en dólares.',
+           '<strong>Consejo:</strong> si tienes $500, puedes poner $300 en USDT y $200 en USDC para diversificar un poco.'],
+     warn:'Si ves una tasa mayor al 25% anual en stablecoins y no hay ninguna explicación clara del por qué, investiga antes de entrar. Las tasas muy altas sin justificación suelen esconder riesgos ocultos.'},
+    {title:'Paso 2 — Activar el interés compuesto automático',
+     path:'Earn → USDT/USDC → Flexible → Escribir el monto → Activar "Auto-suscripción" → Confirmar',
+     desc:'El interés compuesto significa que los intereses que ganas se reinvierten solos y empiezan a generar más intereses. Es como una bola de nieve: mientras más tiempo pasa, más crece. El botón "Auto-suscripción" hace esto automáticamente sin que tengas que hacer nada.',
+     tips:['<strong>Empieza con poco:</strong> prueba con $20-50 primero para ver cómo funciona antes de depositar más.',
+           '<strong>Revisa en 24 horas:</strong> al día siguiente deberías ver una pequeñísima cantidad de interés acreditada.',
+           '<strong>El interés cubre tus fees:</strong> con el tiempo, los intereses que generas pueden cubrir las comisiones de tus otras operaciones en el exchange.']},
+    {title:'Paso 3 — Planear cuándo retirar el dinero',
+     path:'Earn → Mi posición activa → Redimir → Monto a retirar → Confirmar → Verificar en Spot',
+     desc:'Con el producto Flexible puedes retirar tu dinero en cualquier momento, generalmente en pocas horas. Una buena estrategia es tener tu dinero generando interés mientras esperas un buen precio para comprar cripto. Cuando el precio llega al punto que quieres, retiras y compras.',
+     tips:['<strong>Tiempo de retiro:</strong> en la mayoría de exchanges el retiro Flexible tarda entre 1 y 4 horas.',
+           '<strong>Planea con anticipación:</strong> si ves que el precio se está acercando a donde quieres comprar, inicia el retiro un poco antes para tener el dinero listo.',
+           '<strong>No hay penalización:</strong> en el producto Flexible puedes retirar cuando quieras sin perder los intereses ya ganados.']}
+  ],
+  m2:[
+    {title:'Paso 1 — Revisar cuánto ETH recibirás de regreso',
+     path:'Earn → Liquid Staking / Staking de ETH → Ver tasa de conversión WBETH:ETH',
+     desc:'Cuando haces liquid staking de ETH, el exchange te da un token especial (como WBETH en Binance) que representa tu ETH más los intereses que va acumulando. Este token vale un poquito más que 1 ETH y crece cada día. Primero revisa la tasa de conversión para saber exactamente cuánto recibirás.',
+     tips:['<strong>En Binance:</strong> Earn → ETH Staking → ver la tasa de conversión actual WBETH:ETH.',
+           '<strong>La tasa siempre sube:</strong> hoy 1 WBETH = 1.02 ETH, en 6 meses = 1.04 ETH. El token va acumulando los intereses adentro.',
+           '<strong>Precio en mercado vs tasa oficial:</strong> el precio que ves en el mercado puede ser un poco diferente a la tasa oficial — eso es normal y no significa que hayas perdido dinero.']},
+    {title:'Paso 2 — Depositar ETH y recibir el token',
+     path:'Earn → Liquid Staking → Staking ETH → Escribir cantidad → Ejecutar → Ver WBETH en billetera Spot',
+     desc:'El proceso es muy sencillo: escribes cuánto ETH quieres depositar y el exchange te da el token WBETH a cambio. Ese token aparece en tu billetera Spot y va creciendo de valor solo, todos los días, sin que hagas nada. Es como tener una cuenta de ahorros que genera interés automáticamente.',
+     tips:['<strong>El interés se acumula solo:</strong> no necesitas hacer nada. El token vale un poquito más cada día.',
+           '<strong>APR típico:</strong> el staking de ETH suele generar entre 3.5% y 5.5% anual — más estable y predecible que otras opciones.',
+           '<strong>Para capital de largo plazo:</strong> este producto es ideal si piensas mantener ETH por meses o años y quieres que genere algo mientras tanto.'],
+     warn:'Si en algún momento de pánico en el mercado el precio del token cae un poco por debajo del ETH original, no te asustes. Es temporal. El valor real de redención sigue siendo el correcto — solo el precio del mercado tuvo un susto momentáneo.'},
+    {title:'Paso 3 — Decidir cuánto tiempo dejarlo',
+     path:'Earn → Liquid Staking → Ver historial de tasas → Comparar con otras opciones disponibles',
+     desc:'El liquid staking es una estrategia de largo plazo. Mientras más tiempo lo dejes, más ETH acumulas. Puedes comparar el rendimiento de este producto con otras opciones del exchange para decidir la mejor combinación para tu situación.',
+     tips:['<strong>Combinación recomendada para principiantes:</strong> 60-70% en stablecoins generando interés diario + 30-40% en liquid staking de ETH.',
+           '<strong>Cuándo tiene más sentido:</strong> cuando quieres acumular ETH a largo plazo sin perder la posibilidad de usarlo como garantía si lo necesitas.',
+           '<strong>Cuándo retirarlo:</strong> cuando necesites el dinero urgente o cuando quieras vender el ETH — puedes canjear el token de vuelta a ETH desde la misma sección Earn.']}
+  ],
+  m3:[
+    {title:'Paso 1 — Entender qué es la Inversión Dual antes de entrar',
+     path:'Earn → Inversión Dual → Leer descripción del producto → Ver ejemplos de escenarios',
+     desc:'La Inversión Dual es como hacer una promesa al exchange: "me comprometo a comprar BTC a $58,000 si el precio llega ahí" o "me comprometo a vender BTC a $75,000 si el precio llega ahí". A cambio de esa promesa, el exchange te paga un interés por adelantado. Si el precio nunca llega a ese nivel, te quedas con el interés y con tu dinero original.',
+     tips:['<strong>Dos opciones disponibles:</strong> "Comprar Bajo" (te comprometes a comprar si el precio baja) y "Vender Alto" (te comprometes a vender si el precio sube).',
+           '<strong>El interés lo cobras siempre:</strong> sin importar si el precio llega o no a tu nivel, el interés acordado es tuyo.',
+           '<strong>Empieza leyendo los ejemplos:</strong> el exchange muestra dos escenarios de cierre para cada operación. Léelos con calma antes de continuar.'],
+     warn:'Esta operación no se puede cancelar una vez confirmada. Tómate tu tiempo para entender los dos posibles resultados antes de confirmar. Si no tienes claro qué pasa en el peor caso, no entres todavía.'},
+    {title:'Paso 2 — Usar "Vender Alto" (quiero vender si el precio sube)',
+     path:'Earn → Inversión Dual → Vender Alto → Elegir par (BTC/USDT) → Elegir precio objetivo → Elegir fecha → Revisar ambos escenarios → Confirmar',
+     desc:'Con "Vender Alto" pones tus BTC y dices: "si el precio llega a X, los vendo ahí". El exchange te paga un interés por hacer esa promesa. Si el precio sube hasta ese nivel, vendes y cobras el interés. Si el precio no llega, te quedas con tus BTC y también cobras el interés.',
+     tips:['<strong>Resultado 1 — El precio SÍ llega:</strong> vendes tu BTC al precio que elegiste + cobras el interés acordado. Ganaste.',
+           '<strong>Resultado 2 — El precio NO llega:</strong> te quedas con tus BTC + cobras el interés igual. También ganaste.',
+           '<strong>El único riesgo:</strong> si el precio sube MUY por encima de tu nivel, vendiste "barato" — pero igual ganaste el interés y vendiste con ganancia.',
+           '<strong>Empieza con fechas cortas:</strong> 24-72 horas es lo recomendado para principiantes. Menos tiempo = menos incertidumbre.']},
+    {title:'Paso 3 — Usar "Comprar Bajo" (quiero comprar si el precio baja)',
+     path:'Earn → Inversión Dual → Comprar Bajo → Elegir par (BTC/USDT) → Elegir precio objetivo → Elegir fecha → Revisar ambos escenarios → Confirmar',
+     desc:'Con "Comprar Bajo" pones tus USDT y dices: "si el precio de BTC baja a X, lo compro ahí". El exchange te paga un interés por hacer esa promesa. Es ideal cuando quieres comprar BTC más barato de lo que está ahora y de paso ganar algo mientras esperas.',
+     tips:['<strong>Resultado 1 — El precio SÍ baja:</strong> compras BTC al precio que elegiste (más barato que hoy) + cobras el interés en USDT.',
+           '<strong>Resultado 2 — El precio NO baja:</strong> te quedas con tus USDT + cobras el interés igual. Tu dinero no estuvo quieto.',
+           '<strong>Qué precio elegir:</strong> un precio entre 5% y 15% por debajo del precio actual es un buen punto de partida. Ni muy cerca ni muy lejos.',
+           '<strong>IMPORTANTE — No se puede cancelar:</strong> una vez que confirmas, la operación corre hasta la fecha elegida sin posibilidad de cambio. Lee siempre los dos escenarios antes de confirmar.'],
+     warn:'El verdadero riesgo es que el precio caiga MUY por debajo de lo que esperabas. Por ejemplo, si elegiste comprar a $58,000 y BTC cae a $40,000, igual te toca comprar a $58,000. Por eso elige un precio que consideres razonable, no extremo.'},
+    {title:'Paso 4 — Llevar un registro de tus operaciones',
+     path:'Earn → Inversión Dual → Historial → Ver cada operación → Anotar en tu cuaderno o tabla',
+     desc:'Llevar un registro simple te ayuda a aprender con cada operación. Anota qué hiciste, qué resultado tuviste y qué aprendiste. Con el tiempo vas a entender qué precios funcionan mejor y cuándo tiene más sentido usar cada opción.',
+     tips:['<strong>Qué anotar:</strong> fecha, tipo de operación (Comprar Bajo / Vender Alto), precio elegido, fecha de vencimiento, interés recibido, resultado final.',
+           '<strong>Revisión mensual:</strong> al mes, mira cuántas operaciones salieron como esperabas y cuántas no. Eso te dice si tu forma de elegir el precio está funcionando.',
+           '<strong>Empieza con montos pequeños:</strong> las primeras 3-5 operaciones hazlas con el mínimo posible. Aprende primero, escala después.']}
+  ]
+};
+/* ═══════════ FAQS ═══════════ */
+const FAQS={
+  m0:[
+    {q:'¿Por qué el exchange me paga interés si yo no hago nada?',a:'Porque el exchange usa tu dinero para prestárselo a otras personas que sí lo necesitan y pagan por ello. Tú aportas el capital, el exchange hace el trabajo de prestarlo y te da una parte del interés que cobra. Es como cuando un banco usa los ahorros de sus clientes para dar créditos.'},
+    {q:'¿Qué pasa si el exchange quiebra mientras tengo dinero en Earn?',a:'Si el exchange tiene problemas graves, tu dinero en Earn también puede quedar bloqueado temporalmente. Por eso se recomienda usar exchanges reconocidos y no poner todo tu capital en un solo lugar. Una buena regla: divide tu dinero entre al menos dos exchanges diferentes.'},
+    {q:'¿Es complicado usar estos productos?',a:'No. La mayoría de personas lo describen como "más fácil que abrir una cuenta bancaria". Solo necesitas entrar a la sección Earn de tu exchange, elegir el producto, escribir cuánto quieres depositar y confirmar. En menos de 2 minutos ya está generando interés.'}
+  ],
+  m1:[
+    {q:'¿Por qué cambia el porcentaje de interés cada día?',a:'Porque depende de cuánta gente esté pidiendo dinero prestado en ese momento. Cuando el mercado está activo y muchos quieren pedir prestado para invertir, el interés sube. Cuando el mercado está tranquilo y hay poca demanda, el interés baja. Es básicamente la ley de oferta y demanda aplicada al dinero.'},
+    {q:'¿Cuál es la diferencia entre Flexible y Bloqueado?',a:'<strong>Flexible</strong> es como una cuenta de ahorros normal — puedes sacar el dinero cuando quieras, generalmente en pocas horas. El interés es un poco menor. <strong>Bloqueado</strong> es como un CDT o plazo fijo — no puedes tocar el dinero hasta la fecha acordada, pero el interés es mejor. Para principiantes, siempre empieza con Flexible.'},
+    {q:'¿El interés que gano lo puedo retirar en cualquier momento?',a:'Sí, en el producto Flexible puedes retirar el dinero y los intereses cuando quieras. Generalmente el dinero estará disponible en tu billetera del exchange en un plazo de 1 a 4 horas. No hay penalización por salirse antes.'}
+  ],
+  m2:[
+    {q:'¿Por qué el token que recibo no vale exactamente 1 ETH?',a:'Porque ese token ya incluye los intereses que has acumulado. Si lo recibiste hace 6 meses y ha estado ganando un 4% anual, ahora vale un poco más que 1 ETH. Es la forma en que el exchange te muestra que tus intereses ya están incluidos dentro del valor del token.'},
+    {q:'¿Puedo perder mi ETH usando liquid staking?',a:'En condiciones normales, no. Tu ETH sigue siendo tuyo y puedes recuperarlo cuando quieras. Lo que sí puede pasar es que el precio del token baje temporalmente en el mercado durante momentos de pánico — pero eso no significa que perdiste el ETH. Si esperas unos días, el precio normalmente regresa a su valor real.'},
+    {q:'¿Cuándo conviene usar liquid staking y cuándo simplemente guardar el ETH?',a:'Liquid staking conviene cuando planeas mantener tu ETH por varios meses o años y quieres que genere algo mientras tanto. Si planeas vender el ETH pronto o necesitas la liquidez, es más sencillo simplemente tenerlo en tu billetera Spot.'}
+  ],
+  m3:[
+    {q:'¿Por qué el interés de la Inversión Dual es tan alto comparado con otros productos?',a:'Porque estás asumiendo un compromiso: si el precio llega al nivel que elegiste, te toca comprar o vender aunque no quieras en ese momento. El exchange te paga más interés porque asumes ese riesgo. A mayor compromiso asumido, mayor pago recibido.'},
+    {q:'¿Puedo cancelar una Inversión Dual si me arrepiento?',a:'<strong>No. Una vez confirmada no se puede cancelar.</strong> Por eso es importante leer bien los dos escenarios posibles antes de confirmar. Si no entiendes qué pasa en el peor caso, es mejor no entrar todavía. Tómate el tiempo que necesites antes de confirmar.'},
+    {q:'¿Cuánto dinero puedo perder con la Inversión Dual?',a:'Tu capital inicial no desaparece. Lo que puede pasar es que compres o vendas a un precio menos favorable que el del mercado en ese momento. Por ejemplo: comprometiste vender BTC a $70,000 y el precio llegó a $85,000 — igual vendes a $70,000 y pierdes la ganancia del rally. Eso se llama costo de oportunidad, no pérdida directa.'},
+    {q:'¿Qué precio debo elegir para empezar?',a:'Para "Comprar Bajo": elige un precio entre 8% y 15% por debajo del precio actual. Para "Vender Alto": elige un precio entre 8% y 15% por encima del precio actual. Esos rangos son más seguros para principiantes — hay menos posibilidad de que el precio llegue tan lejos en 24-72 horas.'}
+  ]
+};
+
+/* ═══════════ CHECKLISTS ═══════════ */
+const CHECKLISTS={
+  m0:['Sesión iniciada con 2FA activo (no solo contraseña)','Sección "Earn" / "Finanzas" localizada en el exchange','Protocolo subyacente identificado (Aave, Curve, Lido, otro)','Términos de servicio leídos y comprendidos','Monto máximo a asignar definido (regla: máximo 30% del capital por producto)','Diferencia entre riesgo de contraparte y riesgo técnico comprendida'],
+  m1:['Par de stablecoins seleccionado (USDT o USDC)','"Flexible" seleccionado para capital de trading activo','Opción "Auto-suscripción" (interés compuesto) activada','Monto de prueba inicial ($20-50) desplegado antes del monto real','APR actual anotado en la bitácora con fecha de inicio','Alerta configurada para cuando el precio llegue a la zona de compra objetivo'],
+  m2:['Tasa de conversión WBETH:ETH actual anotada','Precio de mercado WBETH/ETH comparado con tasa de conversión oficial','Monto de ETH a convertir definido (capital de largo plazo únicamente)','Comprensión del riesgo de de-peg temporal documentada','Decisión sobre uso como colateral (sí/no) registrada','APR de liquid staking vs APR de lending stablecoins comparados'],
+  m3:['Análisis técnico completado en TradingView (1D + 4H)','zona de soporte o resistencia o zona de precio de soporte/resistencia identificado con precisión','Modalidad elegida (Vender Alto o Comprar Bajo) según el análisis','Strike Price definido y alineado al nivel técnico (no arbitrario)','Vencimiento corto seleccionado (24-72h para primeras operaciones)','AMBOS escenarios de cierre leídos y comprendidos antes de confirmar','Monto a suscribir calculado (máximo lo que el escenario desfavorable puede afectar)','Bitácora preparada para registrar la operación']
+};
+
+/* ═══════════ QUIZ ═══════════ */
+const QUIZ=[
+  {mod:'Módulo I · CeDeFi',title:'El Modelo Híbrido CeDeFi',
+   scenario:'<strong>Situación:</strong> Un estudiante quiere acceder a rendimientos de Aave sin gestionar wallets, claves privadas ni gas fees. El exchange que usa ofrece un producto "DeFi Staking" con Aave como plataforma que maneja el dinero por debajo. ¿Qué tipo de producto está usando?',
+   opts:['DeFi nativo — accede directamente a Aave sin intermediarios.','CeDeFi — el exchange actúa como intermediario que gestiona la interacción con Aave, eliminando la complejidad técnica para el usuario.','Un fondo de inversión tradicional regulado con activos digitales.','Un producto de ahorro bancario con rendimiento garantizado.'],
+   correct:1,ok:'Correcto. CeDeFi (Centralized Decentralized Finance) es exactamente ese modelo: el CEX actúa como interfaz de acceso y garante operativo de protocolos descentralizados. El usuario obtiene simplificación operativa a cambio de asumir riesgo de contraparte del exchange.',
+   fail:'Incorrecto. En DeFi nativo el usuario interactúa directamente con el contrato inteligente desde su propia wallet. Aquí el exchange es el intermediario — eso define el modelo CeDeFi.'},
+  {mod:'Módulo I · CeDeFi',title:'Riesgo de Contraparte vs Riesgo Técnico',
+   scenario:'<strong>Situación:</strong> Camila tiene $5,000 en DeFi Staking de su exchange favorito. El plataforma que maneja el dinero por debajo (Aave) no ha tenido ningún incidente. Sin embargo, el exchange anuncia que congela los retiros por problemas de liquidez. ¿Cuál riesgo se materializó?',
+   opts:['Riesgo técnico de smart contract — el código de Aave falló.','Riesgo de mercado — el precio de sus stablecoins cayó.','Riesgo de contraparte del CEX — los fondos están congelados aunque el plataforma que maneja el dinero por debajo esté sano.','Riesgo de de-peg — sus stablecoins perdieron paridad con el dólar.'],
+   correct:2,ok:'Correcto. El riesgo de que el exchange tenga problemas es el principal riesgo diferencial del CeDeFi vs DeFi nativo. El protocolo Aave puede estar perfectamente operativo, pero si el exchange congela retiros, los fondos quedan atrapados en la plataforma centralizada.',
+   fail:'Incorrecto. El protocolo Aave está sano. Lo que falló es el exchange centralizado que actúa como intermediario. Este es el riesgo de contraparte — el riesgo específico de depender de una entidad centralizada para acceder al DeFi.'},
+  {mod:'Módulo I · CeDeFi',title:'Ventaja del Batching en CeDeFi',
+   scenario:'<strong>Situación:</strong> Un trader deposita $100 en un pool de liquidez en Ethereum directamente (DeFi nativo). El gas fee de la transacción es $15 — un 15% de comisión implícita. El mismo pool vía CeDeFi del exchange cobra $0 de gas. ¿Por qué es posible esto?',
+   opts:['Porque el exchange subsidia los gas fees con sus ganancias operativas.','Porque el exchange usa una blockchain diferente sin gas fees.','Porque el exchange consolida el capital de miles de usuarios en una sola transacción de blockchain (batching), distribuyendo el costo del gas entre todos.','Porque el gobierno regula que los exchanges no pueden cobrar gas fees.'],
+   correct:2,ok:'Correcto. El batching es la economía de escala del CeDeFi. El exchange agrupa los depósitos de miles de usuarios y los envía como una sola transacción a la blockchain, dividiendo el costo del gas entre todos. El usuario minorista con $100 se beneficia de la escala del exchange.',
+   fail:'Incorrecto. El exchange no subsidia el gas — lo elimina mediante batching. Al agrupar miles de pequeñas operaciones en una sola transacción de blockchain, el costo total del gas se divide entre todos los participantes, resultando en costo cero para cada usuario individual.'},
+  {mod:'Módulo II · DeFi Staking',title:'Fuente Real del Rendimiento en Lending',
+   scenario:'<strong>Situación:</strong> El APR del pool de USDT en el exchange subió del 6% al 18% en una semana. El precio de BTC también subió un 30% en ese período. ¿Cuál es la relación más probable entre ambos eventos?',
+   opts:['No hay relación — el APR lo decide el exchange de forma discrecional cada semana.','El rally de BTC aumentó la demanda de préstamos en stablecoins (traders pidiendo USDT para comprar más BTC con apalancamiento), lo que elevó el APR del pool de lending.','El exchange subió el APR para atraer más depósitos y financiar sus operaciones internas.','El APR siempre sube cuando Bitcoin sube — es un mecanismo automático de correlación.'],
+   correct:1,ok:'Correcto. El APR del lending de stablecoins en DeFi/CeDeFi refleja la demanda real de préstamos. Un rally de BTC incentiva a los traders a pedir prestado USDT para comprar más BTC con apalancamiento. Mayor demanda de préstamos = mayor tasa de interés para los proveedores de liquidez.',
+   fail:'Incorrecto. El APR no lo determina el exchange de forma arbitraria. Proviene de la demanda real de prestatarios en el protocolo blockchain subyacente. Un rally genera más demanda de apalancamiento, lo que eleva la tasa de interés que los prestatarios están dispuestos a pagar.'},
+  {mod:'Módulo II · DeFi Staking',title:'Flexible vs Bloqueado: Caso de Uso',
+   scenario:'<strong>Situación:</strong> Carlos tiene $2,000 USDT. $1,200 son su capital de trading que espera zonas de compra en BTC. $800 son ahorros que definitivamente no necesitará por 3 meses. ¿Cómo debería asignar los dos productos?',
+   opts:['Todo en Bloqueado — el APR es más alto y puede esperar.','Todo en Flexible — la liquidez es siempre prioritaria.','$1,200 en Flexible (capital de trading que necesita movilidad) y $800 en Bloqueado a 3 meses (capital de largo plazo que maximiza el APR).','$1,200 en Bloqueado y $800 en Flexible — el capital mayor siempre va al mayor APR.'],
+   correct:2,ok:'Correcto. La asignación correcta segmenta el capital por su función. El capital de trading requiere movilidad (Flexible). El capital de largo plazo puede beneficiarse del mayor APR del Bloqueado sin penalizar la operativa de trading.',
+   fail:'Incorrecto. Poner el capital de trading en Bloqueado podría impedir ejecutar una operación cuando el precio llegue a la zona objetivo. La clave es asignar cada porción de capital al producto que mejor se adapta a su función operativa.'},
+  {mod:'Módulo II · DeFi Staking',title:'Auto-suscripción e Interés Compuesto',
+   scenario:'<strong>Situación:</strong> Dos inversores depositan $10,000 USDT al 8% APR. Inversor A activa Auto-suscripción (interés compuesto diario). Inversor B retira los intereses manualmente cada mes. Al cabo de 2 años, ¿cuál tiene más capital?',
+   opts:['Inversor B, porque retira y puede reinvertir en oportunidades de mayor APR.','Son iguales — el APR anunciado ya incluye el efecto del compuesto.','Inversor A, porque el interés compuesto diario reinvierte cada día generando interés sobre el interés acumulado.','Depende del precio de BTC, no del método de reinversión.'],
+   correct:2,ok:'Correcto. Con compuesto diario al 8% APR durante 2 años: Inversor A tiene ~$11,734. Inversor B (simple) tiene ~$11,600. La diferencia crece exponencialmente con más tiempo y mayor capital. La Auto-suscripción es la herramienta de maximización pasiva más simple y efectiva.',
+   fail:'Incorrecto. El APR anunciado es la tasa simple anualizada. El compuesto diario (APY) produce más porque reinvierte los intereses diariamente, generando interés sobre el interés acumulado. A mayor capital y mayor plazo, la diferencia es significativa.'},
+  {mod:'Módulo III · Liquid Staking',title:'Mecanismo de Acumulación del Token Sintético',
+   scenario:'<strong>Situación:</strong> Lucía tiene 1 WBETH que obtuvo hace 6 meses con un APR de staking del 4% anual. Hoy quiere canjear su WBETH por ETH. ¿Cuánto ETH debería recibir aproximadamente?',
+   opts:['1.00 ETH — siempre mantiene la paridad 1:1 con ETH.','0.98 ETH — pierde un porcentaje por la comisión del exchange al canjear.','Aproximadamente 1.02 ETH — acumuló 6 meses de recompensas de staking dentro del valor del token.','Más de 1.10 ETH — el rendimiento del liquid staking siempre supera el 20% anual.'],
+   correct:2,ok:'Correcto. El token sintético acumula las recompensas dentro de su valor intrínseco. Con APR del 4% anual, en 6 meses acumulas el 2% aproximadamente. Por eso 1 WBETH se canjea por ~1.02 ETH después de 6 meses. El precio de mercado puede diferir (de-peg temporal) pero el valor de redención es ese.',
+   fail:'Incorrecto. El mecanismo del liquid staking acumula las recompensas de validación dentro del valor del token sintético. No mantiene paridad 1:1 — precisamente su valor crece con el tiempo, por eso se puede canjear por más ETH del que se depositó originalmente.'},
+  {mod:'Módulo III · Liquid Staking',title:'Riesgo de De-Peg: Identificación',
+   scenario:'<strong>Situación:</strong> En el mercado Spot del exchange, WBETH/ETH cotiza a 0.932 ETH. La tasa oficial de conversión de redención en la sección Earn muestra 0.978 ETH. ¿Qué está ocurriendo?',
+   opts:['El exchange está cometiendo un error de precio — hay que reportarlo al soporte.','El WBETH tiene un de-peg de mercado del 4.7%. El mercado Spot cotiza con descuento respecto al valor de redención real, probablemente por pánico temporal de liquidez.','El WBETH vale 0.932 ETH para siempre — el staking perdió el valor acumulado.','Esto significa que el plataforma que maneja el dinero por debajo fue hackeado y el ETH ya no es recuperable.'],
+   correct:1,ok:'Correcto. Este es un de-peg de mercado. La tasa de redención (0.978) es lo que recibirás si haces el canje formal en la sección Earn. El precio de mercado Spot (0.932) refleja pánico temporal de liquidez — inversores vendiendo con descuento. El valor de redención sigue intacto.',
+   fail:'Incorrecto. El precio de mercado Spot y el valor de redención son dos cosas diferentes en liquid staking. El valor de redención (0.978) es lo que el protocolo pagará si haces el canje formal. El precio Spot (0.932) es lo que alguien está dispuesto a pagar ahora mismo en el mercado secundario, que puede estar con descuento por pánico.'},
+  {mod:'Módulo IV · Inversión Dual',title:'Strike Price con Análisis Técnico',
+   scenario:'<strong>Situación:</strong> BTC está en $67,000. Identificas un zona de soporte o resistencia de demanda institucional en $58,500 en temporalidad 4H. Quieres usar Inversión Dual "Comprar Bajo". ¿Cuál es el Strike Price correcto?',
+   opts:['$67,000 — el precio actual para asegurarte la compra inmediatamente.','$70,000 — por encima del mercado para garantizar mayor APR.','$58,500 — alineado al zona de soporte o resistencia de demanda identificado en análisis técnico.','$50,000 — lo más bajo posible para maximizar el descuento en caso de caída.'],
+   correct:2,ok:'Correcto. El Strike Price óptimo se fija sobre el zona de soporte o resistencia de demanda institucional ($58,500). Si el precio llega ahí, compras en la zona donde instituciones han mostrado interés comprador históricamente — mayor probabilidad de rebote. El análisis técnico convierte el Strike en una decisión fundamentada, no arbitraria.',
+   fail:'Incorrecto. El Strike Price no se elige aleatoriamente. En "Comprar Bajo", fijarlo sobre un zona de soporte o resistencia de demanda institucional alinea la Inversión Dual con la estructura del mercado — compras donde hay evidencia de órdenes institucionales de compra. Esto maximiza la probabilidad de que la zona actúe como soporte.'},
+  {mod:'Módulo IV · Inversión Dual',title:'Escenario Desfavorable de "Vender Alto"',
+   scenario:'<strong>Situación:</strong> Configuras "Vender Alto" (Vender Alto) con 0.1 BTC a Strike $72,000. El APR acordado es 45% anualizado para 3 días. BTC sube hasta $85,000 antes del vencimiento. ¿Cuál es el resultado real?',
+   opts:['Vendes tus 0.1 BTC a $85,000 y capturas toda la subida.','Conservas tus BTC porque el precio superó el Strike — la opción se cancela automáticamente.','Vendes obligatoriamente 0.1 BTC a $72,000 (el Strike pactado) y cobras el APR acordado. Pierdes el rally de $72,000 a $85,000 por acción.','El exchange te compensa la diferencia entre $72,000 y $85,000 automáticamente.'],
+   correct:2,ok:'Correcto. Este es el costo de oportunidad de la Inversión Dual. Estás obligado a vender a $72,000 cuando el mercado vale $85,000. Tu ganancia real es: (precio Strike - precio de compra original) + APR. El costo: el rally de $13,000 por BTC que no pudiste capturar.',
+   fail:'Incorrecto. La Inversión Dual es irrevocable. Si el precio supera el Strike en "Vender Alto", el exchange ejecuta la venta al precio pactado ($72,000) sin importar que el mercado esté en $85,000. El APR acordado sí se cobra, pero el costo de oportunidad ($13,000/BTC de rally perdido) puede ser significativo.'},
+  {mod:'Módulo IV · Inversión Dual',title:'APR Alto = Señal de Qué',
+   scenario:'<strong>Situación:</strong> Encuentras un producto de Inversión Dual "Comprar Bajo" BTC/USDT con APR del 120% anualizado para 24 horas. Tu friend te dice "esto es imposiblemente alto, es una trampa". ¿Quién tiene razón?',
+   opts:['Tu amigo — un APR del 120% siempre es fraudulento y hay que evitarlo.','Tú — si el exchange es reconocido, el APR refleja la variación de precios del mercado actual del mercado, que puede ser muy alta en momentos de incertidumbre extrema.','Nadie — hay que esperar a que el APR baje antes de suscribir.',
+   'Tu amigo — los APRs legítimos nunca superan el 50% anualizado en ningún producto financiero.'],
+   correct:1,ok:'Correcto. En Inversión Dual, el APR proviene de la variación de precios en el mercado de opciones. En momentos de alta incertidumbre (eventos macro, halvings, crisis regulatorias), la prima que pagan los el exchange por transferirte el riesgo puede ser muy alta — incluso superior al 100% anualizado para plazos de 24-48 horas.',
+   fail:'Incorrecto. El APR en Inversión Dual no es fijo ni regulado por el exchange — proviene del mercado de variación de precios del mercado de opciones. En momentos de alta incertidumbre, la prima que se paga por asumir el riesgo puede ser extremadamente alta. APR alto = volatilidad alta = el mercado paga más porque el riesgo de movimiento brusco es real.'},
+  {mod:'Módulo I · CeDeFi',title:'velocidad de reacción: Ventaja Operativa',
+   scenario:'<strong>Situación:</strong> Daniela tiene $3,000 en un pool DeFi nativo de Ethereum. El precio de BTC llega a su zona de compra objetivo. Para mover el capital necesita: aprobar el contrato (gas), retirar (gas), esperar confirmaciones (~3 min), enviar al exchange (gas + tiempo). El proceso tarda 15-20 minutos y cuesta $45 en gas. ¿Qué ventaja habría tenido con CeDeFi?',
+   opts:['Ninguna — la velocidad no importa en trading de largo plazo.','Con CeDeFi, el retiro del Earn Flexible al Spot del exchange tarda segundos o minutos y tiene costo cero, permitiendo ejecutar la compra antes de que el precio se mueva.','Con CeDeFi habría ganado más rendimiento mientras esperaba.','Con CeDeFi podría haber comprado con mayor apalancamiento.'],
+   correct:1,ok:'Correcto. El velocidad de reacción es la ventaja operativa diferenciadora del CeDeFi. Sin gas fees, sin confirmaciones de blockchain, sin gestión de claves — el capital está disponible en el exchange en segundos o minutos para ejecutar la oportunidad de trading cuando el precio llega al nivel objetivo.',
+   fail:'Incorrecto. La ventaja del CeDeFi en este caso es la velocidad de reacción. Con DeFi nativo, $45 en gas y 15-20 minutos de espera pueden significar perder la zona de entrada si el precio rebota antes de poder ejecutar la compra.'},
+  {mod:'Módulo II · DeFi Staking',title:'Preservación de Capital en Ciclo Bajista',
+   scenario:'<strong>Situación:</strong> El mercado cripto entra en un ciclo bajista pronunciado. BTC cae -60% en 6 meses. Un inversor tiene $10,000 en USDC en el pool de lending flexible al 7% APR. Otro tiene $10,000 en BTC. Al final de los 6 meses, ¿cuál es la situación de cada uno?',
+   opts:['Ambos pierden lo mismo porque el mercado bajista afecta a todos.','El del lending de stablecoins tiene ~$10,350 USDC (capital preservado + 3.5% de 6 meses). El del BTC tiene ~$4,000 de valor. La diferencia es dramática.','El del BTC está en mejor posición porque puede esperar la recuperación.','El lending de stablecoins también pierde valor porque las stablecoins caen con el mercado.'],
+   correct:1,ok:'Correcto. Esta es la función estratégica del lending de stablecoins como herramienta de preservación de capital. Mientras el mercado cae -60%, el capital en USDC no solo mantiene su valor en dólares sino que genera rendimiento adicional. Cuando el ciclo alcista retorne, ese capital puede desplegarse en la zona de descuento.',
+   fail:'Incorrecto. Las stablecoins (USDT/USDC) están diseñadas para mantener paridad con el dólar independientemente del comportamiento del mercado cripto. El lending de stablecoins genera rendimiento en dólares, preservando el capital mientras el mercado bajista afecta a los activos volátiles.'},
+  {mod:'Módulo III · Liquid Staking',title:'Eficiencia de Capital: Colateral + Staking',
+   scenario:'<strong>Situación:</strong> Marco tiene 2 ETH. En staking tradicional, esos ETH están bloqueados y no puede hacer nada más con ellos. Con Liquid Staking, recibe 2 WBETH. ¿Qué puede hacer simultáneamente con los WBETH que no podía con el ETH bloqueado?',
+   opts:['Nada diferente — el WBETH y el ETH bloqueado tienen exactamente los mismos usos.','Puede tradear WBETH en el mercado Spot y perder las recompensas de staking.','Puede usar el WBETH como colateral en futuros/margen mientras acumula las recompensas de staking — doble eficiencia de capital con un mismo activo.','Puede convertir WBETH en BTC directamente sin pasos intermedios.'],
+   correct:2,ok:'Correcto. Esta es la "doble eficiencia" del liquid staking. El ETH bloqueado en staking tradicional está congelado — no puedes hacer nada más con él. El WBETH puede usarse como colateral en futuros, generar rendimiento adicional o tradear en Spot, mientras simultáneamente acumula las recompensas de validación de la red Ethereum.',
+   fail:'Incorrecto. La ventaja definitoria del liquid staking es exactamente la posibilidad de usar el token sintético para múltiples propósitos simultáneamente. El ETH en staking tradicional está bloqueado — el WBETH circula libremente y puede ser colateral, mientras ambos acumulan el mismo rendimiento de staking.'},
+  {mod:'Módulo IV · Inversión Dual',title:'Irrevocabilidad y Disciplina Operativa',
+   scenario:'<strong>Situación:</strong> Sofía suscribe una Inversión Dual "Comprar Bajo" BTC/USDT a las 9am con Strike $60,000 y vencimiento 48h. A las 2pm el precio de BTC cae a $55,000 y ella quiere cancelar para no ser obligada a comprar a $60,000 cuando el mercado vale $55,000. ¿Puede hacerlo?',
+   opts:['Sí — tiene 24 horas de período de cancelación según la regulación de exchanges.','No. La Inversión Dual es irrevocable desde el momento de suscripción. La operación corre hasta el vencimiento sin posibilidad de modificación o cancelación.','Sí, pero pagando una penalización del 10% sobre el monto suscrito.','Solo puede cancelar si demuestra que fue un "error de clic" al soporte del exchange.'],
+   correct:1,ok:'Correcto. La irrevocabilidad es la característica más crítica de la Inversión Dual. Una vez suscrita, no existe cancelación, modificación ni ajuste posible. Por eso el análisis técnico previo y la evaluación de ambos escenarios de cierre son obligatorios ANTES de confirmar la suscripción.',
+   fail:'Incorrecto. La Inversión Dual es irrevocable desde el primer momento. No existe período de gracia, cancelación, ni ajuste una vez confirmada. Este es el motivo por el que el manual enfatiza: definir el Strike sobre zonas técnicas reales, evaluar ambos escenarios de cierre y nunca suscribir bajo presión de tiempo.'}
+];
+
+/* ═══════════ STATE ═══════════ */
+let done=new Set(), stepsDone={}, chkDone={}, quizState={started:false,level:0,score:0,answered:false,answers:[]}, charts={};
+
+/* ═══════ PERSISTENCIA localStorage ═══════ */
+const SAVE_KEY='principia_cedefi_v1';
+function saveProgress(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      done:[...done],
+      stepsDone:Object.fromEntries(Object.entries(stepsDone).map(([k,v])=>[k,[...v]])),
+      chkDone:Object.fromEntries(Object.entries(chkDone).map(([k,v])=>[k,[...v]])),
+      quizScore:quizState.score,
+      quizLevel:quizState.level,
+      quizAnswers:quizState.answers
+    }));
+  }catch(e){}
+}
+function loadProgress(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(d.done)done=new Set(d.done);
+    if(d.stepsDone)stepsDone=Object.fromEntries(Object.entries(d.stepsDone).map(([k,v])=>[k,new Set(v)]));
+    if(d.chkDone)chkDone=Object.fromEntries(Object.entries(d.chkDone).map(([k,v])=>[k,new Set(v)]));
+    if(d.quizScore!=null)quizState.score=d.quizScore;
+    if(d.quizLevel!=null)quizState.level=d.quizLevel;
+    if(d.quizAnswers)quizState.answers=d.quizAnswers;
+  }catch(e){}
+}
+function clearProgress(){
+  if(confirm('¿Seguro que quieres reiniciar todo tu progreso?')){
+    localStorage.removeItem(SAVE_KEY);
+    done=new Set();stepsDone={};
+chkDone={};
+    quizState={started:false,level:0,score:0,answered:false,answers:[]};
+    Object.values(charts).forEach(ch=>{try{ch.destroy();}catch(e){}});charts={};
+    goScr('hero');setProgress(0,'Bienvenida');
+  }
+}
+const TOTAL=4;
+
+/* ═══════════ NAV ═══════════ */
+function goScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('scr-'+id).classList.add('on');window.scrollTo(0,0);}
+function setProgress(pct,lbl){document.getElementById('pbar').style.width=pct+'%';document.getElementById('pct').textContent=pct+'%';document.getElementById('nbadge').textContent=lbl;}
+
+/* ═══════════ COUNTERS ═══════════ */
+function countUp(el,n,d){if(!el)return;d=d||1100;let s=null;function f(ts){if(!s)s=ts;const p=Math.min((ts-s)/d,1);el.textContent=Math.round(p*n);if(p<1)requestAnimationFrame(f);else el.textContent=n;}requestAnimationFrame(f);}
+/* ─── LOAD SAVED PROGRESS ON START ─── */
+setTimeout(()=>{
+  const hadProgress = loadProgress();
+  if(hadProgress){
+    renderMenu();
+    const banner=document.getElementById('resume-banner');
+    const txt=document.getElementById('resume-text');
+    if(banner&&txt){
+      const last=getLastSaved();
+      const mods=done.size;
+      txt.textContent=mods+' módulo'+(mods!==1?'s':'')+' completado'+(mods!==1?'s':'')+(last?' · Última sesión: '+last.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'');
+      banner.style.display='flex';
+    }
+    goScr('menu');
+  }
+},100);
+
+setTimeout(()=>{countUp(document.getElementById('kn1'),4);countUp(document.getElementById('kn2'),6,1200);countUp(document.getElementById('kn3'),15,1400);countUp(document.getElementById('kn4'),4,1600);},350);
+
+/* ═══════════ MENU ═══════════ */
+function renderMenu(){
+  const g=document.getElementById('mgrid');g.innerHTML='';
+  MODULES.forEach(m=>{
+    const d=done.has(m.id),c=document.createElement('div');
+    c.className='mcard'+(d?' mdone':'');
+    c.innerHTML=`<div class="mn">${m.num}</div><div class="mico">${m.ico}</div><div class="mtit">${m.title}</div><div class="mdesc">${m.desc}</div><div class="mtag">${m.tag}</div><div class="mchk"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="1.5"/></svg></div>`;
+    c.onclick=()=>openModule(m.id);g.appendChild(c);
+  });
+  setProgress(Math.round((done.size/TOTAL)*100),done.size===0?'Selecciona un Módulo':`Módulo ${done.size}/${TOTAL}`);
+  if(done.size===TOTAL)setTimeout(showCert,500);
+}
+
+/* ═══════════ MODULE BUILDER ═══════════ */
+function openModule(id){
+  document.getElementById('ci').innerHTML=buildModuleContent(id);
+  goScr('content');
+  setProgress(Math.round((done.size/TOTAL)*100),MODULES[id].num+' — '+MODULES[id].title);
+  setTimeout(()=>initModChart(id),280);
+}
+function completeModule(id){ saveProgress();
+  saveProgress();
+  done.add(id);
+  if(id<TOTAL-1)openModule(id+1);
+  else{renderMenu();goScr('menu');}
+}
+function restartApp(){
+  done.clear();stepsDone={};chkDone={};
+  Object.values(charts).forEach(ch=>{try{ch.destroy();}catch(e){}});charts={};
+  quizState={started:false,level:0,score:0,answered:false,answers:[]};
+  goScr('hero');setProgress(0,'Bienvenida');
+}
+function showCert(){
+  document.getElementById('cert-mods').innerHTML=MODULES.map(m=>'<div class="cert-mod">'+m.num+'<br>'+m.title+'</div>').join('');
+  goScr('cert');setProgress(100,'¡Completado!');
+}
+
+/* ═══════════ STEPS ═══════════ */
+function toggleStep(sid){
+  const b=document.getElementById('body-'+sid),a=document.getElementById('arr-'+sid);
+  if(!b)return;const open=b.classList.toggle('open');
+  if(a)a.style.transform=open?'rotate(90deg)':'';
+}
+function markStep(mid,idx){
+  if(!stepsDone[mid])stepsDone[mid]=new Set();
+  stepsDone[mid].add(idx);
+  const steps=STEPS['m'+mid];
+  const dc=stepsDone[mid].size;
+  const pct=Math.round((dc/steps.length)*100);
+  const mpf=document.getElementById('mpf-'+mid),mpc=document.getElementById('mpc-'+mid);
+  if(mpf)mpf.style.width=pct+'%';if(mpc)mpc.textContent=dc+'/'+steps.length;
+  const sid='s'+mid+'-'+idx;
+  const card=document.getElementById('sc-'+sid);
+  const btn=document.getElementById('btn-'+sid);
+  const num=document.getElementById('sn-'+sid);
+  if(card)card.classList.add('done-s');
+  if(btn){btn.textContent='✓ Completado';btn.className='step-done-btn already';} saveProgress();
+  if(num){num.textContent='✓';num.style.cssText='background:var(--green);border-color:var(--green);color:#000';}
+  saveProgress();
+}
+
+/* ═══════════ CHECKLIST ═══════════ */
+function toggleChk(mid,idx){
+  if(!chkDone[mid])chkDone[mid]=new Set();
+  const item=document.getElementById('chk-'+mid+'-'+idx);
+  if(chkDone[mid].has(idx)){chkDone[mid].delete(idx);item.classList.remove('chk-done');}
+  else{chkDone[mid].add(idx);item.classList.add('chk-done');}
+  const list=CHECKLISTS['m'+mid];
+  const dc=chkDone[mid].size;
+  const pct=Math.round((dc/list.length)*100);
+  const pf=document.getElementById('chkpf-'+mid),pl=document.getElementById('chkpl-'+mid);
+  if(pf)pf.style.width=pct+'%';if(pl)pl.textContent=dc+'/'+list.length;
+  saveProgress(); document.getElementById('chk-'+mid+'-'+idx).querySelector('.chk-box').textContent=chkDone[mid].has(idx)?'✓':'';
+}
+
+/* ═══════════ FAQ ═══════════ */
+function toggleFaq(id){
+  const a=document.getElementById('fa-'+id),arr=document.getElementById('farr-'+id);
+  const open=a.classList.toggle('open');
+  if(arr)arr.textContent=open?'▾':'▸';
+}
+
+/* ═══════════ EXPLAIN TOGGLE ═══════════ */
+function toggleCE(id){
+  const b=document.getElementById('ce-'+id),btn=document.getElementById('ceb-'+id);
+  if(!b||!btn)return;
+  const open=b.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  btn.textContent=open?'✕ Cerrar':'? Cómo leer esta gráfica';
+}
+
+/* ═══════════ BUILD MODULE CONTENT ═══════════ */
+function buildModuleContent(id){
+  const m=MODULES[id];
+  const stList=STEPS['m'+id]||[];
+  if(!stepsDone[id])stepsDone[id]=new Set();
+  const dc=stepsDone[id].size;
+  const pct=Math.round((dc/stList.length)*100);
+  const chkList=CHECKLISTS['m'+id]||[];
+  const faqList=FAQS['m'+id]||[];
+
+  // Steps HTML
+  const stepsHTML=stList.map((s,i)=>{
+    const sid='s'+id+'-'+i;const isDone=stepsDone[id].has(i);
+    return`<div class="step-card${isDone?' done-s':''}" id="sc-${sid}">
+      <div class="step-hdr" onclick="toggleStep('${sid}')">
+        <div class="step-num" id="sn-${sid}">${isDone?'✓':(i+1)}</div>
+        <div class="step-title">${s.title}</div>
+        <div class="step-arr" id="arr-${sid}">▸</div>
+      </div>
+      <div class="step-body" id="body-${sid}">
+        <div class="step-inner">
+          <div class="step-path">📍 ${s.path}</div>
+          <div class="step-desc">${s.desc}</div>
+          <div class="step-tips">${s.tips.map(t=>`<div class="step-tip">${t}</div>`).join('')}</div>
+          ${s.warn?`<div class="step-warn"><span style="flex-shrink:0;margin-right:5px">⚠️</span>${s.warn}</div>`:''}
+          <button class="step-done-btn${isDone?' already':''}" onclick="markStep(${id},${i})" id="btn-${sid}">${isDone?'✓ Completado':'Marcar como visto ▸'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Checklist HTML
+  const chkHTML=chkList.map((item,i)=>{
+    const done2=chkDone[id]&&chkDone[id].has(i);
+    return`<div class="chk-item${done2?' chk-done':''}" id="chk-${id}-${i}" onclick="toggleChk(${id},${i})">
+      <div class="chk-box">${done2?'✓':''}</div>
+      <div class="chk-text">${item}</div>
+    </div>`;
+  }).join('');
+
+  // FAQ HTML
+  const faqHTML=faqList.map((f,i)=>`<div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq('${id}-${i}')">
+      <div class="faq-q-txt">${f.q}</div>
+      <div class="faq-arr" id="farr-${id}-${i}">▸</div>
+    </div>
+    <div class="faq-a" id="fa-${id}-${i}">
+      <div class="faq-a-inner">${f.a}</div>
+    </div>
+  </div>`).join('');
+
+  // Chart section per module
+  const chartSection=buildChartForModule(id);
+
+  // Links per module
+  const links=buildLinksForModule(id);
+
+  return`<button class="back" onclick="goScr('menu');renderMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver al menú</button>
+  <div class="phdr">
+    <div class="pico2">${m.ico}</div>
+    <div><div class="phnum">${m.num} · ${m.tag}</div><div class="phtit"><em>${m.title.split(' ')[0]}</em> ${m.title.split(' ').slice(1).join(' ')}</div><div class="phsub">${m.desc}</div></div>
+  </div>
+
+  ${buildAcademicForModule(id)}
+  ${chartSection}
+  ${links}
+
+  <div class="blk">
+    <div class="blk-lbl">Laboratorio Práctico — Paso a Paso
+      <button class="ceb" id="ceb-steps-${id}" onclick="toggleCE('steps-${id}')" style="margin-left:.5rem">? Cómo usar los pasos</button>
+    </div>
+    <div class="ce" id="ce-steps-${id}"><div class="ce-inner"><div class="ce-grid">
+      <div class="ce-item"><div class="ce-item-lbl">🖱️ Cómo interactuar</div><div class="ce-item-txt">Haz clic en el título de cada paso para desplegarlo. Lee el contenido, sigue la ruta de navegación indicada en el exchange y haz clic en "Marcar como visto" cuando lo completes.</div></div>
+      <div class="ce-item"><div class="ce-item-lbl">📍 Ruta de navegación</div><div class="ce-item-txt">La barra dorada al inicio de cada paso muestra la ruta exacta dentro del exchange: Exchange → Sección → Producto → Acción. Síguela literalmente en tu exchange real.</div></div>
+      <div class="ce-item"><div class="ce-item-lbl">✓ Barra de progreso</div><div class="ce-item-txt">La barra superior muestra cuántos pasos has completado en este módulo. Completa todos los pasos antes de pasar al módulo siguiente para asegurar la comprensión operativa.</div></div>
+      <div class="ce-item"><div class="ce-item-lbl">⚠️ Advertencias</div><div class="ce-item-txt">Los recuadros rojos dentro de cada paso contienen información crítica de riesgo. Léelas cuidadosamente — representan las consecuencias más comunes de saltarse ese paso.</div></div>
+    </div></div></div>
+    <div class="mod-progress">
+      <span class="mp-lbl">Progreso</span>
+      <div class="mp-track"><div class="mp-fill" id="mpf-${id}" style="width:${pct}%"></div></div>
+      <span class="mp-count" id="mpc-${id}">${dc}/${stList.length}</span>
+    </div>
+    <div class="steps-wrap">${stepsHTML}</div>
+  </div>
+
+  <div class="blk">
+    <div class="blk-lbl">Checklist Operativo — Antes de Ejecutar
+      <button class="ceb" id="ceb-chk-${id}" onclick="toggleCE('chk-${id}')" style="margin-left:.5rem">? Cómo usar el checklist</button>
+    </div>
+    <div class="ce" id="ce-chk-${id}"><div class="ce-inner"><div class="ce-grid">
+      <div class="ce-item"><div class="ce-item-lbl">🖱️ Cómo interactuar</div><div class="ce-item-txt">Haz clic en cada ítem para marcarlo como completado (el fondo cambia a verde y aparece el ✓). Haz clic de nuevo para desmarcarlo si necesitas revisar.</div></div>
+      <div class="ce-item"><div class="ce-item-lbl">📋 Para qué sirve</div><div class="ce-item-txt">Este checklist es el protocolo pre-ejecución del módulo. Cada ítem representa un paso crítico que debe estar completo antes de desplegar capital real en el exchange.</div></div>
+      <div class="ce-item"><div class="ce-item-lbl">✓ Barra de progreso</div><div class="ce-item-txt">La barra muestra cuántos ítems del checklist has verificado. El objetivo es llegar al 100% antes de ejecutar cualquier operación real con capital significativo.</div></div>
+      <div class="ce-item"><div class="ce-item-lbl">💡 Uso recomendado</div><div class="ce-item-txt">Usa el checklist cada vez que vayas a operar — incluso cuando ya seas experimentado. Las operaciones más costosas ocurren cuando se salta un ítem "obvio" por confianza excesiva.</div></div>
+    </div></div></div>
+    <div class="chk-progress-wrap">
+      <span style="font-family:'Orbitron',sans-serif;font-size:.54rem;color:var(--tmuted)">Completado</span>
+      <div class="chk-prog-track"><div class="chk-prog-fill" id="chkpf-${id}" style="width:0%"></div></div>
+      <span class="chk-prog-lbl" id="chkpl-${id}">0/${chkList.length}</span>
+    </div>
+    <div class="checklist">${chkHTML}</div>
+  </div>
+
+  <div class="blk">
+    <div class="blk-lbl">Preguntas Frecuentes del Módulo</div>
+    <div>${faqHTML}</div>
+  </div>
+
+  <div class="pfooter">
+    <span style="font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.08em;color:var(--tmuted)">${m.num.toUpperCase()} DE 4 · ${m.tag.toUpperCase()}</span>
+    <button class="btn-next" onclick="completeModule(${id})">
+      Módulo completado
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M20 6L9 17l-5-5"/></svg>
+    </button>
+  </div>`;
+}
+
+/* ═══════════ ACADEMIC ═══════════ */
+function buildAcademicForModule(id){
+  const texts=[
+    {t:'¿Qué es CeDeFi y cómo funciona?',d:'<strong>CeDeFi</strong> es la combinación de dos mundos: la facilidad de un exchange conocido (como Binance o Bybit) con las oportunidades de rendimiento que existen en las plataformas de préstamo y staking descentralizadas. La ventaja principal es que <strong>no necesitas saber nada técnico</strong> — el exchange hace todo el trabajo. Tú simplemente depositas tu dinero, eliges el producto y empiezas a ganar interés.'},
+    {t:'¿Cómo genera el dinero en el producto de interés diario?',d:'Cuando depositas USDT o USDC en el producto de interés del exchange, ese dinero se presta a otras personas que lo necesitan para operar en el mercado. Esas personas pagan un interés por usarlo y ese interés llega a tu cuenta todos los días. <strong>El interés sube cuando mucha gente quiere pedir prestado</strong> (mercados activos) y baja cuando hay poca demanda. Es como ser el banco, pero sin el papeleo.'},
+    {t:'¿Qué es el Liquid Staking y por qué el token vale más cada día?',d:'Ethereum tiene una forma de "votar" por las transacciones de la red que se llama Staking. Quien participa gana una recompensa. El problema es que normalmente el dinero queda bloqueado. El <strong>Liquid Staking</strong> resuelve esto: el exchange bloquea el ETH por ti, te da un token especial a cambio y ese token <strong>crece de valor automáticamente</strong> cada día porque acumula las recompensas adentro. Es como un alcancía que se llena sola.'},
+    {t:'¿Cómo funciona la Inversión Dual en palabras simples?',d:'La Inversión Dual funciona como una promesa: tú le dices al exchange "me comprometo a comprar BTC a X precio si llega ahí" o "me comprometo a vender si el precio llega a Y". A cambio de esa promesa, el exchange te paga un interés por adelantado. <strong>El interés es tuyo sin importar qué pase.</strong> Si el precio llega al nivel que elegiste, completas la operación. Si no llega, te quedas con tu dinero original más el interés ganado.'}
+  ];
+  const t=texts[id];
+  return`<div class="blk"><div class="blk-lbl">¿Cómo funciona?</div><div class="concept-box"><div class="concept-tag">${t.t}</div><p>${t.d}</p></div></div>`;
+}
+
+/* ═══════════ LINKS ═══════════ */
+function buildLinksForModule(id){
+  const all=[
+    [
+      {ico:'🟡',name:'Binance Earn',desc:'Simple Earn, DeFi Staking, ETH Staking — todos los productos CeDeFi',url:'https://www.binance.com/en/earn'},
+      {ico:'🟠',name:'Bybit Earn',desc:'DeFi Mining, Flexible Savings y Liquidity Mining',url:'https://www.bybit.com/en/earn'},
+      {ico:'🔵',name:'OKX Earn',desc:'Simple Earn, DeFi, ETH Staking y más',url:'https://www.okx.com/earn'},
+    ],
+    [
+      {ico:'💧',name:'Binance Simple Earn — USDT',desc:'Flexible y Locked lending de stablecoins con auto-compuesto',url:'https://www.binance.com/en/earn/savings'},
+      {ico:'📊',name:'Bybit Flexible Savings',desc:'Pool de lending flexible con retiro en horas',url:'https://www.bybit.com/en/earn/savings'},
+    ],
+    [
+      {ico:'🔗',name:'Binance ETH Staking (WBETH)',desc:'Liquid staking de ETH con token sintético WBETH',url:'https://www.binance.com/en/eth2'},
+      {ico:'🔗',name:'Bybit Liquid Staking ETH',desc:'Liquid staking con token sintético bbETH',url:'https://www.bybit.com/en/earn/eth-staking'},
+    ],
+    [
+      {ico:'⚔️',name:'Binance Dual Investment',desc:'Inversión Dual — Vender Alto y Comprar Bajo',url:'https://www.binance.com/en/structured-products/dual-investment'},
+      {ico:'⚔️',name:'Bybit Dual Asset',desc:'Dual Asset — estructura equivalente de opciones',url:'https://www.bybit.com/en/earn/dual-asset'},
+      {ico:'📈',name:'TradingView',desc:'Análisis técnico para identificar Strike Price óptimo',url:'https://www.tradingview.com'},
+    ]
+  ];
+  const items=all[id];
+  return`<div class="blk"><div class="blk-lbl">Links de Acceso Directo</div>${items.map(l=>`<a class="ext-link" href="${l.url}" target="_blank" rel="noopener"><div class="ext-link-ico">${l.ico}</div><div><div class="ext-link-name">${l.name}</div><div class="ext-link-desc">${l.desc}</div></div><div class="ext-link-arrow">↗</div></a>`).join('')}</div>`;
+}
+
+/* ═══════════ CHARTS ═══════════ */
+function buildChartForModule(id){
+  let _n=0;
+  function uid(){return 'm'+id+'-'+(++_n);}
+  function eb(lbl){
+    const i=uid();
+    return`<button class="ceb" id="ceb-${i}" onclick="toggleCE('${i}')">? ${lbl||'Cómo leer esta gráfica'}</button>`;
+  }
+  function cePanel(items,tip){
+    const i='m'+id+'-'+_n; // same _n as last eb() call
+    return`<div class="ce" id="ce-${i}"><div class="ce-inner"><div class="ce-grid">
+      ${items.map(([l,t])=>`<div class="ce-item"><div class="ce-item-lbl">${l}</div><div class="ce-item-txt">${t}</div></div>`).join('')}
+    </div><div class="ce-tip"><strong>Prueba esto:</strong> ${tip}</div></div></div>`;
+  }
+  function wboxHelp(uid2,items,tip){
+    return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem">
+      <div class="ctit" style="margin:0"></div>
+      <button class="ceb" id="ceb-${uid2}" onclick="toggleCE('${uid2}')">? Cómo usar esta calculadora</button>
+    </div>
+    <div class="ce" id="ce-${uid2}"><div class="ce-inner"><div class="ce-grid">
+      ${items.map(([l,t])=>`<div class="ce-item"><div class="ce-item-lbl">${l}</div><div class="ce-item-txt">${t}</div></div>`).join('')}
+    </div><div class="ce-tip"><strong>Prueba esto:</strong> ${tip}</div></div></div>`;
+  }
+
+  const sections=[
+    // MODULE 0 — Animated Flow Diagram (SVG) + Comparison
+    `<div class="blk">
+      <div class="blk-lbl">Visualización — Flujo de Capital en el Modelo CeDeFi</div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div><div class="ctit">🏛️ <span>Flujo CeDeFi — del usuario al protocolo y de regreso</span></div>
+          <div class="chart-sub">Diagrama animado del flujo de capital. Haz clic en los nodos para ver el rol de cada capa.</div></div>
+          ${eb('? Cómo usar el diagrama')}
+        </div>
+        ${cePanel([
+          ['📊 Qué muestra','El recorrido del capital desde el usuario hasta el protocolo DeFi y de regreso con rendimiento. Cada nodo es una capa del sistema CeDeFi.'],
+          ['🎯 Cómo leerlo','Lee de izquierda a derecha: Usuario → CEX → Blockchain → Protocolo → Retorno. Los nodos pulsantes son componentes activos en tiempo real.'],
+          ['💡 Clave','<strong>El CEX elimina</strong> el gas fee individual mediante batching. El usuario solo ve el APR neto final sin gestionar claves ni redes.'],
+          ['🖱️ Interacción','Haz clic en cualquier nodo del diagrama para ver su función específica. Cada nodo despliega un panel de explicación debajo del gráfico.']
+        ],'Haz clic en el nodo "CEX" primero, luego en "Protocolo". Compara sus roles — uno es el intermediario humano, el otro es el código autónomo que genera el rendimiento real.')}
+        <div id="flow-diagram" style="width:100%;height:200px;position:relative;background:#0A0C10;border:1px solid rgba(201,168,76,.12);overflow:hidden"></div>
+        <div id="flow-detail" style="display:none;margin-top:.6rem;padding:.65rem .85rem;background:var(--bp2);border:1px solid rgba(201,168,76,.18);font-size:.84rem;color:var(--tdim);line-height:1.65"></div>
+      </div>
+      <div class="blk-lbl" style="margin-top:1.2rem">Comparativa: CeFi vs CeDeFi vs DeFi Nativo</div>
+      <table class="comp-tbl" aria-label="Comparativa CeFi, CeDeFi y DeFi"><thead><tr><th>Característica</th><th>CeFi Tradicional</th><th>CeDeFi</th><th>DeFi Nativo</th></tr></thead><tbody>
+        <tr><td>Gestión de claves</td><td class="good">No requerida</td><td class="good">No requerida</td><td class="bad">Obligatoria</td></tr>
+        <tr><td>Gas fees</td><td class="good">Cero</td><td class="good">Cero (batching)</td><td class="bad">Costo variable</td></tr>
+        <tr><td>Riesgo de contraparte</td><td class="bad">Alto</td><td class="warn">Medio (exchange)</td><td class="good">Mínimo</td></tr>
+        <tr><td>Riesgo de smart contract</td><td class="good">Nulo</td><td class="warn">Bajo (intermediado)</td><td class="bad">Directo</td></tr>
+        <tr><td>Velocidad de retiro</td><td class="warn">1-3 días hábiles</td><td class="good">Minutos/horas</td><td class="good">Minutos + gas</td></tr>
+        <tr><td>Rendimiento bruto</td><td class="bad">Bajo</td><td class="warn">Medio (comisión CEX)</td><td class="good">Máximo</td></tr>
+        <tr><td>Complejidad técnica</td><td class="good">Muy baja</td><td class="good">Baja</td><td class="bad">Alta</td></tr>
+      </tbody></table>
+    </div>`,
+
+    // MODULE 1 — APR Area Chart + Compound Calculator
+    `<div class="blk">
+      <div class="blk-lbl">Visualización — APR Dinámico y Acumulación de Interés Compuesto</div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div><div class="ctit">📈 <span>APR histórico USDT Flexible — Correlación con ciclos de mercado</span></div>
+          <div class="chart-sub">El área rellena muestra el APR a lo largo del tiempo. Los picos correlacionan con fases de alta demanda de préstamos (mercados alcistas con alto apalancamiento).</div></div>
+          ${eb('? Cómo interpretar el APR')}
+        </div>
+        ${cePanel([
+          ['📊 Qué muestra','APR simulado del pool de USDT Flexible durante 12 meses. El área rellena permite ver períodos de alta y baja demanda de préstamos según el ciclo de mercado.'],
+          ['🎯 Cómo leerla','<strong>Picos = alta demanda de préstamos</strong> (traders pidiendo stablecoins para apalancarse). <strong>Valles = mercado bajista</strong> con poca demanda de crédito. La zona verde es el rango saludable del 5-15%.'],
+          ['💡 Lo más importante','Un APR que sube rápido es señal de que el mercado está aumentando el apalancamiento — útil como indicador macroeconómico secundario para tu análisis de contexto.'],
+          ['🖱️ Interacción','Pasa el cursor sobre cualquier punto del gráfico para ver el APR exacto de ese mes y una etiqueta que indica el estado del mercado en ese período.']
+        ],'Identifica el mes con APR más alto. ¿Coincide con un período de bull market? Ahora el mes más bajo. ¿Coincide con contracción? Observa la relación directa entre apalancamiento de mercado y tasa de interés del lending.')}
+        <div style="height:220px;position:relative"><canvas id="chart-m1a" role="img" aria-label="Gráfica de área del APR USDT Flexible durante 12 meses">APR USDT flexible: varía entre 4% y 22% según el ciclo del mercado.</canvas></div>
+      </div>
+      <div class="wbox" style="margin-top:.9rem">
+        <div class="ctit">🧮 <span>Calculadora: Interés Simple vs Compuesto — Diferencia Real</span></div>
+        ${wboxHelp('w-m1',[
+          ['🎯 Para qué sirve','Calcula cuánto dinero adicional genera el interés compuesto automático (Auto-suscripción) respecto a recibir los intereses sin reinvertir.'],
+          ['🖱️ Cómo usar','Mueve los tres sliders: capital inicial, APR anual y plazo en meses. Los resultados se actualizan en tiempo real mostrando la diferencia entre ambos métodos.'],
+          ['💡 Cuándo importa más','La diferencia es pequeña a plazos cortos pero crece significativamente a 24-36 meses y con capital mayor. Prueba $20,000 a 36 meses.'],
+          ['📊 Qué significa la "Diferencia extra"','Es el dinero adicional que genera el compuesto diario vs no reinvertir. Ese valor aparentemente pequeño es lo que el botón "Auto-suscripción" te regala sin esfuerzo adicional.']
+        ],'Pon el capital en $20,000, el APR en 8% y el plazo en 36 meses. Observa cómo la diferencia entre Simple y Compuesto crece con el tiempo. Luego cambia el APR a 15% y compara el resultado — la diferencia se multiplica.')}
+        <div class="wrow"><div class="wlbl">Capital inicial ($)</div><input type="range" class="wslider" id="c-capital" min="500" max="50000" step="500" value="5000" oninput="updCompound()"><div class="wval" id="cv-cap">$5,000</div></div>
+        <div class="wrow"><div class="wlbl">APR anual (%)</div><input type="range" class="wslider" id="c-apr" min="1" max="25" step="0.5" value="8" oninput="updCompound()"><div class="wval" id="cv-apr">8%</div></div>
+        <div class="wrow"><div class="wlbl">Plazo (meses)</div><input type="range" class="wslider" id="c-months" min="1" max="36" step="1" value="12" oninput="updCompound()"><div class="wval" id="cv-months">12 meses</div></div>
+        <div class="wres">
+          <div class="wr"><div class="wr-l">Sin compuesto (simple)</div><div class="wr-v" id="cv-simple">$5,400</div></div>
+          <div class="wr"><div class="wr-l">Con compuesto diario</div><div class="wr-v g" id="cv-compound">$5,416</div></div>
+          <div class="wr"><div class="wr-l">Diferencia extra</div><div class="wr-v g" id="cv-diff">$16</div></div>
+        </div>
+      </div>
+    </div>`,
+
+    // MODULE 2 — Token Value Appreciation + De-peg chart
+    `<div class="blk">
+      <div class="blk-lbl">Visualización — Apreciación del Token Sintético vs De-peg</div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div><div class="ctit">🔗 <span>WBETH/ETH — Valor de redención intrínseco vs precio de mercado Spot</span></div>
+          <div class="chart-sub">La línea dorada es el valor de redención (crece diariamente con staking). La línea azul punteada es el precio de mercado Spot. Las brechas entre ambas son episodios de de-peg.</div></div>
+          ${eb('? Cómo leer la gráfica')}
+        </div>
+        ${cePanel([
+          ['📊 Qué muestra','Dos líneas a lo largo de 18 meses: <strong>dorada</strong> = valor de redención intrínseco del WBETH (siempre creciente). <strong>Azul punteada</strong> = precio de mercado Spot (con volatilidad). La distancia entre ambas en caídas = de-peg.'],
+          ['🎯 Cómo leerla','La dorada siempre sube porque acumula recompensas de staking diariamente. La azul puede caer en pánicos de mercado. Cuando la azul sube por encima de la dorada, hay prima. Cuando cae por debajo, hay descuento (oportunidad de compra).'],
+          ['💡 Lo más importante','Si el precio Spot está por debajo del valor de redención, puedes comprar WBETH barato en Spot y canjear al valor intrínseco superior — arbitraje sin riesgo técnico si tienes paciencia.'],
+          ['🖱️ Interacción','Pasa el cursor sobre las zonas donde la línea azul cae bajo la dorada. Observa la magnitud del de-peg y cuántos meses tardó en recuperarse — eso es el riesgo temporal real de esta estrategia.']
+        ],'Identifica el mayor episodio de de-peg en el gráfico. ¿Cuántos meses tardó en recuperarse? Ahora calcula: si hubieras vendido en pánico en ese punto vs si hubieras esperado la convergencia, ¿cuánto habrías dejado de ganar?')}
+        <div style="height:220px;position:relative"><canvas id="chart-m2" role="img" aria-label="Gráfica de líneas mostrando valor de redención intrínseco versus precio de mercado del token sintético WBETH">Valor de redención crece de 1.0 a 1.072 ETH. Precio Spot muestra episodios de de-peg de hasta -7%.</canvas></div>
+      </div>
+      <div class="wbox" style="margin-top:.9rem">
+        <div class="ctit">⚡ <span>Calculadora de Eficiencia: Liquid Staking — Acumulación en 1 año</span></div>
+        ${wboxHelp('w-m2',[
+          ['🎯 Para qué sirve','Muestra cuánto ETH adicional acumulas en 1 año de liquid staking y cuánto vale ese rendimiento en dólares según el precio actual de ETH.'],
+          ['🖱️ Cómo usar','Ajusta los tres sliders: cantidad de ETH a depositar, APR actual del staking y precio de ETH en dólares. Los resultados se actualizan automáticamente.'],
+          ['💡 Lo que demuestra','El ETH acumulado en 1 año es modesto en porcentaje pero significativo en dólares si el precio de ETH es alto. A mayor precio de ETH, mayor valor del rendimiento de staking.'],
+          ['📊 WBETH disponible','La columna WBETH muestra que tu token sintético sigue circulando libremente como colateral mientras acumula el rendimiento — esa es la doble eficiencia del liquid staking.']
+        ],'Pon el ETH en 5 y el precio en $5,000. Observa el rendimiento anual en dólares. Luego duplica el precio a $10,000 manteniendo el mismo ETH. El rendimiento en dólares también se duplica — el APR en ETH es fijo pero el valor en USD depende del precio.')}
+        <div class="wrow"><div class="wlbl">ETH a depositar</div><input type="range" class="wslider" id="ls-eth" min="0.1" max="10" step="0.1" value="2" oninput="updLiquidStaking()"><div class="wval" id="lsv-eth">2 ETH</div></div>
+        <div class="wrow"><div class="wlbl">APR staking ETH (%)</div><input type="range" class="wslider" id="ls-apr" min="2" max="7" step="0.1" value="4" oninput="updLiquidStaking()"><div class="wval" id="lsv-apr">4%</div></div>
+        <div class="wrow"><div class="wlbl">Precio ETH ($)</div><input type="range" class="wslider" id="ls-price" min="1000" max="10000" step="100" value="3400" oninput="updLiquidStaking()"><div class="wval" id="lsv-price">$3,400</div></div>
+        <div class="wres">
+          <div class="wr"><div class="wr-l">ETH acumulado (1 año)</div><div class="wr-v g" id="lsv-accumulated">2.08 ETH</div></div>
+          <div class="wr"><div class="wr-l">Rendimiento en $</div><div class="wr-v g" id="lsv-usd">$272</div></div>
+          <div class="wr"><div class="wr-l">WBETH disponible</div><div class="wr-v" id="lsv-wbeth">2 WBETH</div></div>
+        </div>
+      </div>
+    </div>`,
+
+    // MODULE 3 — Dual Investment Payoff Diagram + Scenario Builder
+    `<div class="blk">
+      <div class="blk-lbl">Visualización — Diagrama de Payoff de la Inversión Dual</div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div><div class="ctit">⚔️ <span>Diagrama de payoff — Resultado neto por escenario de precio al vencimiento</span></div>
+          <div class="chart-sub">Cada línea muestra el resultado económico de cada estrategia según dónde termine el precio. La zona punteada es el costo de oportunidad de cada modalidad.</div></div>
+          ${eb('? Cómo leer el payoff')}
+        </div>
+        ${cePanel([
+          ['📊 Qué muestra','Resultado económico (% sobre el capital) de "Vender Alto" (dorada) y "Comprar Bajo" (azul) según el precio final de BTC al vencimiento. Eje X = precio final. Eje Y = resultado neto.'],
+          ['🎯 Cómo leerla','<strong>Línea dorada (Vender Alto):</strong> sube con el precio hasta el Strike, luego se aplana — ahí empieza el costo de oportunidad del rally perdido. <strong>Línea azul (Comprar Bajo):</strong> plana mientras el precio no cae al Strike; baja cuando cae por debajo.'],
+          ['💡 Lo más importante','Ambas estrategias siempre cobran el APR. El "riesgo" no es pérdida directa de capital — es el costo de oportunidad en escenarios extremos. La línea nunca baja de cero en condiciones normales.'],
+          ['🖱️ Interacción','Pasa el cursor sobre las líneas para ver el resultado exacto a cada precio. Observa el punto exacto donde la línea cambia de pendiente — eso es el Strike Price y el inicio del costo de oportunidad.']
+        ],'Identifica en el gráfico el precio de Strike de "Comprar Bajo" (donde la línea azul empieza a bajar). Usa el simulador abajo para mover el Strike más cerca del precio actual — ¿sube el APR? ¿Por qué el mercado paga más prima cuando el Strike está más cerca?')}
+        <div style="height:240px;position:relative"><canvas id="chart-m3a" role="img" aria-label="Diagrama de payoff de la Inversión Dual mostrando resultado neto para Vender Alto y Comprar Bajo">Comprar Bajo: APR positivo si precio no baja al Strike. Vender Alto: APR positivo si precio no sube al Strike.</canvas></div>
+      </div>
+      <div class="wbox" style="margin-top:.9rem">
+        <div class="ctit">🎯 <span>Simulador de Escenarios — Inversión Dual Interactivo</span></div>
+        ${wboxHelp('w-m3',[
+          ['🎯 Para qué sirve','Simula en tiempo real los dos escenarios de cierre (favorable y costo de oportunidad) de la Inversión Dual según el precio actual, los Strikes elegidos y el APR disponible.'],
+          ['🖱️ Cómo usar','Mueve los 4 sliders: precio actual de BTC, Strike de "Comprar Bajo", Strike de "Vender Alto" y APR disponible. Los escenarios Bull/Bear se actualizan automáticamente con los valores exactos.'],
+          ['💡 Relación Strike-APR','Observa que al mover el Strike de "Comprar Bajo" más cerca del precio actual, el descuento % baja pero el APR sube — el mercado paga más prima porque hay más probabilidad de activación.'],
+          ['📊 Escenarios dinámicos','Las tarjetas verde y roja debajo muestran exactamente qué ocurre en cada escenario. Úsalas para auditar la operación antes de suscribir — exactamente como pide el checklist del módulo.']
+        ],'Mueve el Strike "Comprar Bajo" a $45,000 (muy lejos del precio actual). Observa el APR — es bajo porque hay poca probabilidad de activación. Ahora muévelo a $63,000 (muy cerca). El APR sube drásticamente. Eso es la prima de riesgo en acción.')}
+        <div class="wrow"><div class="wlbl">Precio actual BTC ($)</div><input type="range" class="wslider" id="di-current" min="20000" max="100000" step="1000" value="67000" oninput="updDual()"><div class="wval" id="dv-current">$67,000</div></div>
+        <div class="wrow"><div class="wlbl">Strike "Comprar Bajo" ($)</div><input type="range" class="wslider" id="di-strike-low" min="10000" max="90000" step="500" value="58500" oninput="updDual()"><div class="wval" id="dv-sl">$58,500</div></div>
+        <div class="wrow"><div class="wlbl">Strike "Vender Alto" ($)</div><input type="range" class="wslider" id="di-strike-high" min="20000" max="150000" step="500" value="75000" oninput="updDual()"><div class="wval" id="dv-sh">$75,000</div></div>
+        <div class="wrow"><div class="wlbl">APR (72h, anualizado)</div><input type="range" class="wslider" id="di-apr" min="10" max="150" step="5" value="45" oninput="updDual()"><div class="wval" id="dv-apr">45%</div></div>
+        <div class="wres">
+          <div class="wr"><div class="wr-l">Descuento "Comprar Bajo"</div><div class="wr-v" id="dv-discount">-12.7%</div></div>
+          <div class="wr"><div class="wr-l">Prima "Vender Alto"</div><div class="wr-v" id="dv-premium">+11.9%</div></div>
+          <div class="wr"><div class="wr-l">Rendimiento 72h</div><div class="wr-v g" id="dv-return">+0.37%</div></div>
+        </div>
+        <div id="dual-scenarios" style="margin-top:.9rem;display:grid;grid-template-columns:1fr 1fr;gap:.7rem"></div>
+      </div>
+    </div>`
+  ];
+  return sections[id]||'';
+}
+
+/* ═══════════ INIT CHARTS ═══════════ */
+const G='#C9A84C',GB='#F0C040',GD='#8A6A20',R='#E05050',GR='#50C878',BL='#4A9EFF',DIM='rgba(255,255,255,0.42)';
+Chart.defaults.color=DIM;Chart.defaults.borderColor='rgba(201,168,76,0.1)';Chart.defaults.font.family='Rajdhani';
+function dch(id){if(charts[id]){try{charts[id].destroy();}catch(e){}}delete charts[id];}
+
+function initModChart(id){
+  if(id===0){buildFlowDiagram();return;}
+  if(id===1){buildAPRChart();updCompound();return;}
+  if(id===2){buildWBETHChart();updLiquidStaking();return;}
+  if(id===3){buildDualChart();updDual();return;}
+}
+
+/* M0 — Flow Diagram SVG */
+function buildFlowDiagram(){
+  const div=document.getElementById('flow-diagram');if(!div)return;
+  const nodes=[
+    {x:60,y:100,label:'Usuario',sub:'Capital USDT',color:'rgba(201,168,76,.8)',id:'user'},
+    {x:200,y:100,label:'CEX',sub:'Intermediario + Batching',color:'rgba(74,158,255,.8)',id:'cex'},
+    {x:350,y:100,label:'Blockchain',sub:'Transacción agregada',color:'rgba(160,112,255,.8)',id:'chain'},
+    {x:500,y:100,label:'Protocolo',sub:'Aave / Curve / Lido',color:'rgba(80,200,120,.8)',id:'proto'},
+    {x:630,y:100,label:'Retorno',sub:'Capital + APR neto',color:'rgba(201,168,76,.8)',id:'ret'},
+  ];
+  const details={
+    user:'<strong>Usuario:</strong> Deposita stablecoins o ETH desde su billetera Spot del exchange. No necesita gestionar claves privadas ni entender la blockchain subyacente.',
+    cex:'<strong>CEX (Exchange Centralizado):</strong> Actúa como intermediario. Consolida el capital de miles de usuarios (batching), ejecuta una sola transacción de blockchain, absorbe el gas fee y gestiona el riesgo técnico.',
+    chain:'<strong>Red Blockchain:</strong> Ethereum u otra blockchain PoS donde corre el protocolo DeFi. La transacción del CEX incluye el capital de cientos de usuarios en una sola operación.',
+    proto:'<strong>Protocolo DeFi:</strong> Smart contract autónomo (Aave, Curve, Lido). Aquí el capital genera el rendimiento real: los prestatarios pagan interés, los validadores generan recompensas de staking.',
+    ret:'<strong>Retorno:</strong> El rendimiento generado por el protocolo llega de vuelta al usuario con la comisión del exchange descontada. El capital más los intereses quedan disponibles en la billetera Spot.'
+  };
+  let svg=`<svg width="100%" height="100%" viewBox="0 0 720 200" style="overflow:visible">
+    <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 Z" fill="rgba(201,168,76,.5)"/></marker></defs>`;
+  // Arrows
+  for(let i=0;i<nodes.length-1;i++){
+    const n=nodes[i],nx=nodes[i+1];
+    svg+=`<line x1="${n.x+38}" y1="${n.y}" x2="${nx.x-38}" y2="${nx.y}" stroke="rgba(201,168,76,.35)" stroke-width="1.5" marker-end="url(#arr)" stroke-dasharray="5 3">
+      <animate attributeName="stroke-dashoffset" from="0" to="-16" dur="1.5s" repeatCount="indefinite"/>
+    </line>`;
+  }
+  // Return arrows (bottom)
+  svg+=`<path d="M ${nodes[4].x} 140 Q 360 180 ${nodes[0].x} 140" stroke="rgba(80,200,120,.35)" stroke-width="1.2" fill="none" marker-end="url(#arr)" stroke-dasharray="4 3">
+    <animate attributeName="stroke-dashoffset" from="0" to="-14" dur="2s" repeatCount="indefinite"/>
+  </path>
+  <text x="355" y="178" font-family="Orbitron,sans-serif" font-size="8" fill="rgba(80,200,120,.55)" text-anchor="middle">Rendimiento + Capital → Usuario</text>`;
+  // Nodes
+  nodes.forEach(n=>{
+    svg+=`<g onclick="showFlowDetail('${n.id}')" style="cursor:pointer">
+      <circle cx="${n.x}" cy="${n.y}" r="38" fill="${n.color.replace('.8',',.15')}" stroke="${n.color}" stroke-width="1.5">
+        <animate attributeName="r" values="38;40;38" dur="${2.5+nodes.indexOf(n)*0.3}s" repeatCount="indefinite"/>
+      </circle>
+      <text x="${n.x}" y="${n.y-5}" font-family="Orbitron,sans-serif" font-size="9" fill="${n.color}" text-anchor="middle" font-weight="700">${n.label}</text>
+      <text x="${n.x}" y="${n.y+8}" font-family="Rajdhani,sans-serif" font-size="8" fill="rgba(255,255,255,.5)" text-anchor="middle">${n.sub}</text>
+    </g>`;
+  });
+  svg+=`</svg>`;
+  div.innerHTML=svg;
+  window.showFlowDetail=function(id){
+    const d=document.getElementById('flow-detail');
+    if(d){d.style.display='block';d.innerHTML=details[id]||'';}
+  };
+}
+
+/* M1 — APR Area Chart */
+function buildAPRChart(){
+  dch('chart-m1a');const ctx=document.getElementById('chart-m1a');if(!ctx)return;
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const apr=[6.2,7.8,11.4,18.2,22.1,15.6,9.8,7.2,8.5,12.3,19.7,14.2];
+  charts['chart-m1a']=new Chart(ctx,{type:'line',data:{labels:months,datasets:[{label:'APR USDT Flexible (%)',data:apr,borderColor:GB,backgroundColor:'rgba(240,192,64,.12)',tension:.45,fill:true,pointRadius:4,pointHoverRadius:6,pointBackgroundColor:GB}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`APR: ${c.parsed.y}%`,afterLabel:c=>{const v=c.parsed.y;return v>15?'⚠️ Alta demanda de préstamos':v>10?'📈 Mercado activo':'📉 Baja demanda de crédito';}}}},
+  scales:{x:{ticks:{color:DIM,font:{size:11}},grid:{color:'rgba(201,168,76,.04)'}},y:{ticks:{color:DIM,callback:v=>v+'%'},grid:{color:'rgba(201,168,76,.04)'},suggestedMax:25}}}});
+}
+
+/* M2 — WBETH vs Spot Chart */
+function buildWBETHChart(){
+  dch('chart-m2');const ctx=document.getElementById('chart-m2');if(!ctx)return;
+  const months=['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12','M13','M14','M15','M16','M17','M18'];
+  const intrinsic=months.map((_,i)=>+(1+i*0.004).toFixed(4));
+  const spot=[1.00,1.004,1.008,1.012,1.016,0.94,0.96,0.98,1.02,1.028,1.032,1.038,1.042,0.985,1.004,1.056,1.06,1.068];
+  charts['chart-m2']=new Chart(ctx,{type:'line',data:{labels:months,datasets:[
+    {label:'Valor de redención (intrínseco)',data:intrinsic,borderColor:GB,backgroundColor:'rgba(240,192,64,.06)',tension:.3,fill:false,pointRadius:3,borderWidth:2.5},
+    {label:'Precio de mercado Spot',data:spot,borderColor:BL,backgroundColor:'rgba(74,158,255,.06)',tension:.35,fill:false,pointRadius:3,borderWidth:2,borderDash:[4,3]}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+  plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(4)} ETH`}}},
+  scales:{x:{ticks:{color:DIM,font:{size:10}},grid:{color:'rgba(201,168,76,.03)'}},y:{ticks:{color:DIM,callback:v=>v.toFixed(3)+' ETH'},grid:{color:'rgba(201,168,76,.04)'}}}}});
+}
+
+/* M3 — Dual Payoff Chart */
+function buildDualChart(){
+  dch('chart-m3a');const ctx=document.getElementById('chart-m3a');if(!ctx)return;
+  const prices=Array.from({length:20},(_,i)=>40000+i*5000);
+  const strikeHigh=75000,strikeLow=58500,apr=0.45*(3/365);
+  const sellHigh=prices.map(p=>p>=strikeHigh?apr*100:((p-67000)/67000)*100+apr*100);
+  const buyLow=prices.map(p=>p<=strikeLow?(p-strikeLow)/strikeLow*100+apr*100:apr*100);
+  charts['chart-m3a']=new Chart(ctx,{type:'line',data:{labels:prices.map(p=>'$'+Math.round(p/1000)+'k'),datasets:[
+    {label:'Vender Alto (Vender Alto)',data:sellHigh,borderColor:GB,backgroundColor:'rgba(240,192,64,.08)',tension:.3,fill:false,pointRadius:0,borderWidth:2.5},
+    {label:'Comprar Bajo (Comprar Bajo)',data:buyLow,borderColor:BL,backgroundColor:'rgba(74,158,255,.08)',tension:.3,fill:false,pointRadius:0,borderWidth:2.5,borderDash:[5,3]}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+  plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(2)}%`}}},
+  scales:{x:{ticks:{color:DIM,font:{size:10},maxTicksLimit:8},grid:{color:'rgba(201,168,76,.03)'}},
+   y:{ticks:{color:DIM,callback:v=>v.toFixed(1)+'%'},grid:{color:'rgba(201,168,76,.04)'},
+      suggestedMin:-15,suggestedMax:15}}}});
+}
+
+/* ═══════════ WIDGET UPDATERS ═══════════ */
+function updCompound(){
+  const cap=parseFloat(document.getElementById('c-capital')?.value||5000);
+  const apr=parseFloat(document.getElementById('c-apr')?.value||8)/100;
+  const months=parseInt(document.getElementById('c-months')?.value||12);
+  document.getElementById('cv-cap').textContent='$'+cap.toLocaleString();
+  document.getElementById('cv-apr').textContent=(apr*100).toFixed(1)+'%';
+  document.getElementById('cv-months').textContent=months+' meses';
+  const simple=cap*(1+apr*(months/12));
+  const compound=cap*Math.pow(1+apr/365,months*30.44);
+  document.getElementById('cv-simple').textContent='$'+Math.round(simple).toLocaleString();
+  document.getElementById('cv-compound').textContent='$'+Math.round(compound).toLocaleString();
+  document.getElementById('cv-diff').textContent='$'+Math.round(compound-simple).toLocaleString();
+}
+function updLiquidStaking(){
+  const eth=parseFloat(document.getElementById('ls-eth')?.value||2);
+  const apr=parseFloat(document.getElementById('ls-apr')?.value||4)/100;
+  const price=parseFloat(document.getElementById('ls-price')?.value||3400);
+  document.getElementById('lsv-eth').textContent=eth.toFixed(1)+' ETH';
+  document.getElementById('lsv-apr').textContent=(apr*100).toFixed(1)+'%';
+  document.getElementById('lsv-price').textContent='$'+price.toLocaleString();
+  const accumulated=+(eth*(1+apr)).toFixed(4);
+  const usd=Math.round((accumulated-eth)*price);
+  document.getElementById('lsv-accumulated').textContent=accumulated+' ETH';
+  document.getElementById('lsv-usd').textContent='$'+usd.toLocaleString();
+  document.getElementById('lsv-wbeth').textContent=eth.toFixed(1)+' WBETH';
+}
+function updDual(){
+  const current=parseFloat(document.getElementById('di-current')?.value||67000);
+  const strikeLow=parseFloat(document.getElementById('di-strike-low')?.value||58500);
+  const strikeHigh=parseFloat(document.getElementById('di-strike-high')?.value||75000);
+  const apr=parseFloat(document.getElementById('di-apr')?.value||45);
+  document.getElementById('dv-current').textContent='$'+Math.round(current).toLocaleString();
+  document.getElementById('dv-sl').textContent='$'+Math.round(strikeLow).toLocaleString();
+  document.getElementById('dv-sh').textContent='$'+Math.round(strikeHigh).toLocaleString();
+  document.getElementById('dv-apr').textContent=Math.round(apr)+'%';
+  const discount=((strikeLow-current)/current*100).toFixed(1);
+  const premium=((strikeHigh-current)/current*100).toFixed(1);
+  const ret72=(apr/365*3).toFixed(2);
+  document.getElementById('dv-discount').textContent=discount+'%';
+  document.getElementById('dv-premium').textContent='+'+premium+'%';
+  document.getElementById('dv-return').textContent='+'+ret72+'%';
+  const sc=document.getElementById('dual-scenarios');
+  if(sc){sc.innerHTML=`
+    <div class="scenario-card bull">
+      <div class="sc-tag">✓ Escenario Favorable</div>
+      <div class="sc-title">Precio NO alcanza el Strike</div>
+      <div class="sc-desc">
+        <strong>Vender Alto:</strong> conservas BTC + cobras +${ret72}% en BTC<br>
+        <strong>Comprar Bajo:</strong> conservas USDT + cobras +${ret72}% en USDT
+      </div>
+    </div>
+    <div class="scenario-card bear">
+      <div class="sc-tag">⚠ Escenario Costo Oportunidad</div>
+      <div class="sc-title">Precio SÍ alcanza el Strike</div>
+      <div class="sc-desc">
+        <strong>Vender Alto:</strong> vendes BTC a $${Math.round(strikeHigh).toLocaleString()} (pierdes el rally posterior)<br>
+        <strong>Comprar Bajo:</strong> compras BTC a $${Math.round(strikeLow).toLocaleString()} (mercado puede valer menos)
+      </div>
+    </div>`;}
+}
+
+/* ═══════════ QUIZ ENGINE ═══════════ */
+function openQuiz(){quizState={started:false,level:0,score:0,answered:false,answers:[]};renderQuizScreen();goScr('quiz');setProgress(Math.round((done.size/TOTAL)*100),'Evaluación Final');}
+function renderQuizScreen(){
+  const c=document.getElementById('quiz-container');
+  if(!quizState.started){
+    c.innerHTML=`<div class="quiz-hero"><div style="font-size:2.8rem;margin-bottom:.9rem">🎯</div><h2>Evaluación Final</h2>
+      <p>15 preguntas sobre los 4 módulos del Taller CeDeFi. Cada respuesta correcta suma 6.67 puntos. Necesitas 60+ para aprobar, 80+ para nivel Experto.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center;margin-bottom:1.4rem">
+        <span class="qm-pill">📋 15 PREGUNTAS</span><span class="qm-pill">🏆 100 PUNTOS</span><span class="qm-pill">🔒 4 MÓDULOS</span>
+      </div>
+      <button class="btn-go" onclick="startQuiz()">▶ INICIAR EVALUACIÓN</button></div>`;
+    return;
+  }
+  if(quizState.level>=QUIZ.length){showResult();return;}
+  renderQ();
+}
+function startQuiz(){quizState.started=true;quizState.level=0;quizState.score=0;quizState.answered=false;quizState.answers=[];renderQ();}
+function renderQ(){
+  const c=document.getElementById('quiz-container');
+  const q=QUIZ[quizState.level];const total=QUIZ.length;
+  const pct=Math.round((quizState.level/total)*100);
+  const dots=Array.from({length:total},(_,i)=>`<div class="qdot${i<quizState.level?' done':i===quizState.level?' active':''}"></div>`).join('');
+  const opts=q.opts.map((o,i)=>`<button class="q-opt" id="qo-${i}" onclick="selectQ(${i})"><span class="q-key">${['A','B','C','D'][i]}</span><span>${o}</span></button>`).join('');
+  c.innerHTML=`<div class="q-prog-wrap">
+    <div class="q-prog-hdr"><span class="q-prog-lbl">Pregunta ${quizState.level+1} de ${total}</span><span class="q-prog-score">Puntaje: <span>${quizState.score.toFixed(0)}</span>/100</span></div>
+    <div class="q-prog-track"><div class="q-prog-fill" style="width:${pct}%"></div></div>
+    <div class="q-dots">${dots}</div>
+  </div>
+  <div class="q-card">
+    <div class="q-mod-tag">${q.mod}</div>
+    <div class="q-title">${q.title}</div>
+    <div class="q-scenario">${q.scenario}</div>
+    <div class="q-opts">${opts}</div>
+    <div class="q-fb" id="qfb"></div>
+    <div class="q-nav"><button class="q-btn-next" id="qnext" disabled onclick="nextQ()">${quizState.level<total-1?'Siguiente →':'Ver Resultados →'}</button></div>
+  </div>`;
+}
+function selectQ(idx){
+  if(quizState.answered)return;
+  quizState.answered=true;
+  const q=QUIZ[quizState.level];const correct=idx===q.correct;
+  if(correct)quizState.score+=100/QUIZ.length;
+  quizState.answers.push({correct,idx,mod:q.mod});
+  document.querySelectorAll('.q-opt').forEach((b,i)=>{
+    b.classList.add('qlocked');
+    if(i===q.correct)b.classList.add('qcorrect');
+    else if(i===idx&&!correct)b.classList.add('qwrong');
+    else b.classList.add('qdim');
+  });
+  const fb=document.getElementById('qfb');
+  fb.className=`q-fb show ${correct?'fc':'fw'}`;
+  fb.innerHTML=`<span style="font-size:1.15rem;flex-shrink:0">${correct?'✅':'⛔'}</span><div><strong>${correct?'¡Correcto!':'Respuesta incorrecta'}</strong>${correct?q.ok:q.fail}</div>`;
+  document.getElementById('qnext').disabled=false;
+}
+function nextQ(){quizState.level++;quizState.answered=false;renderQuizScreen();}
+function showResult(){
+  goScr('result');
+  const s=quizState.score;const correct=quizState.answers.filter(a=>a.correct).length;
+  const stars=s>=90?5:s>=80?4:s>=60?3:s>=40?2:1;
+  const starStr=Array.from({length:5},(_,i)=>i<stars?'⭐':'☆').join('');
+  let ico,title,msg,color;
+  if(s>=90){ico='🏛️';title='Estratega CeDeFi Élite';msg='Dominas los 4 módulos con criterio institucional. Tienes las herramientas conceptuales y operativas para desplegar capital CeDeFi con disciplina profesional.';color='var(--gold-b)';}
+  else if(s>=80){ico='💹';title='Operador CeDeFi Avanzado';msg='Excelente comprensión del taller. Revisa los módulos donde fallaste para cerrar brechas antes de desplegar capital significativo.';color='var(--green)';}
+  else if(s>=60){ico='📈';title='Inversor CeDeFi en Desarrollo';msg='Aprobado. Tienes bases sólidas pero hay conceptos específicos a reforzar — especialmente la Inversión Dual y el riesgo de contraparte.';color='var(--gold)';}
+  else{ico='⚠️';title='Repaso Necesario';msg='Necesitas repasar los módulos antes de desplegar capital real en CeDeFi. El conocimiento incompleto en productos estructurados puede tener costos significativos.';color='var(--red)';}
+  const modScores={};
+  quizState.answers.forEach((a,i)=>{const mod=QUIZ[i].mod.split('·')[0].trim();if(!modScores[mod])modScores[mod]={c:0,t:0};modScores[mod].t++;if(a.correct)modScores[mod].c++;});
+  const breakdownHTML=Object.entries(modScores).map(([mod,sc])=>{
+    const ok=sc.c===sc.t,partial=sc.c>0&&sc.c<sc.t;
+    return`<div class="rb-row"><span style="font-size:1rem;flex-shrink:0">${ok?'✅':partial?'⚠️':'❌'}</span><span class="rb-mod">${mod}</span><span style="font-family:'Orbitron',sans-serif;font-size:.65rem;color:${ok?'var(--green)':partial?'var(--gold)':'var(--red)'};font-weight:700">${sc.c}/${sc.t}</span></div>`;
+  }).join('');
+  document.getElementById('result-container').innerHTML=`
+  <div class="result-hero">
+    <div class="result-badge">${ico}</div>
+    <div style="font-family:'Cinzel',serif;font-size:1.45rem;color:${color};margin-bottom:.3rem">${title}</div>
+    <div class="result-score">${s.toFixed(0)}/100</div>
+    <div class="result-stars">${starStr}</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:.62rem;color:var(--tmuted);margin-bottom:.75rem">${correct} de ${QUIZ.length} respuestas correctas</div>
+    <div class="result-msg">${msg}</div>
+  </div>
+  <div class="result-breakdown"><div class="rb-title">Desglose por Módulo</div>${breakdownHTML}</div>
+  <div class="result-actions">
+    <button class="btn-restart" onclick="retryQuiz()">↺ Repetir Evaluación</button>
+    <button class="btn-menu2" onclick="goScr('menu');renderMenu()">⬅ Volver al Menú</button>
+  </div>`;
+  setProgress(100,'Evaluación Completada');
+}
+function retryQuiz(){quizState={started:true,level:0,score:0,answered:false,answers:[]};renderQ();goScr('quiz');}
+
+/* ═══════════ GLOSARIO ═══════════ */
+const GLOSARIO=[
+  // CeDeFi
+  {term:'CeDeFi',eng:'Centralized Decentralized Finance',cat:'CeDeFi',color:'#C9A84C',
+   def:'Es cuando un exchange conocido (como Binance o Bybit) te da acceso a productos de inversión más avanzados sin que tengas que entender la tecnología por debajo. Tú usas el exchange de siempre, pero el dinero trabaja en sistemas más sofisticados que generan mejor rendimiento.',
+   example:'Ejemplo: entras a Binance, vas a "Earn" y depositas USDT. Sin hacer nada técnico, ese dinero está trabajando en plataformas de préstamo que pagan interés diario.',
+   tip:'La gran ventaja es la simplicidad. No necesitas aprender sobre wallets, blockchain ni tecnología. El exchange lo hace todo por ti a cambio de una pequeña comisión.'},
+  {term:'Exchange',eng:'Exchange / Plataforma de intercambio',cat:'CeDeFi',color:'#C9A84C',
+   def:'Una plataforma donde puedes comprar, vender e invertir criptomonedas. Es como una bolsa de valores pero para cripto. Los exchanges más conocidos son Binance, Bybit, OKX y Coinbase. Los productos del taller (Earn, Liquid Staking, Inversión Dual) están todos dentro del exchange.',
+   example:'Ejemplo: abres Binance, compras $100 de USDT, luego vas a Earn y lo pones a generar interés. Todo sin salir de la misma app.',
+   tip:'Para este taller no necesitas usar más de un exchange. Todo lo que aprendes se hace desde el mismo sitio donde ya tienes tu cuenta.'},
+  {term:'Stablecoin',eng:'Stablecoin / Moneda estable',cat:'CeDeFi',color:'#C9A84C',
+   def:'Una criptomoneda que siempre vale aproximadamente $1. No sube ni baja de precio como el Bitcoin. Es la forma más segura de tener dólares digitales dentro del mundo cripto. Las más usadas son USDT y USDC.',
+   example:'Ejemplo: si tienes $500 en USDT y el mercado cae un 50%, tus $500 siguen siendo $500. Las stablecoins no se mueven con el mercado.',
+   tip:'Para los productos de interés diario del exchange (Earn), las stablecoins son la opción más tranquila porque no hay riesgo de que tu dinero valga menos por volatilidad del mercado.'},
+  {term:'Earn / Finanzas',eng:'Earn Section',cat:'CeDeFi',color:'#C9A84C',
+   def:'La sección del exchange donde están todos los productos para hacer que tu dinero genere interés. Es como el departamento de inversiones del banco, pero dentro de tu exchange de cripto. Aquí encuentras: interés diario en stablecoins, staking de ETH, Inversión Dual y más.',
+   example:'Ejemplo: en Binance se llama "Earn". En Bybit se llama "Earn". En OKX se llama "Earn". El nombre puede variar pero siempre está en el menú principal.',
+   tip:'Antes de usar cualquier producto de esta sección, lee el nombre del producto, qué porcentaje ofrece, y si es Flexible (puedes retirar cuando quieras) o Bloqueado (debes esperar hasta la fecha acordada).'},
+
+  // Lending / Interés
+  {term:'Interés / APR',eng:'Interest Rate / Annual Percentage Rate',cat:'Interés Diario',color:'#4A9EFF',
+   def:'El porcentaje que ganas por dejar tu dinero depositado. APR significa la tasa anual — cuánto ganarías en total si dejás el dinero un año completo. Si el APR es 8%, por cada $100 que depositas ganas $8 al año, o unos centavos por día.',
+   example:'Ejemplo: depositas $1,000 USDT con APR del 8%. Al cabo de un año tienes $1,080. Si lo retiras a los 6 meses, tienes aproximadamente $1,040.',
+   tip:'El APR cambia todos los días según la demanda del mercado. No te preocupes si varía — lo que ganaste ayer ya es tuyo aunque mañana baje el porcentaje.'},
+  {term:'Interés Compuesto',eng:'Compound Interest',cat:'Interés Diario',color:'#4A9EFF',
+   def:'Cuando los intereses que ganas también empiezan a generar intereses. Es como una bola de nieve: mientras más tiempo pasa, más rápido crece. El botón "Auto-suscripción" o "Auto-compuesto" del exchange hace esto automáticamente todos los días.',
+   example:'Ejemplo: depositas $1,000 al 8% APR. Sin compuesto al final del año tienes $1,080. Con compuesto diario tienes $1,083. La diferencia parece pequeña, pero con $10,000 y varios años se vuelve significativa.',
+   tip:'Activa siempre el Auto-compuesto cuando el exchange lo ofrezca. Es dinero gratis que viene de reinvertir automáticamente lo que ya ganaste.'},
+  {term:'Flexible vs Bloqueado',eng:'Flexible vs Locked',cat:'Interés Diario',color:'#4A9EFF',
+   def:'Dos formas de depositar en Earn. <strong>Flexible:</strong> puedes retirar tu dinero cuando quieras, generalmente en pocas horas. El interés es un poco menor. <strong>Bloqueado:</strong> el dinero se queda fijo hasta una fecha acordada (7, 30, 90 días). El interés es mejor porque te comprometes a no tocarlo.',
+   example:'Ejemplo: Flexible al 6% o Bloqueado 30 días al 9%. Si sabes que no necesitarás el dinero en 30 días, el Bloqueado te da más. Si hay chance de necesitarlo, Flexible es más seguro.',
+   tip:'Para empezar, usa siempre Flexible. Cuando tengas más experiencia y sepas con seguridad que no necesitas el dinero, puedes probar el Bloqueado con una parte pequeña.'},
+  {term:'Auto-suscripción',eng:'Auto-subscribe / Auto-compound',cat:'Interés Diario',color:'#4A9EFF',
+   def:'Un botón del exchange que reinvierte automáticamente los intereses que ganas cada día. En lugar de que los intereses queden quietos, los vuelve a depositar para que también generen interés. Así el dinero crece un poquito más rápido sin que hagas nada.',
+   example:'Ejemplo: ganas $0.80 de interés hoy. Con Auto-suscripción, esos $0.80 se depositan automáticamente y mañana generan interés junto con tu dinero original.',
+   tip:'Siempre actívalo si el exchange lo ofrece. Es la opción que maximiza el rendimiento con cero esfuerzo adicional de tu parte.'},
+
+  // Liquid Staking
+  {term:'Staking',eng:'Staking',cat:'Liquid Staking',color:'#A070FF',
+   def:'Una forma de ganar interés por tener criptomonedas. En lugar de que tus monedas estén quietas, las "pones a trabajar" en la red de esa criptomoneda (especialmente Ethereum). A cambio, la red te paga una recompensa. El exchange hace esto por ti automáticamente.',
+   example:'Ejemplo: depositas 1 ETH en Liquid Staking. El exchange lo pone a generar recompensas en la red Ethereum. Tú recibes un token especial que crece de valor cada día.',
+   tip:'El staking a través del exchange es la forma más sencilla de hacerlo. No necesitas saber cómo funciona la red por dentro — solo depositas ETH y empiezas a ganar.'},
+  {term:'Token de Liquid Staking (WBETH)',eng:'Liquid Staking Token',cat:'Liquid Staking',color:'#A070FF',
+   def:'Un comprobante digital que el exchange te da cuando depositas ETH en liquid staking. Este token representa tu ETH más los intereses que va acumulando. Su valor sube automáticamente cada día. Cuando quieras recuperar tu ETH, entregas el token y recibes más ETH del que depositaste.',
+   example:'Ejemplo: depositas 1 ETH → recibes 1 WBETH. Después de 1 año (con APR 4%), ese WBETH se puede cambiar por 1.04 ETH. El token creció solo sin que hicieras nada.',
+   tip:'No te asustes si el precio del token en el mercado sube y baja un poco. Lo importante es el valor al que puedes cambiarlo de vuelta por ETH en la sección Earn — ese sí siempre sube.'},
+  {term:'De-peg (precio temporal más bajo)',eng:'De-peg',cat:'Liquid Staking',color:'#A070FF',
+   def:'A veces, en momentos de mucho pánico en el mercado, el precio del token de staking puede bajar un poco por debajo de su valor real en la sección de intercambio. Esto es temporal — cuando el pánico pasa, el precio vuelve a su valor correcto. El valor de tu ETH original no desaparece.',
+   example:'Ejemplo: depositaste 1 ETH y tienes 1 WBETH. En un día de pánico, el precio del WBETH en el mercado baja a 0.95 ETH. Pero si vas a Earn y lo canjeas oficialmente, sigues recibiendo 1.04 ETH. La caída fue solo en el precio de mercado, no en el valor real.',
+   tip:'Si ves que el precio del token baja en el mercado, lo mejor es no hacer nada. Espera a que el mercado se calme. Los que vendieron durante el pánico de 2022 perdieron dinero innecesariamente.'},
+
+  // Inversión Dual
+  {term:'Inversión Dual',eng:'Dual Investment',cat:'Inversión Dual',color:'#E05050',
+   def:'Un producto del exchange donde te comprometes a comprar o vender una cripto a un precio que tú eliges, y a cambio cobras un interés por ese compromiso. Si el precio llega al nivel que elegiste, completas la operación. Si no llega, te quedas con tu dinero y el interés ganado. El interés es tuyo en ambos casos.',
+   example:'Ejemplo: BTC está a $67,000. Usas "Comprar Bajo" con precio objetivo $58,000. Si BTC llega a $58,000 lo compras ahí (más barato). Si no llega, te quedas con tus USDT + el interés ganado.',
+   tip:'Para principiantes: empieza con montos pequeños (el mínimo del exchange) y fechas cortas (24-72 horas). Lee siempre los dos escenarios posibles antes de confirmar. Esta operación NO se puede cancelar.'},
+  {term:'"Comprar Bajo"',eng:'Buy Low / Comprar Bajo',cat:'Inversión Dual',color:'#E05050',
+   def:'Una de las dos opciones de la Inversión Dual. Pones tus USDT y eliges un precio de BTC más bajo que el actual. Si el precio llega a ese nivel, el exchange te vende BTC a ese precio. Si el precio no baja tanto, te devuelve tus USDT + el interés.',
+   example:'Ejemplo: BTC está a $67,000. Eliges "Comprar Bajo" a $58,000 por 72 horas con 30% APR. Resultado A: BTC cae a $58,000 → compras BTC barato + cobras el interés. Resultado B: BTC no cae tanto → te devuelven tus USDT + el interés.',
+   tip:'Usa este producto cuando creas que el precio está alto y puede bajar, o simplemente cuando quieras acumular más BTC a un precio más conveniente que el actual.'},
+  {term:'"Vender Alto"',eng:'Sell High / Vender Alto',cat:'Inversión Dual',color:'#E05050',
+   def:'La otra opción de la Inversión Dual. Pones tus BTC y eliges un precio más alto que el actual. Si el precio sube hasta ese nivel, vendes ahí. Si el precio no sube tanto, te devuelven tu BTC + el interés.',
+   example:'Ejemplo: BTC está a $67,000. Eliges "Vender Alto" a $75,000 por 72 horas con 25% APR. Resultado A: BTC sube a $75,000 → vendes con ganancia + cobras el interés. Resultado B: BTC no llega → te devuelven tu BTC + el interés.',
+   tip:'Usa este producto cuando creas que el precio puede subir a ese nivel y quieras vender ahí con ganancia, o cuando simplemente quieras que tu BTC genere algo mientras esperas ese precio.'},
+  {term:'Precio objetivo (Strike)',eng:'Strike Price',cat:'Inversión Dual',color:'#E05050',
+   def:'El precio de compra o venta que tú eliges al configurar la Inversión Dual. Es el nivel de precio al que el exchange ejecutará la operación si el mercado llega ahí. Elegirlo bien es la parte más importante de este producto.',
+   example:'Ejemplo: si BTC está a $67,000 y eliges precio objetivo $58,000 para "Comprar Bajo", solo comprarás BTC si el precio baja hasta $58,000. Si se queda en $62,000, no se ejecuta.',
+   tip:'Para empezar, elige precios entre el 8% y 15% alejados del precio actual. Ni muy cerca (se ejecuta demasiado fácil) ni muy lejos (el interés será muy bajo).'},
+  {term:'Costo de oportunidad',eng:'Opportunity Cost',cat:'Inversión Dual',color:'#E05050',
+   def:'El principal riesgo de la Inversión Dual. No es perder dinero directamente, sino no ganar todo lo que podrías haber ganado. Por ejemplo: si vendiste BTC a $75,000 y el precio siguió subiendo a $90,000, vendiste bien pero "dejaste de ganar" los $15,000 adicionales del rally.',
+   example:'Ejemplo: vendiste 0.1 BTC a $75,000 con Inversión Dual. BTC llega a $90,000. Ganaste: (precio venta - precio compra) + interés. Pero dejaste de ganar: 0.1 BTC × $15,000 de rally adicional = $1,500.',
+   tip:'El costo de oportunidad no es una pérdida real — nunca pierdes lo que tenías. Solo significa que en ese escenario específico, no haberlo puesto en Dual habría sido más rentable. Para un principiante, cobrar el interés seguro ya es un buen resultado.'},
+
+  // Riesgo
+  {term:'Riesgo del exchange',eng:'Counterparty / Exchange Risk',cat:'Riesgos',color:'#F59E0B',
+   def:'El riesgo de que el exchange tenga problemas graves (quiebra, hackeo, congelamiento) y no pueda devolverte tu dinero. No es lo más común, pero ha pasado. Por eso se recomienda no poner todo el dinero en un solo exchange y usar plataformas grandes y reconocidas.',
+   example:'Ejemplo: en 2022 el exchange FTX quebró y los usuarios que tenían dinero ahí lo perdieron o tardaron mucho en recuperarlo. Binance o Bybit, al ser mucho más grandes, tienen más reservas y supervisión.',
+   tip:'Regla sencilla: no pongas más del 50% de tu capital cripto en products Earn de un solo exchange. Divide entre dos plataformas diferentes para reducir el riesgo.'},
+  {term:'Operación irrevocable',eng:'Irrevocable / Non-cancellable',cat:'Riesgos',color:'#F59E0B',
+   def:'Significa que una vez que confirmas la operación, no hay marcha atrás. La Inversión Dual funciona así — una vez que le dices sí al exchange, la operación corre hasta la fecha de vencimiento sin posibilidad de cancelación ni modificación.',
+   example:'Ejemplo: confirmas una Inversión Dual a las 9am. A las 2pm el mercado se mueve diferente a lo esperado. No puedes cancelar — la operación sigue hasta el vencimiento acordado.',
+   tip:'La solución es simple: antes de confirmar, lee los dos escenarios posibles y hazte esta pregunta: "¿estoy cómodo con el peor caso?" Si la respuesta es no, no confirmes todavía.'},
+  {term:'Diversificación',eng:'Diversification',cat:'Riesgos',color:'#F59E0B',
+   def:'No poner todos los huevos en la misma canasta. En CeDeFi significa repartir el dinero entre diferentes productos y diferentes exchanges. Así, si un producto o exchange tiene problemas, no perdes todo.',
+   example:'Ejemplo: tienes $1,000. En lugar de poner todo en un solo producto, pones $400 en Flexible USDT, $300 en Liquid Staking ETH y $300 los guardas fuera de Earn para tener liquidez inmediata.',
+   tip:'La diversificación no necesita ser complicada. Con dividir entre 2 productos diferentes y 2 exchanges diferentes ya reduces significativamente el riesgo.'},
+
+  // General
+  {term:'Billetera Spot',eng:'Spot Wallet',cat:'General',color:'#50C878',
+   def:'La billetera principal de tu exchange donde tienes tus criptomonedas disponibles para comprar, vender o mover. Es tu "cuenta corriente" dentro del exchange. Los productos Earn toman el dinero de aquí y cuando retiras, el dinero regresa aquí.',
+   example:'Ejemplo: compras $200 de USDT en Binance → aparecen en tu billetera Spot. Luego los mueves a Earn para generar interés. Cuando retiras de Earn, los $200 + intereses regresan a tu billetera Spot.',
+   tip:'Siempre verifica que el dinero llegó correctamente a tu billetera Spot antes de cerrar el exchange. Puede tardar unos minutos en aparecer.'},
+  {term:'2FA (Doble Factor)',eng:'Two-Factor Authentication',cat:'General',color:'#50C878',
+   def:'Una capa de seguridad adicional para proteger tu cuenta. Además de tu contraseña, necesitas un código que cambia cada 30 segundos (generado por una app como Google Authenticator). Así aunque alguien robe tu contraseña, no puede entrar a tu cuenta sin también tener tu teléfono.',
+   example:'Ejemplo: intentas entrar a Binance → escribes tu contraseña → el exchange te pide además el código de 6 dígitos que aparece en Google Authenticator en tu teléfono → solo entonces te deja entrar.',
+   tip:'Activa el 2FA antes de depositar cualquier cantidad significativa. Es la medida de seguridad más importante que puedes tomar y tarda menos de 5 minutos en configurar.'},
+  {term:'ETH / Ethereum',eng:'Ethereum / ETH',cat:'General',color:'#50C878',
+   def:'Una de las criptomonedas más importantes del mundo. A diferencia de Bitcoin que es principalmente una reserva de valor, Ethereum es también una plataforma donde corren aplicaciones y contratos inteligentes. El Liquid Staking de este taller usa ETH.',
+   example:'Ejemplo: igual que el dólar es la moneda de Estados Unidos, ETH es la moneda nativa de la red Ethereum. Se usa para pagar transacciones y como base de muchos productos de inversión en cripto.',
+   tip:'No necesitas entender cómo funciona Ethereum por dentro para hacer Liquid Staking. Solo necesitas tener ETH en tu exchange y seguir los pasos del módulo.'},
+  {term:'USDT / USDC',eng:'Tether / USD Coin',cat:'General',color:'#50C878',
+   def:'Las dos stablecoins (dólares digitales) más usadas en el mundo cripto. Ambas siempre valen aproximadamente $1. USDT es emitida por Tether y es la más usada. USDC es emitida por Circle y es considerada un poco más transparente por publicar auditorías regulares.',
+   example:'Ejemplo: si tienes $500 y quieres "parquearlos" en cripto sin que se muevan de precio, los conviertes a $500 USDT. Cuando quieras comprar BTC u otra cripto, conviertes de vuelta.',
+   tip:'Para los productos de interés diario (Earn Flexible), USDT y USDC son prácticamente iguales. La diferencia de rendimiento entre los dos suele ser de décimas de porcentaje — no hace gran diferencia para empezar.'},
+];
+
+
+/* ═══════════ GLOSARIO LOGIC ═══════════ */
+let glosActiveCat='Todas';
+
+function openGlosario(){
+  goScr('glosario');
+  setProgress(Math.round((done.size/TOTAL)*100),'Glosario CeDeFi');
+  renderGlosario();
+}
+
+function renderGlosario(){
+  // Build filter buttons
+  const cats=['Todas',...[...new Set(GLOSARIO.map(g=>g.cat))]];
+  const catColors={'CeDeFi':'#C9A84C','Lending':'#4A9EFF','Liquid Staking':'#A070FF','Inversión Dual':'#E05050','Riesgo':'#F59E0B','Análisis Técnico':'#50C878','Blockchain':'#00D4FF'};
+  const filtersEl=document.getElementById('glos-filters');
+  if(filtersEl){
+    filtersEl.innerHTML=cats.map(cat=>{
+      const color=cat==='Todas'?'#C9A84C':(catColors[cat]||'#C9A84C');
+      const isActive=glosActiveCat===cat;
+      return`<button class="glos-filter-btn ${isActive?'active':''}"
+        style="--active-bg:${color}18;--active-border:${color}55;--active-text:${color};${isActive?'background:'+color+'18;border-color:'+color+'55;color:'+color:''}"
+        onclick="setCat('${cat}')">${cat}</button>`;
+    }).join('');
+  }
+  filterGlosario();
+}
+
+function setCat(cat){
+  glosActiveCat=cat;
+  renderGlosario();
+}
+
+function filterGlosario(){
+  const q=(document.getElementById('glos-search')?.value||'').toLowerCase().trim();
+  const filtered=GLOSARIO.filter(g=>{
+    const matchCat=glosActiveCat==='Todas'||g.cat===glosActiveCat;
+    const matchQ=!q||g.term.toLowerCase().includes(q)||g.eng.toLowerCase().includes(q)||g.def.toLowerCase().includes(q);
+    return matchCat&&matchQ;
+  }).sort((a,b)=>a.term.localeCompare(b.term,'es'));
+
+  const countEl=document.getElementById('glos-count');
+  if(countEl)countEl.textContent=filtered.length+' término'+(filtered.length!==1?'s':'');
+
+  const listEl=document.getElementById('glos-list');
+  if(!listEl)return;
+  if(!filtered.length){
+    listEl.innerHTML=`<div class="glos-no-results">No se encontraron términos para "${q}"</div>`;
+    return;
+  }
+  listEl.innerHTML=filtered.map((g,i)=>`
+    <div class="glos-card" id="gc-${i}" style="--term-color:${g.color}">
+      <div class="glos-card-hdr" onclick="toggleGlos('gc-${i}')">
+        <div>
+          <div class="glos-term">${g.term}</div>
+          <div class="glos-eng">${g.eng}</div>
+        </div>
+        <div class="glos-cat-badge" style="color:${g.color};border-color:${g.color}33;background:${g.color}10">${g.cat}</div>
+        <div class="glos-arr" id="garr-${i}">▸</div>
+      </div>
+      <div class="glos-body" id="gb-${i}">
+        <div class="glos-def">
+          <div class="glos-def-main">${g.def}</div>
+          <div class="glos-example">${g.example}</div>
+          <div class="glos-tip">${g.tip}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleGlos(id){
+  const b=document.getElementById('gb-'+id.replace('gc-',''));
+  const a=document.getElementById('garr-'+id.replace('gc-',''));
+  if(!b)return;
+  const open=b.classList.toggle('open');
+  if(a)a.textContent=open?'▾':'▸';
+}
+
+
+loadProgress();
+
+/* ═══════════ PARTICLES ═══════════ */
+(function(){
+  const c=document.getElementById('cvs'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();addEventListener('resize',resize);
+  class P{constructor(){this.reset(true);}
+    reset(r){this.x=Math.random()*W;this.y=r?Math.random()*H:H+5;
+      this.vx=(Math.random()-.5)*.2;this.vy=-(Math.random()*.3+.07);
+      this.r=Math.random()*1.2+.28;this.a=Math.random()*.38+.08;this.da=(Math.random()-.5)*.0032;}
+    update(){this.x+=this.vx;this.y+=this.vy;this.a+=this.da;
+      if(this.a<.05)this.da=Math.abs(this.da);if(this.a>.62)this.da=-Math.abs(this.da);
+      if(this.y<-5||this.x<-10||this.x>W+10)this.reset(false);}
+    draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(201,168,76,${this.a})`;ctx.fill();}}
+  for(let i=0;i<80;i++)pts.push(new P());
+  function lines(){for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+    const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<95){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+      ctx.strokeStyle=`rgba(201,168,76,${.09*(1-d/95)})`;ctx.lineWidth=.3;ctx.stroke();}}}
+  function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw();});lines();requestAnimationFrame(loop);}
+  loop();
+})();
+</script>
+</body>
+</html>

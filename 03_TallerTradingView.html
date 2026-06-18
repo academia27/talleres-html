@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Taller TradingView — Dominio Avanzado 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;--gold-b:#F0C040;--gold-dim:#8A6A20;--gold-glow:#FFD700;
+  --bcard:#0D0D0D;--bpanel:#111;--bpanel2:#161616;--bpanel3:#1C1C1C;
+  --bg:rgba(201,168,76,0.22);--bgb:rgba(240,192,64,0.5);
+  --tgold:#C9A84C;--tgoldb:#F0C040;--tmuted:rgba(201,168,76,0.5);
+  --tw:rgba(255,255,255,0.93);--tdim:rgba(255,255,255,0.62);
+  --red:#E05050;--green:#50C878;--blue:#4A9EFF;--purple:#A070FF;--cyan:#00D4FF;
+}
+html,body{width:100%;min-height:100vh;background:#000;overflow-x:hidden;font-family:'Rajdhani',sans-serif;color:var(--tw);line-height:1.65}
+#cvs{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.3}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(201,168,76,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.025) 1px,transparent 1px);
+  background-size:55px 55px}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── NAV ── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.8rem;
+  border-bottom:1px solid var(--bg);background:rgba(0,0,0,.88);
+  backdrop-filter:blur(18px);position:sticky;top:0;z-index:200;gap:1rem;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:.75rem;cursor:pointer;flex-shrink:0}
+.logo-ring{width:38px;height:38px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:glow 4s ease infinite}
+@keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 14px rgba(201,168,76,.4)}}
+.logo-txt{font-family:'Orbitron',sans-serif;font-size:.6rem;color:var(--tgold);letter-spacing:.1em;text-transform:uppercase;line-height:1.4}
+.logo-txt b{display:block;font-size:.48rem;color:var(--tmuted);letter-spacing:.16em;font-weight:400}
+.nav-prog{flex:1;max-width:260px}
+.plbl{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:4px}
+.ptrack{height:2px;background:rgba(201,168,76,.1);border-radius:2px}
+.pbar{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease;width:0%}
+.nbadge{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.09em;padding:.28rem .75rem;border:1px solid var(--bgb);color:var(--tgoldb);text-transform:uppercase;background:rgba(201,168,76,.06);white-space:nowrap}
+
+/* ── SCREENS ── */
+.scr{display:none;flex-direction:column;flex:1;animation:fup .45s ease both}
+.scr.on{display:flex}
+@keyframes fup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO ── */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:2.5rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+.hero-deco{position:absolute;inset:0;pointer-events:none}
+.hdline{position:absolute;top:50%;left:50%;width:700px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.09),transparent);transform:translate(-50%,-50%) rotate(var(--r));animation:lf 7s ease infinite;animation-delay:var(--d)}
+@keyframes lf{0%,100%{opacity:0}50%{opacity:1}}
+.emblem{position:relative;width:200px;height:200px;margin:0 auto 1.8rem;flex-shrink:0}
+.er{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.15);animation:rp 4.5s ease infinite}
+.er:nth-child(1){inset:0}.er:nth-child(2){inset:-18px;animation-delay:.7s;border-color:rgba(201,168,76,.08)}.er:nth-child(3){inset:-36px;animation-delay:1.4s;border-color:rgba(201,168,76,.04)}
+@keyframes rp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.55}}
+.ecore{position:absolute;inset:12px;border-radius:50%;border:2px solid rgba(201,168,76,.5);background:radial-gradient(circle at 35% 30%,rgba(201,168,76,.15),rgba(0,0,0,.9));display:flex;align-items:center;justify-content:center}
+.hero-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.22em;color:var(--gold);border:1px solid var(--bg);padding:.32rem 1rem;text-transform:uppercase;margin-bottom:1.5rem;display:inline-block;animation:bp 3s ease infinite}
+@keyframes bp{0%,100%{border-color:rgba(201,168,76,.2)}50%{border-color:rgba(240,192,64,.6);box-shadow:0 0 12px rgba(201,168,76,.16)}}
+.hero h1{font-family:'Cinzel',serif;font-size:clamp(1.8rem,4.5vw,3rem);color:#fff;line-height:1.05;font-weight:700;margin-bottom:.4rem}
+.hero h1 span{color:var(--gold-b);display:block}
+.hero-sub{font-size:1rem;color:var(--tdim);letter-spacing:.04em;margin-bottom:1.8rem;max-width:480px;line-height:1.7;font-weight:300}
+.hero-sub strong{color:var(--tgold);font-weight:600}
+.hero-kpis{display:flex;gap:1.8rem;margin-bottom:2.2rem;flex-wrap:wrap;justify-content:center}
+.kpi{text-align:center}.kpi-n{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;color:var(--gold-b);line-height:1}
+.kpi-l{font-size:.62rem;letter-spacing:.11em;color:var(--tmuted);text-transform:uppercase;margin-top:.2rem}
+.ksep{width:1px;background:var(--bg);align-self:stretch}
+.btn-go{font-family:'Orbitron',sans-serif;font-size:.7rem;letter-spacing:.17em;padding:.9rem 2.2rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;border:none;cursor:pointer;font-weight:700;transition:all .3s;position:relative;overflow:hidden}
+.btn-go::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-120%);transition:transform .5s}
+.btn-go:hover::after{transform:translateX(120%)}
+.btn-go:hover{box-shadow:0 0 26px rgba(201,168,76,.4);transform:translateY(-2px)}
+
+/* ── MENU ── */
+.menu-wrap{padding:2rem 1.8rem 3rem;max-width:1060px;margin:0 auto;width:100%}
+.sec-hdr{border-left:3px solid var(--gold);padding-left:1rem;margin-bottom:1.8rem}
+.sec-hdr h2{font-family:'Cinzel',serif;font-size:1.4rem;color:#fff;font-weight:600}
+.sec-hdr p{font-size:.86rem;color:var(--tmuted);letter-spacing:.03em;margin-top:.22rem}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-bottom:1.4rem}
+@media(max-width:700px){.mgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.mgrid{grid-template-columns:1fr}}
+.mcard{background:var(--bcard);border:1px solid var(--bg);padding:1.2rem 1rem;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.55rem}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .4s}
+.mcard:hover::before,.mcard.mdone::before{transform:scaleX(1)}
+.mcard:hover{border-color:rgba(240,192,64,.42);background:#0f0f0f;transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.mcard.mdone{border-color:rgba(80,200,120,.22)}
+.mcard.mdone::before{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.mn{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.16em;color:var(--tmuted);text-transform:uppercase}
+.mico{width:40px;height:40px;border:1px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+.mtit{font-family:'Cinzel',serif;font-size:.87rem;color:var(--gold-b);font-weight:600;line-height:1.3}
+.mdesc{font-size:.8rem;color:var(--tdim);line-height:1.5}
+.mtag{font-size:.56rem;letter-spacing:.08em;padding:.16rem .5rem;border:1px solid var(--bg);color:var(--tmuted);text-transform:uppercase;font-family:'Orbitron',sans-serif;align-self:flex-start}
+.mchk{position:absolute;top:.65rem;right:.65rem;width:19px;height:19px;border-radius:50%;background:var(--green);display:none;align-items:center;justify-content:center}
+.mchk svg{width:10px;height:10px}
+.mcard.mdone .mchk{display:flex}
+.menu-btns{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn-s{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.1em;padding:.62rem 1.4rem;border:1.5px solid rgba(201,168,76,.45);color:var(--tgoldb);text-transform:uppercase;background:rgba(201,168,76,.08);cursor:pointer;transition:all .22s;font-weight:600}
+.btn-s:hover{border-color:var(--gold-b);color:var(--gold-b);background:rgba(201,168,76,.15);box-shadow:0 0 14px rgba(201,168,76,.2)}
+
+/* ── CONTENT ── */
+.cwrap{max-width:960px;margin:0 auto;padding:1.8rem 1.8rem;width:100%}
+.back{display:inline-flex;align-items:center;gap:.4rem;font-size:.6rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;cursor:pointer;border:none;background:none;font-family:'Orbitron',sans-serif;transition:color .2s;margin-bottom:1.6rem;padding:0}
+.back:hover{color:var(--gold)}
+.back svg{width:12px;height:12px}
+.phdr{display:flex;align-items:flex-start;gap:1.2rem;margin-bottom:1.8rem;padding-bottom:1.6rem;border-bottom:1px solid var(--bg)}
+.pico2{width:60px;height:60px;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.7rem;background:rgba(201,168,76,.06)}
+.phnum{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.18em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.3rem}
+.phtit{font-family:'Cinzel',serif;font-size:1.6rem;color:#fff;font-weight:700;line-height:1.1;margin-bottom:.25rem}
+.phtit em{font-style:normal;color:var(--gold-b)}
+.phsub{font-size:.88rem;color:var(--tdim);line-height:1.5}
+
+/* ── BLOCKS ── */
+.blk{margin-bottom:1.8rem}
+.blk-lbl{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:.42rem}
+.blk-lbl::after{content:'';flex:1;height:1px;background:var(--bg)}
+
+/* ── ACADEMIC BOX ── */
+.academic-box{background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.18);border-left:4px solid var(--blue);padding:1rem 1.2rem;margin-bottom:.9rem}
+.academic-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.13em;color:var(--blue);text-transform:uppercase;margin-bottom:.35rem;display:flex;align-items:center;gap:.38rem}
+.academic-tag::before{content:'📚';font-size:.8rem}
+.academic-box p{font-size:.91rem;color:rgba(180,210,255,.8);line-height:1.7}
+.academic-box strong{color:rgba(150,200,255,.92)}
+
+/* ── INFO CARDS ── */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+@media(max-width:560px){.info-grid{grid-template-columns:1fr}}
+.info-card{background:var(--bpanel2);border:1px solid rgba(201,168,76,.12);padding:1rem 1.1rem}
+.info-card-ico{font-size:1.4rem;margin-bottom:.5rem}
+.info-card-t{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.4rem}
+.info-card-d{font-size:.88rem;color:var(--tdim);line-height:1.65}
+.info-card-d strong{color:var(--tgold)}
+
+/* ── EXTERNAL LINK CARD ── */
+.ext-link{display:flex;align-items:center;gap:1rem;padding:.9rem 1.1rem;border:1.5px solid rgba(201,168,76,.35);background:rgba(201,168,76,.05);text-decoration:none;transition:all .22s;margin-bottom:.8rem;position:relative;overflow:hidden}
+.ext-link::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);transform:translateX(-100%);transition:transform .5s}
+.ext-link:hover::after{transform:translateX(100%)}
+.ext-link:hover{border-color:var(--gold);background:rgba(201,168,76,.1);transform:translateX(3px)}
+.ext-link-ico{font-size:1.3rem;flex-shrink:0}
+.ext-link-info{flex:1}
+.ext-link-name{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.08em;color:var(--gold-b);text-transform:uppercase;margin-bottom:.18rem}
+.ext-link-desc{font-size:.82rem;color:var(--tdim);line-height:1.4}
+.ext-link-arrow{font-size:.7rem;color:var(--tmuted);flex-shrink:0;font-family:'Orbitron',sans-serif}
+
+/* ── STEP CARDS ── */
+.steps-wrap{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1rem}
+.step-card{background:var(--bpanel2);border:1px solid rgba(201,168,76,.1);border-left:3px solid var(--gold-dim);overflow:hidden;transition:border-color .25s}
+.step-card.done-s{border-left-color:var(--green)}
+.step-hdr{display:flex;align-items:center;gap:.85rem;padding:.82rem .95rem;cursor:pointer;user-select:none}
+.step-hdr:hover{background:rgba(201,168,76,.04)}
+.step-num{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--gold);flex-shrink:0;transition:all .3s}
+.step-card.done-s .step-num{background:var(--green);border-color:var(--green);color:#000}
+.step-title{flex:1;font-size:.91rem;color:var(--tgoldb);font-weight:600}
+.step-arr{font-size:.62rem;color:var(--tmuted);transition:transform .28s;font-family:'Orbitron',sans-serif}
+.step-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1)}
+.step-body.open{max-height:1400px}
+.step-inner{padding:.2rem .95rem .95rem 2.6rem}
+.step-path{background:rgba(0,0,0,.45);border:1px solid rgba(201,168,76,.18);padding:.65rem .95rem;margin-bottom:.8rem;font-size:.78rem;line-height:1.7;color:rgba(201,168,76,.7);font-family:'Orbitron',sans-serif;letter-spacing:.04em}
+.step-desc{font-size:.88rem;color:var(--tdim);line-height:1.7;margin-bottom:.75rem}
+.step-tips{display:flex;flex-direction:column;gap:.38rem;margin-bottom:.75rem}
+.step-tip{display:flex;align-items:flex-start;gap:.52rem;font-size:.85rem;color:var(--tdim);line-height:1.6;padding:.5rem .72rem;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.07)}
+.step-tip::before{content:'▸';color:var(--gold);flex-shrink:0;margin-top:.12rem;font-size:.7rem}
+.step-tip strong{color:var(--tgold)}
+.step-warn{display:flex;align-items:flex-start;gap:.55rem;padding:.6rem .78rem;background:rgba(224,80,80,.06);border:1px solid rgba(224,80,80,.18);border-left:3px solid var(--red);font-size:.85rem;color:rgba(255,200,200,.75);line-height:1.6;margin-bottom:.65rem}
+.step-done-btn{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.1em;padding:.48rem 1.1rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .22s}
+.step-done-btn:hover:not(.already){box-shadow:0 0 14px rgba(201,168,76,.25);transform:translateY(-1px)}
+.step-done-btn.already{background:rgba(80,200,120,.12);color:var(--green);border:1px solid rgba(80,200,120,.26);cursor:default}
+
+/* ── MODULE PROGRESS ── */
+.mod-progress{display:flex;align-items:center;gap:.85rem;margin-bottom:1.4rem;padding:.85rem 1rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.1)}
+.mp-lbl{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;min-width:75px}
+.mp-track{flex:1;height:2px;background:rgba(201,168,76,.08);border-radius:2px}
+.mp-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease}
+.mp-count{font-family:'Orbitron',sans-serif;font-size:.63rem;color:var(--gold-b);font-weight:700;min-width:36px;text-align:right}
+
+/* ── CHART SECTION ── */
+.chart-section{background:var(--bcard);border:1px solid var(--bg);padding:1.1rem;margin-bottom:1rem}
+.chart-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.7rem;gap:.8rem;flex-wrap:wrap}
+.ctit{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.2rem;display:flex;align-items:center;gap:.42rem}
+.ctit span{color:var(--gold);font-size:.72rem}
+.chart-subtitle{font-size:.82rem;color:var(--tdim);line-height:1.5;max-width:540px}
+
+/* ── EXPLAIN TOGGLE ── */
+.chart-explain-btn{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.09em;padding:.32rem .8rem;border:1px solid rgba(201,168,76,.28);color:var(--tmuted);background:none;cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.chart-explain-btn:hover{border-color:var(--gold);color:var(--gold)}
+.chart-explain-btn.open{border-color:var(--gold-b);color:var(--gold-b);background:rgba(201,168,76,.06)}
+.chart-explain{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.chart-explain.open{max-height:600px}
+.chart-explain-inner{border-top:1px solid rgba(201,168,76,.1);padding:.8rem 0 .2rem}
+.ce-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.75rem}
+@media(max-width:520px){.ce-grid{grid-template-columns:1fr}}
+.ce-item{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.1);padding:.65rem .8rem}
+.ce-item-lbl{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.3rem}
+.ce-item-txt{font-size:.84rem;color:var(--tdim);line-height:1.6}
+.ce-item-txt strong{color:var(--tgold)}
+.ce-interaction{background:rgba(74,158,255,.04);border:1px solid rgba(74,158,255,.15);border-left:3px solid var(--blue);padding:.65rem .85rem;font-size:.84rem;color:rgba(180,210,255,.78);line-height:1.65}
+.ce-interaction strong{color:rgba(150,200,255,.92)}
+
+/* ── PINE CODE ── */
+.pine-box{background:#0A0E1A;border:1px solid rgba(74,158,255,.25);border-left:4px solid var(--blue);padding:1rem;margin-bottom:1rem;position:relative;overflow:hidden}
+.pine-tag{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem}
+.pine-tag::before{content:'⌨️';font-size:.8rem}
+.pine-code{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.75;color:rgba(180,220,255,.85);white-space:pre;overflow-x:auto;scrollbar-width:thin}
+.pine-code .c{color:rgba(100,160,100,.7)}
+.pine-code .k{color:#7EC8E3}
+.pine-code .s{color:#F0C040}
+.pine-code .f{color:#A0D080}
+.pine-code .v{color:rgba(180,220,255,.85)}
+
+/* ── TV IMAGE MOCKUP ── */
+.tv-mockup{background:#0D1117;border:1px solid rgba(201,168,76,.2);border-radius:4px;overflow:hidden;margin-bottom:1rem}
+.tv-topbar{display:flex;align-items:center;gap:.6rem;padding:.55rem .9rem;background:#161B22;border-bottom:1px solid rgba(255,255,255,.06)}
+.tv-dot{width:10px;height:10px;border-radius:50%}
+.tv-bar-txt{font-family:'Orbitron',sans-serif;font-size:.5rem;color:rgba(255,255,255,.35);letter-spacing:.08em;flex:1}
+.tv-chart-area{height:200px;position:relative;display:flex;align-items:flex-end;padding:.75rem;gap:2px;overflow:hidden}
+.tv-candle{display:flex;flex-direction:column;align-items:center;gap:1px;flex:1}
+.tv-wick{width:1px;background:rgba(255,255,255,.35)}
+.tv-body{width:70%;border-radius:1px;min-height:4px}
+.tv-ema50{position:absolute;left:0;right:0;pointer-events:none}
+.tv-ema200{position:absolute;left:0;right:0;pointer-events:none}
+.tv-label{position:absolute;font-family:'Orbitron',sans-serif;font-size:.45rem;letter-spacing:.08em;padding:1px 5px;border-radius:2px}
+.tv-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent)}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+@media(max-width:480px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--bpanel2);border:1px solid rgba(201,168,76,.1);padding:.85rem;text-align:center}
+.stat-n{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gold-b);line-height:1}
+.stat-l{font-size:.7rem;color:var(--tmuted);margin-top:.18rem;letter-spacing:.04em}
+
+/* ── COMPARISON TABLE ── */
+.comp-tbl{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:.9rem;overflow-x:auto;display:block}
+.comp-tbl th{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;padding:.5rem .7rem;border-bottom:1px solid var(--bg);text-align:left;font-weight:400;white-space:nowrap}
+.comp-tbl td{padding:.6rem .7rem;border-bottom:1px solid rgba(201,168,76,.05);color:var(--tdim);vertical-align:top;line-height:1.45}
+.comp-tbl td:first-child{color:var(--gold-b);font-weight:600;white-space:nowrap}
+.comp-tbl .good{color:var(--green)}.comp-tbl .bad{color:var(--red)}
+
+/* ── RULE BOX ── */
+.rule-box{background:rgba(201,168,76,.04);border:1px solid var(--bg);border-left:4px solid var(--gold);padding:.9rem 1.1rem;margin-bottom:.9rem}
+.rule-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;margin-bottom:.3rem}
+.rule-box p{font-size:.96rem;color:var(--tgoldb);font-weight:500;line-height:1.65}
+
+/* ── ALERT BOX ── */
+.alert-box{background:rgba(50,120,50,.07);border:1px solid rgba(80,180,80,.18);border-left:4px solid #50C050;padding:.85rem 1rem;font-size:.87rem;color:rgba(175,235,175,.75);line-height:1.6;margin-bottom:.9rem}
+.alert-box strong{color:#80D080}
+
+/* ── WIDGET (sliders) ── */
+.wbox{background:var(--bcard);border:1px solid var(--bg);padding:1.1rem;margin-bottom:1rem}
+.wrow{display:flex;align-items:center;gap:.9rem;margin-bottom:.85rem;flex-wrap:wrap}
+.wlbl{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;min-width:115px;line-height:1.4}
+.wslider{flex:1;min-width:110px;-webkit-appearance:none;height:3px;background:rgba(201,168,76,.14);outline:none;border-radius:2px;cursor:pointer}
+.wslider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold-b);cursor:pointer;box-shadow:0 0 7px rgba(240,192,64,.42)}
+.wval{font-family:'Orbitron',sans-serif;font-size:.7rem;color:var(--gold-b);min-width:60px;text-align:right;font-weight:700}
+.wres{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-top:.85rem}
+@media(max-width:480px){.wres{grid-template-columns:1fr 1fr}}
+.wr{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12);padding:.72rem;text-align:center}
+.wr-l{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.08em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.38rem}
+.wr-v{font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:700;color:var(--gold-b)}
+.wr-v.g{color:var(--green)}.wr-v.r{color:var(--red)}
+
+/* ── FOOTER ── */
+.pfooter{display:flex;justify-content:space-between;align-items:center;margin-top:1.8rem;padding-top:1.2rem;border-top:1px solid var(--bg);flex-wrap:wrap;gap:.75rem}
+.btn-next{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.7rem 1.7rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;border:none;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:.38rem;transition:all .3s}
+.btn-next:hover{box-shadow:0 0 20px rgba(201,168,76,.32);transform:translateY(-1px)}
+
+/* ── QUIZ ── */
+.quiz-wrap{max-width:760px;margin:0 auto;padding:1.8rem;width:100%}
+.quiz-hero{text-align:center;padding:1.8rem 1rem 2.2rem;border-bottom:1px solid var(--bg);margin-bottom:1.8rem}
+.quiz-hero h2{font-family:'Cinzel',serif;font-size:clamp(1.5rem,3.5vw,2.2rem);color:#fff;margin-bottom:.55rem}
+.quiz-hero p{font-size:.9rem;color:var(--tdim);line-height:1.7;max-width:480px;margin:0 auto 1.4rem}
+.qm-pill{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.09em;color:var(--tmuted);padding:.28rem .75rem;border:1px solid rgba(201,168,76,.18);margin:.15rem}
+.q-prog-wrap{margin-bottom:1.4rem}
+.q-prog-hdr{display:flex;justify-content:space-between;margin-bottom:.45rem}
+.q-prog-lbl{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.q-prog-score{font-family:'Orbitron',sans-serif;font-size:.52rem;color:var(--tmuted)}
+.q-prog-score span{color:var(--gold-b);font-weight:700}
+.q-prog-track{height:2px;background:rgba(201,168,76,.1);border-radius:2px;margin-bottom:.65rem}
+.q-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease}
+.q-dots{display:flex;gap:3px}
+.qdot{width:20px;height:3px;border-radius:2px;background:rgba(201,168,76,.12);transition:background .3s}
+.qdot.done{background:var(--green)}.qdot.active{background:var(--gold-b)}
+.q-card{background:var(--bcard);border:1px solid var(--bg);border-top:3px solid var(--gold);padding:1.4rem 1.2rem}
+.q-mod-tag{display:inline-flex;align-items:center;gap:.38rem;font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.12em;color:var(--gold-b);text-transform:uppercase;padding:.26rem .7rem;background:rgba(240,192,64,.07);border:1px solid rgba(240,192,64,.17);margin-bottom:.85rem}
+.q-title{font-family:'Cinzel',serif;font-size:1rem;color:#fff;margin-bottom:.85rem;line-height:1.35}
+.q-scenario{background:rgba(0,0,0,.35);border-left:3px solid var(--gold-dim);padding:.85rem 1.05rem;margin-bottom:1.1rem;font-size:.89rem;color:var(--tdim);line-height:1.75}
+.q-scenario strong{color:var(--tgold)}
+.q-opts{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.9rem}
+.q-opt{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem .9rem;background:var(--bpanel2);border:1.5px solid rgba(201,168,76,.09);cursor:pointer;transition:all .18s;font-size:.88rem;color:var(--tdim);line-height:1.52;text-align:left;width:100%}
+.q-opt:hover:not(.qlocked){border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.04);transform:translateX(2px)}
+.q-key{min-width:23px;height:23px;border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;color:var(--tmuted);flex-shrink:0;margin-top:.06rem}
+.q-opt.qcorrect{border-color:var(--green);background:rgba(80,200,120,.07)}
+.q-opt.qcorrect .q-key{background:var(--green);border-color:var(--green);color:#000}
+.q-opt.qwrong{border-color:var(--red);background:rgba(224,80,80,.07)}
+.q-opt.qwrong .q-key{background:var(--red);border-color:var(--red);color:#fff}
+.q-opt.qdim{opacity:.28;cursor:default}.q-opt.qlocked{cursor:default}
+.q-fb{display:none;gap:.85rem;align-items:flex-start;padding:.85rem .95rem;margin-bottom:.85rem;font-size:.87rem;line-height:1.7}
+.q-fb.show{display:flex;animation:fup .3s ease both}
+.q-fb.fc{background:rgba(80,200,120,.06);border:1px solid rgba(80,200,120,.18);border-left:3px solid var(--green);color:rgba(175,235,175,.85)}
+.q-fb.fw{background:rgba(224,80,80,.06);border:1px solid rgba(224,80,80,.18);border-left:3px solid var(--red);color:rgba(255,190,200,.85)}
+.q-fb strong{display:block;margin-bottom:.2rem;font-size:.91rem}
+.q-fb.fc strong{color:#80D890}.q-fb.fw strong{color:#FF7090}
+.q-nav{display:flex;justify-content:flex-end}
+.q-btn-next{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.11em;padding:.6rem 1.4rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .25s}
+.q-btn-next:hover:not(:disabled){box-shadow:0 0 16px rgba(201,168,76,.3);transform:translateY(-1px)}
+.q-btn-next:disabled{opacity:.26;cursor:not-allowed}
+.result-hero{text-align:center;padding:2rem 1rem}
+.result-badge{width:110px;height:110px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1.3rem;font-size:3rem;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 70%);animation:rp 3s ease infinite}
+.result-score{font-family:'Orbitron',sans-serif;font-size:3.8rem;font-weight:700;background:linear-gradient(135deg,var(--gold-dim),var(--gold-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:.3rem}
+.result-stars{font-size:1.6rem;margin-bottom:1rem;letter-spacing:.28rem}
+.result-msg{font-size:.9rem;color:var(--tdim);line-height:1.75;max-width:440px;margin:.85rem auto 1.4rem;padding:.85rem .95rem;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12)}
+.result-breakdown{background:var(--bcard);border:1px solid var(--bg);padding:1.1rem;max-width:580px;margin:0 auto 1.4rem}
+.rb-title{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.13em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.9rem}
+.rb-row{display:flex;align-items:center;gap:.75rem;padding:.45rem 0;border-bottom:1px solid rgba(201,168,76,.05)}
+.rb-row:last-child{border-bottom:none}
+.rb-mod{font-size:.8rem;color:var(--tdim);flex:1}
+.result-actions{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap}
+.btn-restart{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.68rem 1.6rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .25s}
+.btn-restart:hover{box-shadow:0 0 20px rgba(201,168,76,.35);transform:translateY(-2px)}
+.btn-menu2{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.68rem 1.6rem;border:1px solid var(--bg);color:var(--tmuted);background:none;cursor:pointer;text-transform:uppercase;transition:all .22s}
+.btn-menu2:hover{border-color:var(--gold);color:var(--gold)}
+.cert{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:2.5rem 1.5rem;text-align:center}
+.cert-badge{width:140px;height:140px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.6rem;background:radial-gradient(circle,rgba(201,168,76,.1),transparent 70%)}
+.cert-mods{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;max-width:460px;margin:0 auto 1.6rem}
+.cert-mod{padding:.58rem;border:1px solid var(--bg);background:rgba(201,168,76,.04);font-size:.6rem;color:var(--gold);letter-spacing:.06em;font-family:'Orbitron',sans-serif}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
+@media(max-width:580px){.cwrap{padding:1.3rem .9rem}.quiz-wrap{padding:1.3rem .9rem}.step-inner{padding-left:1rem}}
+</style>
+</head>
+<body>
+<canvas id="cvs"></canvas>
+<div class="grid-bg"></div>
+<div class="app">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo" onclick="goScr('hero')">
+    <div class="logo-ring">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6z" stroke="#C9A84C" stroke-width="1.4" fill="rgba(201,168,76,.08)"/><path d="M9 9h6v6H9z" fill="#C9A84C" opacity=".6"/></svg>
+    </div>
+    <div class="logo-txt">TradingView <b>Dominio Avanzado · 2026</b></div>
+  </div>
+  <div class="nav-prog">
+    <div class="plbl"><span>Progreso</span><span id="pct">0%</span></div>
+    <div class="ptrack"><div class="pbar" id="pbar"></div></div>
+  </div>
+  <div class="nbadge" id="nbadge">Bienvenida</div>
+</nav>
+
+<!-- HERO -->
+<div class="scr on" id="scr-hero">
+<div class="hero">
+  <div class="hero-deco">
+    <div class="hdline" style="--r:-22deg;--d:0s"></div>
+    <div class="hdline" style="--r:22deg;--d:2.5s"></div>
+    <div class="hdline" style="--r:0deg;--d:5s"></div>
+  </div>
+  <div class="hero-tag">Taller Profesional · Edición 2026</div>
+  <div class="emblem"><div class="er"></div><div class="er"></div><div class="er"></div>
+    <div class="ecore">
+      <svg width="76" height="76" viewBox="0 0 80 80" fill="none">
+        <rect x="10" y="24" width="12" height="30" fill="#C9A84C" opacity=".9" rx="1"/>
+        <rect x="26" y="16" width="12" height="38" fill="#F0C040" opacity=".9" rx="1"/>
+        <rect x="42" y="30" width="12" height="24" fill="#C9A84C" opacity=".8" rx="1"/>
+        <rect x="58" y="8" width="12" height="46" fill="#F0C040" rx="1"/>
+        <line x1="10" y1="38" x2="78" y2="22" stroke="#50C878" stroke-width="1.5" opacity=".7" stroke-dasharray="3 2"/>
+        <line x1="10" y1="48" x2="78" y2="40" stroke="#4A9EFF" stroke-width="1.5" opacity=".6" stroke-dasharray="3 2"/>
+        <circle cx="16" cy="24" r="2.5" fill="#C9A84C"/>
+        <circle cx="32" cy="16" r="2.5" fill="#F0C040"/>
+        <circle cx="48" cy="30" r="2.5" fill="#C9A84C"/>
+        <circle cx="64" cy="8" r="2.5" fill="#F0C040"/>
+      </svg>
+    </div>
+  </div>
+  <h1>DOMINIO AVANZADO DE <span>TRADINGVIEW</span></h1>
+  <p class="hero-sub">6 módulos teórico-prácticos: desde la arquitectura de la plataforma hasta <strong>Pine Script v6, estrategias automatizadas y microestructura de mercado</strong>.</p>
+  <div class="hero-kpis">
+    <div class="kpi"><div class="kpi-n" id="kn1">0</div><div class="kpi-l">Módulos</div></div>
+    <div class="ksep"></div>
+    <div class="kpi"><div class="kpi-n" id="kn2">0</div><div class="kpi-l">Labs prácticos</div></div>
+    <div class="ksep"></div>
+    <div class="kpi"><div class="kpi-n" id="kn3">0</div><div class="kpi-l">Preguntas</div></div>
+    <div class="ksep"></div>
+    <div class="kpi"><div class="kpi-n" id="kn4">0</div><div class="kpi-l">Herramientas</div></div>
+  </div>
+  <button class="btn-go" onclick="goScr('menu');renderMenu()">▶ &nbsp;INICIAR TALLER</button>
+</div>
+</div>
+
+<!-- MENU -->
+<div class="scr" id="scr-menu">
+<div class="menu-wrap">
+  
+<!-- RESUME BANNER -->
+<div id="resume-banner" style="display:none;margin:-1rem -1.8rem 1.4rem;padding:.85rem 1.8rem;background:rgba(80,200,120,.07);border-bottom:1px solid rgba(80,200,120,.22);display:none;align-items:center;gap:.9rem;flex-wrap:wrap">
+  <span style="font-size:1.2rem">✅</span>
+  <div style="flex:1">
+    <div style="font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.09em;color:#50C878;text-transform:uppercase;margin-bottom:.15rem">Progreso guardado</div>
+    <div id="resume-text" style="font-size:.83rem;color:rgba(80,200,120,.75);line-height:1.4"></div>
+  </div>
+  <button onclick="clearProgress()" style="font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.08em;padding:.3rem .75rem;border:1px solid rgba(224,80,80,.35);color:rgba(224,80,80,.7);background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0">↺ Reiniciar</button>
+</div>
+<div class="sec-hdr">
+    <h2>Los 6 Módulos del Taller</h2>
+    <p>Cada módulo incluye teoría académica, laboratorio paso a paso, gráficas interactivas y acceso a TradingView.</p>
+  </div>
+  <div class="mgrid" id="mgrid"></div>
+  <div class="menu-btns">
+    <button class="btn-s" onclick="openQuiz()">🎯 Evaluación Final (15 preguntas)</button>
+  </div>
+</div>
+</div>
+
+<!-- CONTENT -->
+<div class="scr" id="scr-content"><div class="cwrap" id="ci"></div></div>
+
+<!-- QUIZ -->
+<div class="scr" id="scr-quiz"><div class="quiz-wrap" id="quiz-container"></div></div>
+
+<!-- RESULT -->
+<div class="scr" id="scr-result"><div class="quiz-wrap" id="result-container"></div></div>
+
+<!-- CERT -->
+<div class="scr" id="scr-cert">
+  <div class="cert">
+    <div class="cert-badge"><span style="font-size:2.8rem">📈</span></div>
+    <div style="font-family:'Cinzel',serif;font-size:1.8rem;color:#fff;margin-bottom:.35rem">Taller <span style="color:var(--gold-b)">Completado</span></div>
+    <div style="font-size:.82rem;color:var(--tmuted);letter-spacing:.09em;margin-bottom:1.3rem">TradingView · Dominio Avanzado · 2026</div>
+    <div style="width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.3rem"></div>
+    <div class="cert-mods" id="cert-mods"></div>
+    <p style="font-size:.86rem;color:var(--tmuted);max-width:340px;line-height:1.72;margin-bottom:1.8rem">Has completado los 6 módulos del taller. Aplica cada herramienta y metodología con disciplina analítica.</p>
+    <button class="btn-go" onclick="restartApp()">↺ &nbsp;REINICIAR TALLER</button>
+  </div>
+</div>
+
+</div><!-- .app -->
+<script>
+/* ═══════════ PERSISTENCIA LOCAL (GUARDADO AUTOMÁTICO) ═══════════ */
+const SAVE_KEY='TradingView2026_v1';
+function saveProgress(){
+  try{
+    const data={
+      done:[...done],
+      stepsDone:Object.fromEntries(Object.entries(stepsDone).map(([k,v])=>[k,[...v]])),
+      quizScore:quizState?quizState.score:0,
+      savedAt:Date.now()
+    };
+    localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+  }catch(e){}
+}
+function loadProgress(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return false;
+    const data=JSON.parse(raw);
+    if(data.done)done=new Set(data.done);
+    if(data.stepsDone)Object.entries(data.stepsDone).forEach(([k,v])=>{stepsDone[k]=new Set(v);});
+    return data.done&&data.done.length>0;
+  }catch(e){return false;}
+}
+function clearProgress(){
+  try{localStorage.removeItem(SAVE_KEY);}catch(e){}
+  location.reload();
+}
+function getLastSaved(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return null;
+    const data=JSON.parse(raw);
+    return data.savedAt?new Date(data.savedAt):null;
+  }catch(e){return null;}
+}
+
+function openModule(id){
+  const m=MODULES[id];
+  document.getElementById('ci').innerHTML=moduleContent(m);
+  goScr('content');
+  setProgress(Math.round((done.size/TOTAL)*100),m.num+' — '+m.title);
+  setTimeout(function(){initChart(m.chart);},280);
+}
+function completeModule(id){ saveProgress();
+  done.add(id);
+  if(id<TOTAL-1)openModule(id+1);
+  else{renderMenu();goScr('menu');}
+}
+function restartApp(){
+  done.clear();stepsDone={};
+  Object.values(charts).forEach(function(ch){try{ch.destroy();}catch(e){}});
+  charts={};
+  quizState={started:false,level:0,score:0,answered:false,answers:[]};
+  goScr('hero');setProgress(0,'Bienvenida');
+}
+function showCert(){
+  document.getElementById('cert-mods').innerHTML=MODULES.map(function(m){return'<div class="cert-mod">'+m.num+'<br>'+m.title+'</div>';}).join('');
+  goScr('cert');setProgress(100,'¡Completado!');
+}
+
+
+function openQuiz(){quizState={started:false,level:0,score:0,answered:false,answers:[]};renderQuizScreen();goScr('quiz');setProgress(Math.round((done.size/TOTAL)*100),'Evaluación Final');}
+function renderQuizScreen(){
+  const c=document.getElementById('quiz-container');
+  if(!quizState.started){
+    c.innerHTML=`<div class="quiz-hero"><div style="font-size:2.8rem;margin-bottom:.9rem">🎯</div><h2>Evaluación Final</h2>
+      <p>15 escenarios reales de los 6 módulos. Cada respuesta correcta suma 6.67 puntos sobre 100. Necesitas 60+ para aprobar.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center;margin-bottom:1.4rem">
+        <span class="qm-pill">📋 15 PREGUNTAS</span><span class="qm-pill">🏆 100 PUNTOS</span><span class="qm-pill">🔒 6 MÓDULOS</span>
+      </div>
+      <button class="btn-go" onclick="startQuiz()">▶ INICIAR EVALUACIÓN</button></div>`;
+    return;
+  }
+  if(quizState.level>=QUIZ.length){showResult();return;}
+  renderQ();
+}
+function startQuiz(){quizState.started=true;quizState.level=0;quizState.score=0;quizState.answered=false;quizState.answers=[];renderQ();}
+function renderQ(){
+  const c=document.getElementById('quiz-container');
+  const q=QUIZ[quizState.level];const total=QUIZ.length;
+  const pct=Math.round((quizState.level/total)*100);
+  const dots=Array.from({length:total},(_,i)=>`<div class="qdot${i<quizState.level?' done':i===quizState.level?' active':''}"></div>`).join('');
+  const opts=q.opts.map((o,i)=>`<button class="q-opt" id="qo-${i}" onclick="selectQ(${i})"><span class="q-key">${['A','B','C','D'][i]}</span><span>${o}</span></button>`).join('');
+  c.innerHTML=`<div class="q-prog-wrap">
+    <div class="q-prog-hdr"><span class="q-prog-lbl">Pregunta ${quizState.level+1} de ${total}</span><span class="q-prog-score">Puntaje: <span>${quizState.score.toFixed(0)}</span>/100</span></div>
+    <div class="q-prog-track"><div class="q-prog-fill" style="width:${pct}%"></div></div>
+    <div class="q-dots">${dots}</div>
+  </div>
+  <div class="q-card">
+    <div class="q-mod-tag">${q.mod}</div>
+    <div class="q-title">${q.title}</div>
+    <div class="q-scenario">${q.scenario}</div>
+    <div class="q-opts">${opts}</div>
+    <div class="q-fb" id="qfb"></div>
+    <div class="q-nav"><button class="q-btn-next" id="qnext" disabled onclick="nextQ()">${quizState.level<total-1?'Siguiente →':'Ver Resultados →'}</button></div>
+  </div>`;
+}
+function selectQ(idx){
+  if(quizState.answered)return;
+  quizState.answered=true;
+  const q=QUIZ[quizState.level];const correct=idx===q.correct;
+  if(correct)quizState.score+=100/QUIZ.length;
+  quizState.answers.push({correct,idx,mod:q.mod});
+  document.querySelectorAll('.q-opt').forEach((b,i)=>{
+    b.classList.add('qlocked');
+    if(i===q.correct)b.classList.add('qcorrect');
+    else if(i===idx&&!correct)b.classList.add('qwrong');
+    else b.classList.add('qdim');
+  });
+  const fb=document.getElementById('qfb');
+  fb.className=`q-fb show ${correct?'fc':'fw'}`;
+  fb.innerHTML=`<span style="font-size:1.15rem;flex-shrink:0">${correct?'✅':'⛔'}</span><div><strong>${correct?'¡Correcto!':'Respuesta incorrecta'}</strong>${correct?q.ok:q.fail}</div>`;
+  document.getElementById('qnext').disabled=false;
+}
+function nextQ(){quizState.level++;quizState.answered=false;renderQuizScreen();}
+function showResult(){
+  goScr('result');
+  const s=quizState.score;const correct=quizState.answers.filter(a=>a.correct).length;
+  const stars=s>=90?5:s>=80?4:s>=60?3:s>=40?2:1;
+  const starStr=Array.from({length:5},(_,i)=>i<stars?'⭐':'☆').join('');
+  let ico,title,msg,color;
+  if(s>=90){ico='🏆';title='Analista Élite';msg='Dominas la microestructura del mercado y las herramientas avanzadas de TradingView. Estás listo para desarrollar y automatizar estrategias propias con Pine Script.';color='var(--gold-b)';}
+  else if(s>=80){ico='📈';title='Trader Avanzado';msg='Excelente comprensión de los módulos. Revisa los errores específicos — especialmente BOS/CHoCH y Pine Script v6.';color='var(--green)';}
+  else if(s>=60){ico='📊';title='Operador en Desarrollo';msg='Aprobado con brechas en microestructura o automatización. Repasa los módulos donde fallaste antes de operar con capital real.';color='var(--gold)';}
+  else{ico='⚠️';title='Repaso Necesario';msg='Necesitas repasar los módulos fundamentales. El conocimiento incompleto de las herramientas puede generar errores costosos de análisis.';color='var(--red)';}
+  const modScores={};
+  quizState.answers.forEach((a,i)=>{const mod=QUIZ[i].mod.split('·')[0].trim();if(!modScores[mod])modScores[mod]={c:0,t:0};modScores[mod].t++;if(a.correct)modScores[mod].c++;});
+  const breakdownHTML=Object.entries(modScores).map(([mod,sc])=>{
+    const ok=sc.c===sc.t,partial=sc.c>0&&sc.c<sc.t;
+    return`<div class="rb-row"><span style="font-size:1rem;flex-shrink:0">${ok?'✅':partial?'⚠️':'❌'}</span><span class="rb-mod">${mod}</span><span style="font-family:'Orbitron',sans-serif;font-size:.65rem;color:${ok?'var(--green)':partial?'var(--gold)':'var(--red)'};font-weight:700">${sc.c}/${sc.t}</span></div>`;
+  }).join('');
+  document.getElementById('result-container').innerHTML=`
+  <div class="result-hero">
+    <div class="result-badge">${ico}</div>
+    <div style="font-family:'Cinzel',serif;font-size:1.45rem;color:${color};margin-bottom:.3rem">${title}</div>
+    <div class="result-score">${s.toFixed(0)}/100</div>
+    <div class="result-stars">${starStr}</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:.62rem;color:var(--tmuted);margin-bottom:.75rem">${correct} de ${QUIZ.length} respuestas correctas</div>
+    <div class="result-msg">${msg}</div>
+  </div>
+  <div class="result-breakdown"><div class="rb-title">Desglose por Módulo</div>${breakdownHTML}</div>
+  <div class="result-actions">
+    <button class="btn-restart" onclick="retryQuiz()">↺ Repetir Evaluación</button>
+    <button class="btn-menu2" onclick="goScr('menu');renderMenu()">⬅ Volver al Menú</button>
+  </div>`;
+  setProgress(100,'Evaluación Completada');
+}
+function retryQuiz(){quizState={started:true,level:0,score:0,answered:false,answers:[]};renderQ();goScr('quiz');}
+
+/* ══════════════ PARTICLES ══════════════ */
+/* ══════════════ MODULES DATA ══════════════ */
+const MODULES=[
+  {id:0,ico:'🖥️',num:'Módulo I',  title:'Arquitectura de la Plataforma',   tag:'Interfaz & Datos',     desc:'Flujo de datos globales, anatomía de velas OHLC, entorno SuperCharts y configuración óptima.',chart:'arch'},
+  {id:1,ico:'📐',num:'Módulo II', title:'Herramientas Gráficas y Riesgo',  tag:'Geometría & Position Sizing', desc:'Trazado milimétrico, líneas de tendencia, cálculo de posición y árbol de objetos.',chart:'tools'},
+  {id:2,ico:'📊',num:'Módulo III',title:'Análisis Técnico Clásico',         tag:'S&R · EMAs · Zonas',   desc:'Zonas de oferta/demanda, medias móviles EMA 50/200, regímenes tendenciales y señales.',chart:'classic'},
+  {id:3,ico:'🧠',num:'Módulo IV', title:'Microestructura & Smart Money',    tag:'BOS · CHoCH · Wyckoff', desc:'Fases de Wyckoff, Break of Structure, Change of Character y flujo institucional.',chart:'smc'},
+  {id:4,ico:'⚙️',num:'Módulo V',  title:'Automatización y Backtesting',    tag:'Alertas · Bar Replay',  desc:'Motor de alertas en la nube, configuración de disparadores lógicos y simulación histórica.',chart:'auto'},
+  {id:5,ico:'💻',num:'Módulo VI', title:'Screeners y Pine Script v6',       tag:'Código · Cuantitativo', desc:'Filtros booleanos avanzados, Pine Script v6 y construcción de indicadores propios.',chart:'pine'}
+];
+
+/* ══════════════ STEPS DATA ══════════════ */
+const STEPS={
+  arch:[
+    {title:'Paso 1 — Inicializar el Entorno Limpio en SuperCharts',
+     path:['TradingView.com','SuperCharts','Clic derecho en gráfico','Configuración de gráfico','Lienzo → Fondo sólido + Cuadrícula 0%'],
+     desc:'Un entorno limpio elimina el ruido visual que afecta la toma de decisiones. El fondo neutro y sin cuadrícula activan el Sistema 2 de Kahneman — pensamiento analítico en lugar del impulsivo.',
+     tips:['<strong>Fondo recomendado:</strong> Gris oscuro (#1A1A2E) o negro puro para sesiones nocturnas. Blanco puro para sesiones con luz natural.',
+           '<strong>Cuadrícula a 0%:</strong> ve a pestaña "Lienzo" → desliza la opacidad de líneas de cuadrícula completamente a la izquierda.',
+           '<strong>Guardar plantilla:</strong> clic en el ícono de nube en la esquina superior derecha → "Guardar plantilla" → nombre "Plantilla Limpia 2026".'],
+     warn:'No guardar la plantilla hace que pierdas la configuración si refrescas el navegador o cambias de dispositivo.'},
+    {title:'Paso 2 — Construir la Watchlist de Especialización',
+     path:['Panel derecho','Lista de seguimiento','+ Nueva lista → "Portafolio de Especialización"','Agregar: FX:EURUSD, BINANCE:BTCUSDT, INDEX:SPX, OANDA:XAUUSD'],
+     desc:'Seleccionar el proveedor de datos correcto es crítico. En Forex/Cripto (mercados OTC), el spread y volumen varían según la fuente. FXCM, OANDA e ICE tienen libros de órdenes diferentes.',
+     tips:['<strong>FX:EURUSD</strong> → usa FXCM para datos completos de spread interbancario.',
+           '<strong>BINANCE:BTCUSDT</strong> → datos de Binance (el exchange con mayor volumen spot).',
+           '<strong>Bandera Roja:</strong> clic en el cuadro izquierdo de cada activo → señal de configuración operativa para hoy.',
+           '<strong>Barra espaciadora:</strong> navega entre activos de la Watchlist sin soltar las manos del teclado.']},
+    {title:'Paso 3 — Configurar las Temporalidades de Análisis',
+     path:['Barra superior izquierda','Menú de temporalidades','★ Fijar en barra rápida: 1D, 4H, 1H, 15M, 5M'],
+     desc:'El análisis Top-Down requiere 5 temporalidades sincronizadas. La 1D define el sesgo macro. La 4H identifica zonas institucionales. La 1H da la dirección. La 15M define la estructura local. La 5M ejecuta.',
+     tips:['<strong>Atajo de teclado:</strong> teclas numéricas 1-9 cambian entre temporalidades guardadas.',
+           '<strong>Orden institucional:</strong> siempre analiza de mayor a menor temporalidad. Nunca empieces en 5M sin revisar 1D primero.',
+           '<strong>Layout multi-gráfico:</strong> botón "+" en barra superior para ver 4H y 1H simultáneamente.']}
+  ],
+  tools:[
+    {title:'Paso 1 — Activar Imán (Magnet) en Modo Débil',
+     path:['Barra lateral izquierda','Ícono del imán','Clic → Imán débil (Weak magnet)'],
+     desc:'El imán débil atrapa el cursor al precio OHLC más cercano de la vela al dibujar. Esto elimina el sesgo manual y garantiza que tus niveles sean matemáticamente exactos al decimal.',
+     tips:['<strong>Imán fuerte:</strong> solo actívalo para capturar extremos exactos de velas. Para líneas de tendencia usa siempre imán débil.',
+           '<strong>Atajo:</strong> tecla M activa/desactiva el imán desde cualquier herramienta.']},
+    {title:'Paso 2 — Trazar Líneas de Tendencia Milimétricas',
+     path:['Atajo Alt+T (Línea de tendencia)','Clic en Low 1 de la mecha','Clic en Low 2 del siguiente mínimo estructural','Verificar: mínimo 3 puntos de contacto para validez estadística'],
+     desc:'Una línea de tendencia requiere al menos 3 toques para tener relevancia estadística (Teoría de Dow). Con solo 2 puntos es una proyección hipotética con bajo coeficiente predictivo.',
+     tips:['<strong>Extiende la línea a la derecha:</strong> clic derecho → "Extender hacia la derecha" para ver la proyección futura.',
+           '<strong>Color institucional:</strong> usa azul oscuro para soporte, naranja para resistencia, gris para neutras.'],
+     warn:'Una línea tocada muchas veces se debilita — cada toque consume la liquidez de órdenes en ese nivel.'},
+    {title:'Paso 3 — Position Sizing con la Herramienta de Posición',
+     path:['Panel izquierdo → Predicción','Herramienta "Posición larga" o "Posición corta"','Doble clic sobre el recuadro','Entrada de datos → Cuenta + % Riesgo','Mueve SL y TP para calcular cantidad exacta'],
+     desc:'La fórmula de position sizing garantiza que ninguna operación destruya tu curva de capital: Volumen = (Capital × % Riesgo) / Distancia del Stop Loss. Máximo 0.5–1% de riesgo por operación.',
+     tips:['<strong>Ejemplo:</strong> $10,000 cuenta × 1% riesgo = $100 máximo de pérdida. Si el SL está a 50 pips, el tamaño es 2 mini-lotes.',
+           '<strong>Campo "Cantidad":</strong> es el número exacto que debes ingresar en tu bróker — no improvisar jamás.',
+           '<strong>Ratio R:R mínimo:</strong> el TP debe ser al menos 2× la distancia del SL (Risk:Reward ≥ 2:1).']},
+    {title:'Paso 4 — Árbol de Objetos: Organización por Capas',
+     path:['Esquina inferior derecha','Ícono de capas (Object Tree)','Nueva carpeta → "Dibujos Macro 1D"','Arrastrar líneas del marco temporal 1D'],
+     desc:'El árbol de objetos permite ocultar todos los dibujos macro con un clic al bajar a temporalidades de ejecución. Evita la contaminación visual y la toma de decisiones con información de otro marco temporal.',
+     tips:['<strong>Nomenclatura recomendada:</strong> "Macro 1D", "Zonas 4H", "Estructura 1H", "Ejecución 15M".',
+           '<strong>Ocultar grupo:</strong> clic en el ojo junto a cada carpeta — todos los objetos dentro desaparecen instantáneamente.']}
+  ],
+  classic:[
+    {title:'Paso 1 — Delimitar Zonas de Oferta y Demanda con Rectángulos',
+     path:['Cambiar a temporalidad 4H o 1D','Herramienta Rectángulo (panel izquierdo)','Desde el cuerpo de la vela pivote hasta el extremo de la mecha','Extender hacia la derecha'],
+     desc:'Las zonas S&D no son líneas — son horquillas donde existe desequilibrio masivo en el libro de órdenes. El principio de polaridad confirma que una resistencia rota se convierte en soporte (y viceversa).',
+     tips:['<strong>Zona de Demanda válida:</strong> debe haber salido de ella con una vela explosiva (impulso fuerte).',
+           '<strong>Freshness:</strong> una zona "fresca" nunca fue tocada después de formarse. Es más potente.',
+           '<strong>Color codificado:</strong> verde semitransparente para demanda, rojo para oferta.'],
+     warn:'Una zona visitada múltiples veces pierde potencia. Las instituciones han consumido los órdenes pendientes en cada visita.'},
+    {title:'Paso 2 — Insertar y Configurar EMA 50 y EMA 200',
+     path:['Botón Indicadores (barra superior) o tecla /','Buscar "Media móvil exponencial"','Insertar 2 veces','EMA 1: Longitud 50, color azul','EMA 2: Longitud 200, color naranja/rojo, grosor mayor'],
+     desc:'La EMA aplica mayor peso a los precios recientes, reduciendo el lag respecto a la SMA. La EMA 50 filtra tendencia de corto plazo; la EMA 200 define el régimen institucional de largo plazo.',
+     tips:['<strong>Señal de compra:</strong> precio > EMA 50 > EMA 200 = tendencia alcista establecida. Solo buscar compras.',
+           '<strong>Golden Cross:</strong> EMA 50 cruza hacia arriba la EMA 200 = cambio de régimen macro alcista.',
+           '<strong>Death Cross:</strong> EMA 50 cruza hacia abajo la EMA 200 = régimen bajista macro.']},
+    {title:'Paso 3 — Análisis Concurrente de Tendencia',
+     path:['Verificar posición relativa: precio vs EMA 50 vs EMA 200','Si precio > EMA50 > EMA200 → solo compras','Si precio < EMA50 < EMA200 → solo ventas','Esperar retroceso a zona de demanda + EMA 50 para entrada'],
+     desc:'La confluencia entre zona de demanda y EMA 50 multiplica la probabilidad estadística de la reacción. No operar contra la tendencia del marco temporal superior.',
+     tips:['<strong>Temporalidad de confirmación:</strong> el análisis en 4H define el sesgo; la entrada se ejecuta en 1H o 15M.',
+           '<strong>Señal de máxima confluencia:</strong> zona de demanda + EMA 50 + BOS reciente en temporalidad inferior = setup de alta probabilidad.']}
+  ],
+  smc:[
+    {title:'Paso 1 — Filtrar la Estructura con la Herramienta Ruta (Path)',
+     path:['Pinceles en menú izquierdo → Ruta (Path)','Clic en máximos y mínimos estructurales más evidentes','Ignorar fluctuaciones menores (ruido)','Doble clic para finalizar'],
+     desc:'La herramienta Ruta crea un zigzag que abstrae la estructura fractal limpia del mercado, eliminando el ruido. Permite identificar visualmente BOS y CHoCH sin ambigüedad.',
+     tips:['<strong>Solo estructura significativa:</strong> conecta únicamente los pivotes que son visualmente obvios en esa temporalidad.',
+           '<strong>Escala mínima:</strong> en 4H, un pivote significativo tiene al menos 3–5 velas de contexto en cada dirección.']},
+    {title:'Paso 2 — Marcar Break of Structure (BOS)',
+     path:['Identificar: el zigzag superó un pico previo','Alt+H → Línea horizontal sobre ese máximo','Doble clic → pestaña Texto → escribir "BOS"','Color gris claro, estilo discontinuo, texto a la derecha'],
+     desc:'BOS confirma la continuación de la tendencia. En alcista, el cuerpo completo de la vela cierra por encima del último Higher High. Solo la mecha = Liquidity Sweep, no BOS válido.',
+     tips:['<strong>Criterio de validez:</strong> el CUERPO de la vela (no la mecha) debe cerrar por encima del nivel.',
+           '<strong>BOS con volumen:</strong> un BOS con vela de alto rango y volumen elevado tiene mayor fiabilidad.',
+           '<strong>Post-BOS:</strong> el nivel del BOS se convierte en una zona de demanda institucional para el siguiente retroceso.']},
+    {title:'Paso 3 — Identificar Change of Character (CHoCH)',
+     path:['Identificar el mínimo estructural antes del último Higher High','Trazar línea horizontal sobre ese mínimo','Si precio cierra en CUERPO por debajo → CHoCH bajista','Renombrar: "CHoCH (Bajista)" → cambiar color a rojo'],
+     desc:'CHoCH es la primera señal de reversión del flujo de órdenes dominante. Es una señal de ALERTA, no de ejecución inmediata. Requiere confirmación adicional antes de operar contra la tendencia previa.',
+     tips:['<strong>CHoCH vs BOS:</strong> BOS = continuación. CHoCH = posible reversión. Son complementarios.',
+           '<strong>Confirmación post-CHoCH:</strong> espera el primer BOS en la dirección contraria para confirmar el nuevo flujo.',
+           '<strong>Temporalidad de ejecución:</strong> el CHoCH en 1H o 4H es la señal; ejecutar en 15M o 5M.'],
+     warn:'Un CHoCH sin confirmación posterior es solo una corrección. No cambies de sesgo operativo hasta ver un BOS confirmado en la nueva dirección.'}
+  ],
+  auto:[
+    {title:'Paso 1 — Programar Alertas Sobre Zonas de Demanda',
+     path:['Clic derecho sobre el rectángulo de demanda','Añadir alerta en Rectángulo...','Condición: Cruzando','Opciones: Una vez por cierre de barra','Activar: Notificación app + Correo electrónico'],
+     desc:'Las alertas del servidor de TradingView operan 24/7 aunque tu computadora esté apagada. Esto elimina la fatiga cognitiva de vigilar gráficos constantemente, que degrada la calidad de las decisiones.',
+     tips:['<strong>Mensaje de alerta recomendado:</strong> "ALERTA: Precio ingresó a zona de demanda 4H. Monitorear CHoCH en 5M para gatillar posición."',
+           '<strong>Una vez por cierre de barra:</strong> evita falsas alertas por mechas instantáneas — solo activa si el CUERPO confirma.',
+           '<strong>Webhook:</strong> en plan Pro puedes enviar la alerta a un bot de Telegram o Discord para notificación inmediata.']},
+    {title:'Paso 2 — Bar Replay: Backtesting Visual Manual',
+     path:['Ícono de reloj con flecha (barra superior central)','Clic → aparece línea roja vertical','Arrastra hacia el pasado (ej: 4–8 semanas atrás)','Clic izquierdo para anclar el punto de inicio'],
+     desc:'Bar Replay es una máquina del tiempo para el backtesting. Permite simular decisiones en condiciones históricas reales sin el sesgo del conocimiento futuro (hindsight bias).',
+     tips:['<strong>Avanzar barra a barra:</strong> tecla → (flecha derecha) agrega una vela por vez.',
+           '<strong>Velocidad automática:</strong> botón ▶ reproduce en tiempo real acelerado. Pausa cuando el precio llegue a tu zona de interés.',
+           '<strong>Registro obligatorio:</strong> lleva una bitácora con: fecha, activo, setup, resultado. Sin registro no hay aprendizaje estadístico.'],
+     warn:'El hindsight bias es el enemigo del backtesting. Nunca avances las velas para "ver qué pasó" antes de tomar tu decisión.'},
+    {title:'Paso 3 — Strategy Tester: Backtesting Automatizado',
+     path:['Pestaña "Tester de estrategia" (barra inferior)','Agregar un script de estrategia Pine Script','Revisar: Win Rate, Profit Factor, Max Drawdown','Optimizar parámetros con Walk-Forward Analysis'],
+     desc:'El backtesting automatizado con el Strategy Tester aplica el método científico al trading. Una estrategia es una hipótesis que debe validarse con datos históricos antes de arriesgar capital real.',
+     tips:['<strong>Métricas clave:</strong> Win Rate >45%, Profit Factor >1.5, Max Drawdown <20% del capital.',
+           '<strong>Muestra mínima:</strong> mínimo 100 operaciones para resultados estadísticamente significativos.',
+           '<strong>Overfitting:</strong> si la estrategia funciona perfecto en datos históricos pero no en live = sobreajuste. Prueba en datos fuera de muestra.']}
+  ],
+  pine:[
+    {title:'Paso 1 — Screener: Filtro de Descuento Institucional',
+     path:['Barra inferior → pestaña Screener','Seleccionar mercado (Criptomonedas / Acciones / Forex)','Botón Filtros (embudo)','Configurar: Cambio%>0, Último>EMA200, RSI(14)≤40','Guardar como "Filtro Descuento Institucional"'],
+     desc:'Los screeners ejecutan consultas booleanas masivas en miles de instrumentos simultáneamente. El filtro configurado aísla activos en tendencia alcista macro que están en retroceso técnico — el setup institucional de compra más clásico.',
+     tips:['<strong>Lógica del filtro:</strong> Precio > EMA200 = tendencia alcista macro ✓. RSI ≤ 40 = retroceso técnico en curso ✓. Cambio% > 0 = momentum positivo del día ✓.',
+           '<strong>Pine Screener:</strong> TradingView permite usar indicadores Pine Script como filtros en el screener. Agrega indicadores a favoritos primero.',
+           '<strong>Actualización:</strong> el screener actualiza en tiempo real — los activos entran y salen del filtro automáticamente.']},
+    {title:'Paso 2 — Pine Editor: Tu Primer Indicador',
+     path:['Barra inferior → Editor Pine','Borrar código por defecto','Copiar y pegar el código del módulo','Ctrl+S para guardar','Botón "Añadir al gráfico"'],
+     desc:'Pine Script v6 es el lenguaje nativo de TradingView. Cada barra es un índice de un array de series temporales ([0]=actual, [1]=anterior). El código se compila en la nube y se ejecuta en cada barra histórica simultáneamente.',
+     tips:['<strong>//@version=6:</strong> siempre usar v6 en scripts nuevos. v5 está en modo mantenimiento.',
+           '<strong>No-repainting:</strong> usa close[1] o barstate.isconfirmed para evitar que el indicador cambie señales pasadas.',
+           '<strong>Documentación oficial:</strong> pine-script-docs en tradingview.com — la referencia más completa.']},
+    {title:'Paso 3 — Auditoría Visual del Indicador Compilado',
+     path:['Observar el fondo del gráfico (verde o rojo pálido)','Verde pálido = precio > EMA institucional de la HTF','Rojo pálido = precio < EMA institucional de la HTF','Ajustar parámetros desde el menú de configuración del indicador'],
+     desc:'El indicador cambia el color de fondo automáticamente según el sesgo macro. El análisis visual en segundos reemplaza minutos de análisis manual repetitivo — automatizando el primer filtro de confluencia.',
+     tips:['<strong>Parámetros ajustables:</strong> la longitud de la EMA y la temporalidad HTF son configurables sin modificar el código.',
+           '<strong>Añadir condiciones:</strong> puedes ampliar el código para incluir BOS automático, zonas de demanda o señales de entrada.',
+           '<strong>Publicar en Community Scripts:</strong> scripts con más de 500 votos aparecen en la búsqueda de toda la comunidad.']}
+  ]
+};
+
+/* ══════════════ QUIZ DATA ══════════════ */
+const QUIZ=[
+  {mod:'Módulo I · Plataforma',title:'Fuentes de Datos en Forex',
+   scenario:'<strong>Situación:</strong> Estás analizando EURUSD en TradingView y notas que el volumen y spread difieren entre dos instancias del mismo par. ¿Cuál es la causa técnica más probable?',
+   opts:['Un error de la plataforma que se corrige refrescando el navegador.','Cada proveedor de datos (FXCM, OANDA, ICE) tiene su propia red ECN con diferente liquidez y libro de órdenes.','El precio de cierre de las velas cambia con la temporalidad seleccionada.','La diferencia horaria entre el trader y el servidor de TradingView.'],
+   correct:1,ok:'Correcto. En mercados OTC como Forex, no existe una bolsa centralizada. Cada proveedor agrega liquidez de diferentes contrapartes interbancarias, generando variaciones en spread, volumen y cotizaciones de cierre.',
+   fail:'Incorrecto. Los mercados OTC no tienen un SIP centralizado como NYSE. Cada ECN (FXCM, OANDA, ICE) representa un pool de liquidez diferente con spreads y volúmenes propios.'},
+  {mod:'Módulo I · Plataforma',title:'Anatomía OHLC y Mechas',
+   scenario:'<strong>Situación:</strong> Una vela bajista de 4H en BTCUSDT muestra un cuerpo pequeño pero mechas muy largas en ambos extremos. ¿Qué representa estructuralmente esta vela?',
+   opts:['Una vela de alta volatilidad sin dirección definida, indicando equilibrio temporal entre compradores y vendedores (indecisión / Doji extendido).','Una vela con sesgo alcista porque la mecha inferior es más larga.','Un error en el feed de datos de Binance por desconexión temporal.','Una vela de distribución institucional en zona de oferta.'],
+   correct:0,ok:'Correcto. Las mechas largas simétricas indican que ambos bandos ejercieron presión pero ninguno dominó — los compradores rechazaron los mínimos y los vendedores rechazaron los máximos. Es una vela de indecisión.',
+   fail:'Incorrecto. Las mechas representan zonas de rechazo donde el flujo de órdenes contrario absorbió la presión agresora. Mechas largas en ambas direcciones = equilibrio temporal = indecisión.'},
+  {mod:'Módulo II · Herramientas',title:'Validez Estadística de Líneas de Tendencia',
+   scenario:'<strong>Situación:</strong> Trazas una línea de tendencia alcista conectando exactamente 2 mínimos estructurales. ¿Cuál es la confiabilidad estadística de este trazado según la Teoría de Dow?',
+   opts:['Máxima — 2 puntos son suficientes para definir cualquier recta matemática.','Media — requieres al menos 3 puntos de contacto para confirmar relevancia estadística.','Nula — las líneas de tendencia con 2 puntos no se deben dibujar.','Depende del volumen de las velas que tocaron la línea.'],
+   correct:1,ok:'Correcto. Con solo 2 puntos, la línea es una proyección hipotética de baja predictibilidad. El tercer contacto validado eleva el coeficiente de correlación y confirma que el nivel tiene relevancia en el libro de órdenes.',
+   fail:'Incorrecto. Matemáticamente 2 puntos definen una recta, pero en el contexto del mercado la relevancia estadística requiere al menos 3 toques que demuestren que el precio reconoce ese nivel repetidamente.'},
+  {mod:'Módulo II · Herramientas',title:'Position Sizing y Gestión del Riesgo',
+   scenario:'<strong>Situación:</strong> Tu cuenta tiene $5,000. Tu riesgo máximo por operación es 1%. El Stop Loss está a 80 pips de distancia. ¿Cuánto capital arriesgas en esta operación?',
+   opts:['$50 — que es el 1% de $5,000.','$80 — porque el SL es de 80 pips.','$500 — el 10% de la cuenta.','$5,000 × 80 pips = $400,000.'],
+   correct:0,ok:'Correcto. 1% de $5,000 = $50 de riesgo máximo. Ese $50 es el capital que perderías si el precio llega al Stop Loss. El tamaño de la posición se calcula dividiendo $50 entre los 80 pips de distancia.',
+   fail:'Incorrecto. La fórmula es: Riesgo en dinero = Capital × % Riesgo = $5,000 × 1% = $50. El SL define el tamaño de la posición, no el monto a arriesgar.'},
+  {mod:'Módulo III · Análisis Técnico',title:'Principio de Polaridad',
+   scenario:'<strong>Situación:</strong> BTCUSDT rompió con fuerza la resistencia de $65,000 con el cuerpo completo de la vela semanal. Ahora retrocede. ¿Qué esperas en esa zona?',
+   opts:['Que continúe bajando libremente porque ya rompió ese nivel.','Reacción alcista: la antigua resistencia de $65,000 ahora actúa como soporte. Los vendedores atrapados comprarán ahí para cerrar sus pérdidas.','El precio ignorará ese nivel porque ya fue perforado.','Solo es relevante si el volumen en el retroceso supera al del rompimiento.'],
+   correct:1,ok:'Correcto. El principio de polaridad establece que los niveles cambian de rol al ser perforados. Los traders cortos atrapados buscarán cerrar en breakeven ($65,000) inyectando órdenes de compra que convierten la resistencia en soporte.',
+   fail:'Incorrecto. El principio de polaridad es uno de los conceptos más poderosos del análisis técnico: resistencia rota = nuevo soporte. La liquidez de los cortos atrapados alimenta la reacción alcista en ese nivel.'},
+  {mod:'Módulo III · Análisis Técnico',title:'Régimen Tendencial con EMAs',
+   scenario:'<strong>Situación:</strong> En el gráfico diario de SOL/USDT: precio cotiza a $180. EMA 50 = $165. EMA 200 = $140. ¿Cuál es el plan operativo correcto según el análisis de tendencia?',
+   opts:['Buscar ventas porque el precio está muy alto respecto a las EMAs.','Buscar SOLO compras cuando el precio retroceda a la EMA 50 ($165) o a una zona de demanda cercana. Las ventas están prohibidas en este régimen.','Las EMAs no son relevantes si el RSI está en sobrecompra.','Esperar un cruce de EMAs antes de tomar cualquier decisión.'],
+   correct:1,ok:'Correcto. Precio > EMA50 > EMA200 = tendencia alcista estructural confirmada. El plan solo contempla compras en retrocesos a EMA50 o zonas de demanda. Operar ventas en este contexto va en contra del flujo institucional.',
+   fail:'Incorrecto. Con precio > EMA50 > EMA200, el mercado está en régimen alcista definido. El protocolo prohíbe las ventas y restringe la actividad a buscar compras en retrocesos a niveles de soporte dinámico.'},
+  {mod:'Módulo IV · Smart Money',title:'BOS vs Liquidity Sweep',
+   scenario:'<strong>Situación:</strong> El precio en EURUSD 4H supera el último máximo estructural solo con la mecha pero el cuerpo de la vela cierra por debajo. ¿Es esto un BOS válido?',
+   opts:['Sí, el precio tocó el nivel — eso es suficiente para confirmar la ruptura.','No. Es un Liquidity Sweep (Stop Run) que activó stop-losses minoristas pero no hay cierre de cuerpo por encima. No es BOS válido.','Depende del volumen de esa vela.','Sí, si ocurrió en horario de sesión de Londres o Nueva York.'],
+   correct:1,ok:'Correcto. Un BOS real requiere que el CUERPO de la vela cierre por encima del nivel. Solo la mecha = las instituciones barrieron la liquidez de los stops minoristas (Liquidity Sweep) pero no comprometieron una ruptura estructural.',
+   fail:'Incorrecto. La distinción entre mecha y cuerpo es fundamental en SMC. La mecha representa una incursión temporal para activar stops; el cuerpo representa el precio de consenso real del período. BOS requiere cierre de cuerpo.'},
+  {mod:'Módulo IV · Smart Money',title:'Change of Character (CHoCH)',
+   scenario:'<strong>Situación:</strong> BTC está en tendencia alcista (HH y HL). El precio cierra en CUERPO por debajo del último Higher Low. ¿Qué señala este evento?',
+   opts:['Una simple corrección normal dentro de la tendencia alcista.','Un CHoCH bajista: primera señal de que el control de la subasta migró de compradores a vendedores institucionales. Cambiar el sesgo a neutral/bajista.','Un BOS bajista que confirma reversión definitiva.','Una zona de demanda fuerte que debe comprarse inmediatamente.'],
+   correct:1,ok:'Correcto. El CHoCH es la primera ALERTA de reversión, no la confirmación. El precio rompió el último HL (el mínimo que generó el último HH). Esto indica que los vendedores tomaron el control de la subasta, aunque aún se requiere confirmación.',
+   fail:'Incorrecto. El CHoCH se identifica cuando el precio cierra en cuerpo por debajo del último Higher Low. Es la primera señal de cambio de carácter — migración del control del mercado de compradores a vendedores.'},
+  {mod:'Módulo V · Automatización',title:'Alertas del Servidor TradingView',
+   scenario:'<strong>Situación:</strong> Configuras una alerta "Una vez por cierre de barra" en una zona de demanda. Apagas tu computadora. ¿La alerta seguirá funcionando?',
+   opts:['No — las alertas requieren que TradingView esté abierto en el navegador.','Sí — las alertas se ejecutan en los servidores cloud de TradingView, independientemente del estado de tu dispositivo.','Solo si mantienes activa la app móvil de TradingView en segundo plano.','Depende del plan de suscripción.'],
+   correct:1,ok:'Correcto. El motor de alertas opera del lado del servidor (Cloud-based). Las condiciones se evalúan en tiempo real en los servidores de TradingView sin importar si tu computadora está apagada o sin conexión.',
+   fail:'Incorrecto. Las alertas de TradingView son completamente cloud-based. Se ejecutan en los servidores de la plataforma 24/7, sin necesidad de que el cliente (tu navegador o app) esté activo.'},
+  {mod:'Módulo V · Automatización',title:'Bar Replay y Hindsight Bias',
+   scenario:'<strong>Situación:</strong> Estás haciendo backtesting con Bar Replay. Antes de decidir tu entrada, avanzas 3 velas para ver "si el trade hubiera funcionado". ¿Qué sesgo cognitivo estás cometiendo?',
+   opts:['Sesgo de confirmación — buscas evidencia que respalde tu decisión previa.','Hindsight Bias (sesgo de retrospectiva) — tomar decisiones con información futura destruye la validez estadística del backtesting.','Overconfidence Bias — sobreestimas tu capacidad de predicción.','Sesgo de anclaje — te anclas al precio de las 3 velas vistas.'],
+   correct:1,ok:'Correcto. Ver el resultado antes de decidir invalida el backtesting porque en condiciones reales esa información no existe. El Hindsight Bias infla artificialmente las métricas del sistema y crea falsas expectativas.',
+   fail:'Incorrecto. Ver el futuro antes de decidir se llama Hindsight Bias. Esto contamina los resultados del backtesting porque en trading real no puedes saber qué ocurrirá en las próximas velas.'},
+  {mod:'Módulo VI · Pine Script',title:'Pine Script: Indexación de Series Temporales',
+   scenario:'<strong>Situación:</strong> En Pine Script v6, quieres referirte al precio de cierre de la vela anterior (no la actual). ¿Cuál es la notación correcta?',
+   opts:['close.previous','close(-1)','close[1]','prev(close)'],
+   correct:2,ok:'Correcto. En Pine Script, los corchetes acceden a valores históricos: close[0] o close = barra actual, close[1] = barra anterior, close[2] = dos barras atrás. Es la indexación estándar de arrays de series temporales.',
+   fail:'Incorrecto. Pine Script usa indexación con corchetes: close[N] donde N es el número de barras hacia atrás. close[0] = actual, close[1] = anterior. Esta notación es consistente en toda la API del lenguaje.'},
+  {mod:'Módulo VI · Pine Script',title:'No-Repainting en Pine Script',
+   scenario:'<strong>Situación:</strong> Tu indicador Pine Script da señales perfectas en el historial pero en condiciones en vivo las señales desaparecen o cambian. ¿Cuál es el problema más probable?',
+   opts:['El código tiene errores de sintaxis que solo afectan las barras en tiempo real.','El indicador está repintando: usa request.security() sin el offset [1] o barstate.isconfirmed, calculando sobre velas no cerradas que luego cambian.','El servidor de TradingView tiene retraso en los datos en tiempo real.','La estrategia no es válida para el activo seleccionado.'],
+   correct:1,ok:'Correcto. El repainting ocurre cuando el indicador calcula sobre la vela actual en tiempo real, que aún no ha cerrado. Cuando la vela cierra con valores diferentes, la señal cambia. La solución es usar close[1] o barstate.isconfirmed.',
+   fail:'Incorrecto. El repainting es el problema más común en Pine Script. Ocurre al calcular sobre datos de la barra no cerrada. Siempre usar close[1] (vela anterior cerrada) o request.security(..., close[1]) para evitarlo.'},
+  {mod:'Módulo VI · Pine Script',title:'Screener: Lógica del Filtro Institucional',
+   scenario:'<strong>Situación:</strong> Configuras un filtro en el Screener con: Precio > EMA200 y RSI(14) ≤ 40 y Cambio% > 0. Un activo aparece en los resultados. ¿Qué situación de mercado representa?',
+   opts:['Un activo en tendencia bajista que está en sobrecompra.','Un activo en tendencia alcista macro (precio > EMA200) que está experimentando un retroceso técnico (RSI ≤ 40) con momentum positivo intradiario — el setup clásico de compra institucional.','Un activo volátil sin dirección definida.','Un activo que acaba de hacer un CHoCH bajista.'],
+   correct:1,ok:'Correcto. Esta confluencia de tres condiciones identifica el setup clásico: estructura macro alcista (EMA200) + retroceso técnico (RSI bajo) + momentum positivo del día. Es el escenario donde las instituciones suelen acumular.',
+   fail:'Incorrecto. El filtro combina: macro alcista (precio > EMA200) + corrección técnica (RSI ≤ 40) + día positivo (Cambio% > 0). Esto identifica activos en descanso dentro de una tendencia alcista — zona de compra institucional.'},
+  {mod:'Módulo IV · Smart Money',title:'Fases del Ciclo de Wyckoff',
+   scenario:'<strong>Situación:</strong> BTC lleva 6 semanas en rango lateral con compresión de volatilidad. El volumen disminuye cada semana. Las noticias negativas no producen nuevas bajas. ¿En qué fase de Wyckoff se encuentra?',
+   opts:['Distribución — las instituciones están vendiendo su inventario.','Markdown — el mercado está cayendo con fuerza.','Acumulación — las instituciones están comprando inventario en el rango silenciosamente antes del Markup.','Markup — expansión del precio por escasez de oferta.'],
+   correct:2,ok:'Correcto. Los síntomas son típicos de Acumulación Wyckoff: rango lateral, compresión de volatilidad, volumen decreciente y resistencia a noticias negativas. Las instituciones absorben silenciosamente la oferta disponible antes del Markup.',
+   fail:'Incorrecto. La Acumulación de Wyckoff se caracteriza por: rango lateral + volumen decreciente + precio que no responde a noticias negativas. Las instituciones compran en silencio antes de iniciar el Markup alcista.'},
+  {mod:'Módulo V · Automatización',title:'Métricas del Backtesting: Profit Factor',
+   scenario:'<strong>Situación:</strong> Tu estrategia tiene: 70 operaciones ganadoras promedio $150 c/u y 30 operaciones perdedoras promedio $200 c/u. ¿Cuál es el Profit Factor?',
+   opts:['1.75 — ganancia bruta $10,500 / pérdida bruta $6,000','1.50 — porque el Win Rate es 70%','0.87 — las pérdidas superan las ganancias','2.33 — porque ganas más del doble en promedio'],
+   correct:0,ok:'Correcto. Profit Factor = Ganancias brutas / Pérdidas brutas = (70 × $150) / (30 × $200) = $10,500 / $6,000 = 1.75. Un PF > 1.5 es considerado aceptable. > 2.0 es excelente. Este sistema es rentable a pesar del bajo promedio por operación.',
+   fail:'Incorrecto. Profit Factor = Suma de todas las ganancias / Suma de todas las pérdidas = (70 operaciones × $150) / (30 operaciones × $200) = $10,500 / $6,000 = 1.75. El Win Rate importa pero debe ponderarse con el tamaño promedio de ganancias vs pérdidas.'}
+];
+
+/* ══════════════ STATE ══════════════ */
+let done=new Set(),stepsDone={},quizState={started:false,level:0,score:0,answered:false,answers:[]},charts={};
+const TOTAL=6;
+
+/* ══════════════ NAV ══════════════ */
+function goScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('scr-'+id).classList.add('on');window.scrollTo(0,0);}
+function setProgress(pct,lbl){document.getElementById('pbar').style.width=pct+'%';document.getElementById('pct').textContent=pct+'%';document.getElementById('nbadge').textContent=lbl;}
+
+/* ══════════════ COUNTERS ══════════════ */
+function countUp(el,n,d){if(!el)return;d=d||1100;let s=null;function f(ts){if(!s)s=ts;const p=Math.min((ts-s)/d,1);el.textContent=Math.round(p*n);if(p<1)requestAnimationFrame(f);else el.textContent=n;}requestAnimationFrame(f);}
+/* ─── LOAD SAVED PROGRESS ON START ─── */
+setTimeout(()=>{
+  const hadProgress = loadProgress();
+  if(hadProgress){
+    renderMenu();
+    const banner=document.getElementById('resume-banner');
+    const txt=document.getElementById('resume-text');
+    if(banner&&txt){
+      const last=getLastSaved();
+      const mods=done.size;
+      txt.textContent=mods+' módulo'+(mods!==1?'s':'')+' completado'+(mods!==1?'s':'')+(last?' · Última sesión: '+last.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'');
+      banner.style.display='flex';
+    }
+    goScr('menu');
+  }
+},100);
+
+setTimeout(()=>{countUp(document.getElementById('kn1'),6);countUp(document.getElementById('kn2'),18,1200);countUp(document.getElementById('kn3'),15,1400);countUp(document.getElementById('kn4'),24,1600);},350);
+
+/* ══════════════ MENU ══════════════ */
+function renderMenu(){
+  const g=document.getElementById('mgrid');g.innerHTML='';
+  MODULES.forEach(m=>{
+    const d=done.has(m.id),c=document.createElement('div');
+    c.className='mcard'+(d?' mdone':'');
+    c.innerHTML=`<div class="mn">${m.num}</div><div class="mico">${m.ico}</div><div class="mtit">${m.title}</div><div class="mdesc">${m.desc}</div><div class="mtag">${m.tag}</div><div class="mchk"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="1.5"/></svg></div>`;
+    c.onclick=()=>openModule(m.id);g.appendChild(c);
+  });
+  setProgress(Math.round((done.size/TOTAL)*100),done.size===0?'Selecciona un Módulo':`Módulo ${done.size}/${TOTAL}`);
+  if(done.size===TOTAL)setTimeout(showCert,500);
+}
+
+/* ══════════════ MODULE CONTENT ══════════════ */
+function moduleContent(m){
+  const steps=STEPS[m.chart]||[];
+  if(!stepsDone[m.id])stepsDone[m.id]=new Set();
+  const dc=stepsDone[m.id].size;
+  const pct=Math.round((dc/steps.length)*100);
+
+  function buildPath(path){
+    return path.map((p,i)=>`${p}${i<path.length-1?' <span style="color:rgba(201,168,76,.35)">→</span> ':''}`).join('');
+  }
+
+  const stepsHTML=steps.map((s,i)=>{
+    const sid=`s${m.id}-${i}`;const isDone=stepsDone[m.id].has(i);
+    return`<div class="step-card${isDone?' done-s':''}" id="sc-${sid}">
+      <div class="step-hdr" onclick="toggleStep('${sid}')">
+        <div class="step-num" id="sn-${sid}">${isDone?'✓':(i+1)}</div>
+        <div class="step-title">${s.title}</div>
+        <div class="step-arr" id="arr-${sid}">▸</div>
+      </div>
+      <div class="step-body" id="body-${sid}">
+        <div class="step-inner">
+          <div class="step-path">📍 ${buildPath(s.path)}</div>
+          <div class="step-desc">${s.desc}</div>
+          <div class="step-tips">${s.tips.map(t=>`<div class="step-tip">${t}</div>`).join('')}</div>
+          ${s.warn?`<div class="step-warn"><span style="flex-shrink:0;margin-right:5px">⚠️</span>${s.warn}</div>`:''}
+          <button class="step-done-btn${isDone?' already':''}" onclick="markStep(${m.id},${i})" id="btn-${sid}">${isDone?'✓ Completado':'Marcar como visto ▸'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const chartSection=buildChartSection(m.chart);
+
+  return`<button class="back" onclick="goScr('menu');renderMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver al menú</button>
+  <div class="phdr">
+    <div class="pico2">${m.ico}</div>
+    <div><div class="phnum">${m.num} · ${m.tag}</div><div class="phtit"><em>${m.title.split(' ')[0]}</em> ${m.title.split(' ').slice(1).join(' ')}</div><div class="phsub">${m.desc}</div></div>
+  </div>
+  ${buildAcademic(m.chart)}
+  ${chartSection}
+  <div class="blk">
+    <div class="blk-lbl">Links Oficiales — Acceso Directo</div>
+    ${buildLinks(m.chart)}
+  </div>
+  <div class="blk">
+    <div class="blk-lbl">Laboratorio Práctico — Paso a Paso</div>
+    <div class="mod-progress">
+      <span class="mp-lbl">Progreso</span>
+      <div class="mp-track"><div class="mp-fill" id="mpf-${m.id}" style="width:${pct}%"></div></div>
+      <span class="mp-count" id="mpc-${m.id}">${dc}/${steps.length}</span>
+    </div>
+    <div class="steps-wrap">${stepsHTML}</div>
+  </div>
+  ${buildPineSection(m.chart)}
+  <div class="pfooter">
+    <span style="font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.08em;color:var(--tmuted)">${m.num.toUpperCase()} DE 6 · ${m.tag.toUpperCase()}</span>
+    <button class="btn-next" onclick="completeModule(${m.id})">Módulo completado <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button>
+  </div>`;
+}
+
+/* ══════════════ ACADEMIC ══════════════ */
+function buildAcademic(type){
+  const map={
+    arch:`<div class="blk"><div class="blk-lbl">Base Académica</div>
+      <div class="academic-box"><div class="academic-tag">Flujo de Datos y Teoría OHLC — Steve Nison + ECN Markets</div>
+      <p>Los gráficos representan <strong>series temporales agregadas</strong> de fuentes de datos. En mercados centralizados (NYSE, NASDAQ), el <strong>SIP</strong> (Securities Information Processor) unifica la información. En mercados OTC como Forex y Cripto, los datos provienen de redes ECN y proveedores interbancarios. Steve Nison introdujo las velas japonesas en occidente: cada vela condensa la interacción oferta-demanda en 4 variables OHLC — el cuerpo es la fuerza neta dominante y las mechas son zonas de rechazo.</p></div></div>`,
+    tools:`<div class="blk"><div class="blk-lbl">Base Académica</div>
+      <div class="academic-box"><div class="academic-tag">Geometría de Tendencias — Charles Dow + Algoritmia del Riesgo</div>
+      <p>Charles Dow definió la tendencia como una <strong>serie geométrica de pivotes</strong>: Higher Highs y Higher Lows en alcista. Una línea de tendencia requiere mínimo <strong>3 contactos validados</strong> para tener relevancia estadística. La supervivencia del trader depende de la <strong>asimetría matemática</strong>: Volumen = (Capital × % Riesgo) / Distancia del SL. Con riesgo 0.5–1% por operación, ninguna racha perdedora destruye la curva de capital.</p></div></div>`,
+    classic:`<div class="blk"><div class="blk-lbl">Base Académica</div>
+      <div class="academic-box"><div class="academic-tag">Principio de Polaridad + EMA Ponderada — Hipótesis de Mercados Eficientes (Fama)</div>
+      <p>Las zonas S&D no son líneas sino <strong>horquillas de precio</strong> donde existe desequilibrio severo en el Order Book. El principio de polaridad convierte resistencias en soportes al ser perforadas — los cortos atrapados inyectan compras en el breakeven. La <strong>EMA</strong> aplica peso exponencial a los precios recientes, reduciendo el lag de la SMA. La combinación EMA50 + EMA200 es el filtro tendencial institucional más utilizado globalmente.</p></div></div>`,
+    smc:`<div class="blk"><div class="blk-lbl">Base Académica</div>
+      <div class="academic-box"><div class="academic-tag">Wyckoff + Smart Money Concepts — Microestructura Moderna</div>
+      <p>Richard Wyckoff identificó <strong>4 fases del ciclo</strong>: Acumulación → Markup → Distribución → Markdown. Los conceptos SMC modernos extienden esto: <strong>BOS</strong> (Break of Structure) valida la continuación cuando el <em>cuerpo</em> de la vela cierra más allá del último máximo. <strong>CHoCH</strong> (Change of Character) es la primera alerta de reversión cuando el precio rompe el último Higher Low. La distinción cuerpo vs. mecha es crítica para evitar falsos breakouts.</p></div></div>`,
+    auto:`<div class="blk"><div class="blk-lbl">Base Académica</div>
+      <div class="academic-box"><div class="academic-tag">Fatiga Cognitiva + Método Científico del Backtesting</div>
+      <p>La exposición prolongada a gráficos genera <strong>fatiga de decisión</strong> — degrada la percepción del riesgo e induce overtrading. Las alertas cloud-based de TradingView mitigan esto al activar la atención solo cuando se cumplen las confluencias del plan. El <strong>backtesting</strong> aplica el método científico: una estrategia es una hipótesis que debe validarse con mínimo 100 operaciones históricas. Métricas clave: Win Rate, <strong>Profit Factor</strong> = Ganancias Brutas / Pérdidas Brutas.</p></div></div>`,
+    pine:`<div class="blk"><div class="blk-lbl">Base Académica</div>
+      <div class="academic-box"><div class="academic-tag">Pine Script v6 — Lógica de Series Temporales + Screeners Booleanos</div>
+      <p>Pine Script es el lenguaje propietario de TradingView para <strong>procesamiento de vectores de series temporales</strong>. Cada barra es un índice ([0]=actual, [1]=anterior). El código se compila en la nube y se ejecuta en cada barra histórica en paralelo. <strong>Pine Script v6</strong> (lanzado 2025) añade evaluación lazy de booleanos y límite extendido de trades en el Strategy Tester. Los <strong>Screeners</strong> ejecutan consultas booleanas masivas en tiempo real para aislar activos con confluencias matemáticas específicas.</p></div></div>`
+  };
+  return map[type]||'';
+}
+
+/* ══════════════ LINKS ══════════════ */
+function buildLinks(type){
+  const LINKS={
+    arch:[
+      {ico:'📊',name:'TradingView SuperCharts',desc:'Plataforma principal de gráficos — acceso gratuito y planes Pro',url:'https://www.tradingview.com/chart/'},
+      {ico:'📚',name:'Centro de Ayuda TradingView',desc:'Documentación oficial de todas las funciones de la plataforma',url:'https://www.tradingview.com/support/'}
+    ],
+    tools:[
+      {ico:'📐',name:'Herramientas de Dibujo — TradingView',desc:'Guía oficial de todas las herramientas de dibujo y medición',url:'https://www.tradingview.com/support/solutions/43000703396-drawing-tools-available-on-tradingview/'},
+      {ico:'⚖️',name:'Calculadora de Position Sizing',desc:'Herramienta integrada de gestión de riesgo en TradingView',url:'https://www.tradingview.com/chart/'}
+    ],
+    classic:[
+      {ico:'📈',name:'Indicadores — TradingView',desc:'Biblioteca de +400 indicadores built-in incluyendo EMAs y S&R',url:'https://www.tradingview.com/indicators/'},
+      {ico:'🔍',name:'Screener de Acciones',desc:'Escaneo de mercados con filtros técnicos en tiempo real',url:'https://www.tradingview.com/screener/'}
+    ],
+    smc:[
+      {ico:'🧠',name:'Ideas de Trading Community',desc:'Análisis de Smart Money Concepts de la comunidad global',url:'https://www.tradingview.com/ideas/smcconcept/'},
+      {ico:'📋',name:'Documentación Pine Script v6',desc:'Referencia completa del lenguaje Pine Script — versión oficial',url:'https://www.tradingview.com/pine-script-docs/welcome/'}
+    ],
+    auto:[
+      {ico:'🔔',name:'Alertas en TradingView',desc:'Guía completa de configuración de alertas cloud-based',url:'https://www.tradingview.com/support/solutions/43000520149/'},
+      {ico:'⏮️',name:'Bar Replay — Backtesting Visual',desc:'Cómo usar la función de reproducción de barras históricas',url:'https://www.tradingview.com/support/solutions/43000598192/'}
+    ],
+    pine:[
+      {ico:'💻',name:'Pine Script v6 — Docs Oficiales',desc:'Documentación completa con ejemplos del lenguaje Pine Script v6',url:'https://www.tradingview.com/pine-script-docs/welcome/'},
+      {ico:'🌐',name:'Pine Script Editor en TradingView',desc:'Abre el editor de Pine Script directamente en la plataforma',url:'https://www.tradingview.com/pine-script-editor/'},
+      {ico:'📦',name:'Community Scripts (100k+ scripts)',desc:'Biblioteca open-source de indicadores y estrategias de la comunidad',url:'https://www.tradingview.com/scripts/'}
+    ]
+  };
+  return (LINKS[type]||[]).map(l=>`<a class="ext-link" href="${l.url}" target="_blank" rel="noopener">
+    <div class="ext-link-ico">${l.ico}</div>
+    <div class="ext-link-info"><div class="ext-link-name">${l.name}</div><div class="ext-link-desc">${l.desc}</div></div>
+    <div class="ext-link-arrow">↗</div>
+  </a>`).join('');
+}
+
+/* ══════════════ CHART SECTIONS ══════════════ */
+function buildChartSection(type){
+  let _idx=0;
+  function uid(){return type+'-'+(++_idx);}
+
+  function eb(label){
+    const id=uid();
+    return`<button class="chart-explain-btn" id="ceb-${id}" onclick="toggleExplain('${id}')">? ${label||'Cómo leer esta gráfica'}</button>`;
+  }
+
+  function cePanel(items,interaction){
+    const id=type+'-'+_idx;
+    return`<div class="chart-explain" id="ce-${id}"><div class="chart-explain-inner">
+      <div class="ce-grid">${items.map(([lbl,txt])=>`<div class="ce-item"><div class="ce-item-lbl">${lbl}</div><div class="ce-item-txt">${txt}</div></div>`).join('')}</div>
+      <div class="ce-interaction"><strong>Prueba esto:</strong> ${interaction}</div>
+    </div></div>`;
+  }
+
+  const sections={
+
+/* ════════════════════════════════════════════
+   MÓDULO I — Gráfica de Velas SVG Animada + Live Price Ticker
+════════════════════════════════════════════ */
+arch:`<div class="blk">
+  <div class="blk-lbl">Simulador de Gráfica de Velas — BTCUSDT 4H en Vivo</div>
+  <div class="chart-section">
+    <div class="chart-header">
+      <div>
+        <div class="ctit">📊 <span>Gráfica de Velas OHLC Interactiva — Fondo dinámico de sesgo institucional</span></div>
+        <div class="chart-subtitle">Pasa el cursor sobre cualquier vela para ver sus datos OHLC. El fondo verde/rojo muestra el sesgo según la EMA 200. Haz clic en "Nueva Vela" para simular el mercado en vivo.</div>
+      </div>
+      ${eb('? Cómo usar la gráfica')}
+    </div>
+    ${cePanel([
+      ['📊 Qué muestra','Velas japonesas OHLC en tiempo real simulado. El cuerpo es la distancia entre apertura y cierre. La mecha superior es el máximo; la inferior es el mínimo del período.'],
+      ['🎯 Cómo leerla','<strong>Verde = vela alcista</strong> (cierre > apertura). <strong>Roja = vela bajista</strong>. El fondo del gráfico cambia con el sesgo de la EMA 200: verde pálido = precio sobre EMA (alcista), rojo pálido = bajista.'],
+      ['💡 Dato clave','Una mecha larga con cuerpo pequeño = rechazo de precio en ese nivel. Las mechas son zonas donde el flujo contrario absorbió al agresor. Estos extremos son zonas clave de S&D.'],
+      ['🖱️ Interacción','Pasa el cursor sobre cada vela para ver OHLC. Haz clic en "Nueva Vela" para añadir una nueva simulada. El indicador LIVE actualiza en tiempo real.']
+    ],'Coloca el cursor sobre la vela con la mecha más larga. Ese máximo/mínimo representa un nivel donde el precio fue rechazado — posible zona de oferta o demanda institucional. Haz clic en "Nueva Vela" para ver cómo se construye una vela nueva.')}
+    <!-- Ticker Strip -->
+    <div id="ticker-strip" style="display:flex;gap:.5rem;overflow:hidden;margin-bottom:.75rem;padding:.4rem 0;border-bottom:1px solid rgba(201,168,76,.1)"></div>
+    <!-- SVG Candle Chart -->
+    <div style="position:relative;background:#0A0C10;border:1px solid rgba(201,168,76,.12);border-radius:3px;overflow:hidden">
+      <svg id="candle-svg" width="100%" height="260" style="display:block;cursor:crosshair"></svg>
+      <div id="candle-tooltip" style="display:none;position:absolute;background:rgba(13,13,13,.95);border:1px solid rgba(201,168,76,.4);padding:.5rem .75rem;font-family:'Orbitron',sans-serif;font-size:.55rem;pointer-events:none;z-index:10;line-height:1.7;color:var(--tgoldb)"></div>
+    </div>
+    <!-- Controls -->
+    <div style="display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap;align-items:center">
+      <button onclick="addCandle()" style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.08em;padding:.4rem 1rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700">+ Nueva Vela</button>
+      <button onclick="resetCandles()" style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.08em;padding:.4rem 1rem;border:1px solid rgba(201,168,76,.35);color:var(--tmuted);background:none;cursor:pointer">↺ Reiniciar</button>
+      <div id="candle-bias" style="margin-left:auto;font-family:'Orbitron',sans-serif;font-size:.58rem;padding:.35rem .8rem;border-radius:2px"></div>
+    </div>
+  </div>
+  <!-- Spread Gauge -->
+  <div class="blk-lbl" style="margin-top:1.4rem">Comparativa de Proveedores — Gauge de Calidad de Datos</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem">
+    ${['FXCM','OANDA','ICE','Pepperstone','FOREX.com'].map((p,i)=>{
+      const scores=[92,88,90,78,72];const colors=['#50C878','#50C878','#50C878','#F59E0B','#E05050'];
+      return`<div style="background:var(--bpanel2);border:1px solid rgba(201,168,76,.1);padding:.75rem .5rem;text-align:center">
+        <svg width="60" height="60" viewBox="0 0 60 60" style="display:block;margin:0 auto .4rem">
+          <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(201,168,76,.1)" stroke-width="5"/>
+          <circle cx="30" cy="30" r="24" fill="none" stroke="${colors[i]}" stroke-width="5" stroke-dasharray="${Math.round(scores[i]*1.508)} 150.8" stroke-dashoffset="37.7" stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dasharray 1.5s ease" class="gauge-arc" data-val="${scores[i]}"/>
+          <text x="30" y="35" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="10" fill="${colors[i]}" font-weight="700">${scores[i]}</text>
+        </svg>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.5rem;color:var(--tmuted);letter-spacing:.06em">${p}</div>
+      </div>`;
+    }).join('')}
+  </div>
+</div>`,
+
+/* ════════════════════════════════════════════
+   MÓDULO II — Gauge Circular de Riesgo + Simulador Interactivo
+════════════════════════════════════════════ */
+tools:`<div class="blk">
+  <div class="blk-lbl">Calculadora de Position Sizing — Visual Interactiva</div>
+  <div class="wbox">
+    <div class="ctit">⚡ <span>Ley del Riesgo — Ajusta los sliders y observa el gauge en tiempo real</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:center">
+      <div>
+        <div class="wrow"><div class="wlbl">Capital total ($)</div><input type="range" class="wslider" id="ps-capital" min="1000" max="50000" step="500" value="10000" oninput="updPS()"><div class="wval" id="psv-cap">$10,000</div></div>
+        <div class="wrow"><div class="wlbl">% Riesgo por trade</div><input type="range" class="wslider" id="ps-risk" min="0.1" max="5" step="0.1" value="1" oninput="updPS()"><div class="wval" id="psv-risk">1.0%</div></div>
+        <div class="wrow"><div class="wlbl">Distancia SL</div><input type="range" class="wslider" id="ps-sl" min="5" max="200" step="5" value="50" oninput="updPS()"><div class="wval" id="psv-sl">50 pts</div></div>
+        <div class="wres" style="grid-template-columns:1fr 1fr">
+          <div class="wr"><div class="wr-l">Riesgo en $</div><div class="wr-v r" id="psv-dmg">$100</div></div>
+          <div class="wr"><div class="wr-l">Tamaño posición</div><div class="wr-v" id="psv-size">2.00 lots</div></div>
+          <div class="wr"><div class="wr-l">TP mínimo (2:1)</div><div class="wr-v g" id="psv-tp">+$200</div></div>
+          <div class="wr"><div class="wr-l">Ganancia potencial</div><div class="wr-v g" id="psv-gain">$200</div></div>
+        </div>
+      </div>
+      <!-- Risk Gauge SVG -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.5rem">
+        <svg id="risk-gauge" width="180" height="110" viewBox="0 0 180 110">
+          <defs>
+            <linearGradient id="gGreen" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#50C878"/><stop offset="100%" stop-color="#A0E840"/></linearGradient>
+            <linearGradient id="gAmber" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#F0C040"/></linearGradient>
+            <linearGradient id="gRed" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#E05050"/><stop offset="100%" stop-color="#FF2020"/></linearGradient>
+          </defs>
+          <!-- Track -->
+          <path d="M 20 90 A 70 70 0 0 1 160 90" fill="none" stroke="rgba(201,168,76,.1)" stroke-width="14" stroke-linecap="round"/>
+          <!-- Green zone (0-33%) -->
+          <path d="M 20 90 A 70 70 0 0 1 90 20" fill="none" stroke="url(#gGreen)" stroke-width="14" stroke-linecap="round" opacity=".7"/>
+          <!-- Amber zone (33-66%) -->
+          <path d="M 90 20 A 70 70 0 0 1 147 55" fill="none" stroke="url(#gAmber)" stroke-width="14" stroke-linecap="round" opacity=".7"/>
+          <!-- Red zone (66-100%) -->
+          <path d="M 147 55 A 70 70 0 0 1 160 90" fill="none" stroke="url(#gRed)" stroke-width="14" stroke-linecap="round" opacity=".7"/>
+          <!-- Needle -->
+          <line id="gauge-needle" x1="90" y1="90" x2="90" y2="28" stroke="#F0C040" stroke-width="2.5" stroke-linecap="round" style="transform-origin:90px 90px;transform:rotate(-90deg);transition:transform .5s cubic-bezier(.4,0,.2,1)"/>
+          <circle cx="90" cy="90" r="5" fill="#F0C040"/>
+          <!-- Labels -->
+          <text x="14" y="108" font-family="Orbitron,sans-serif" font-size="7" fill="#50C878">SEGURO</text>
+          <text x="74" y="12" font-family="Orbitron,sans-serif" font-size="7" fill="#F59E0B" text-anchor="middle">CAUTO</text>
+          <text x="148" y="108" font-family="Orbitron,sans-serif" font-size="7" fill="#E05050" text-anchor="end">RIESGO</text>
+          <!-- Center value -->
+          <text id="gauge-center" x="90" y="82" font-family="Orbitron,sans-serif" font-size="13" fill="#F0C040" text-anchor="middle" font-weight="700">1.0%</text>
+        </svg>
+        <div id="gauge-label" style="font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.1em;padding:.3rem .8rem;border-radius:2px;background:rgba(80,200,120,.1);border:1px solid rgba(80,200,120,.25);color:var(--green)">✓ GESTIÓN PROFESIONAL</div>
+      </div>
+    </div>
+  </div>
+  <!-- Equity Curve Canvas -->
+  <div class="chart-section" style="margin-top:.9rem">
+    <div class="chart-header">
+      <div><div class="ctit">📈 <span>Curva de Equity — 30 operaciones simuladas con el riesgo seleccionado</span></div>
+      <div class="chart-subtitle">Mueve los sliders arriba para ver cómo el % de riesgo afecta la volatilidad de la curva. Haz clic en "Resimular" para generar una nueva secuencia de operaciones.</div></div>
+      <div style="display:flex;gap:.4rem;align-items:center">
+        <button onclick="resimulateEquity()" style="font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.07em;padding:.3rem .8rem;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.28);color:var(--gold);cursor:pointer">↺ Resimular</button>
+        ${eb('? Cómo interpretar')}
+      </div>
+    </div>
+    ${cePanel([
+      ['📊 Qué muestra','Evolución del capital a lo largo de 30 operaciones. Cada punto es el capital acumulado tras cada trade con el % de riesgo configurado en los sliders.'],
+      ['🎯 Cómo leerla','La línea dorada = gestión actual (slider). Línea punteada gris = capital inicial. Los puntos verdes = operaciones ganadoras. Puntos rojos = perdedoras. La distancia entre picos y valles es el drawdown.'],
+      ['💡 Lo más importante','<strong>El drawdown máximo importa más que la ganancia bruta.</strong> Un sistema con 200% de ganancia y 60% de drawdown es psicológicamente imposible de seguir. Un 20% de drawdown es el límite profesional.'],
+      ['🖱️ Interacción','Mueve el slider de "% Riesgo" a 3%, 4% y 5% y haz clic en Resimular. Observa cómo la curva se hace cada vez más salvaje con los mismos resultados de Win Rate.']
+    ],'Pon el riesgo al 5% y haz clic en "Resimular" 3 veces. Luego cambia a 1% y haz lo mismo. Observa cuál configuración produce curvas de capital psicológicamente sostenibles.')}
+    <div style="height:220px;position:relative"><canvas id="chart-tools"></canvas></div>
+    <div id="equity-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.75rem"></div>
+  </div>
+</div>`,
+
+/* ════════════════════════════════════════════
+   MÓDULO III — Heatmap de Régimen + Gráfica EMA Interactiva
+════════════════════════════════════════════ */
+classic:`<div class="blk">
+  <div class="blk-lbl">Heatmap de Régimen de Mercado — EMA 50 vs EMA 200</div>
+  <div class="chart-section">
+    <div class="chart-header">
+      <div><div class="ctit">🌡️ <span>Heatmap de confluencia tendencial — 8 activos × 4 temporalidades</span></div>
+      <div class="chart-subtitle">Cada celda muestra el régimen tendencial de un activo en una temporalidad. Verde = alcista (precio > EMA50 > EMA200). Rojo = bajista. Amarillo = mixto. Haz clic en cualquier celda para ver detalles.</div></div>
+      ${eb('? Cómo leer el heatmap')}
+    </div>
+    ${cePanel([
+      ['📊 Qué muestra','Tabla de régimen tendencial cruzada: filas = activos, columnas = temporalidades. El color indica si el activo está en tendencia alcista, bajista o mixta según la posición relativa de precio, EMA50 y EMA200.'],
+      ['🎯 Cómo leerla','<strong>Verde brillante</strong> = precio>EMA50>EMA200 = solo compras. <strong>Rojo</strong> = precio<EMA50<EMA200 = solo ventas. <strong>Ámbar</strong> = señales mixtas = sin operaciones. La columna 1D define el sesgo macro.'],
+      ['💡 Lo más importante','Una fila completamente verde en todos los timeframes es un activo en régimen alcista de alta confluencia — el de mayor probabilidad estadística para setups de compra. Es el primero en la lista de seguimiento.'],
+      ['🖱️ Interacción','Haz clic en cualquier celda para ver el estado exacto de las EMAs. La celda seleccionada se ilumina con borde dorado. Observa la columna 1D — define el sesgo macro que no debe ignorarse.']
+    ],'Busca filas donde al menos 3 de 4 celdas sean verdes — esos activos tienen confluencia tendencial multi-timeframe. Luego haz clic en cada celda verde para ver el estado de las EMAs.')}
+    <div id="heatmap-container" style="margin:.3rem 0"></div>
+    <div id="heatmap-detail" style="display:none;margin-top:.6rem;padding:.65rem .85rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.18);font-size:.84rem;color:var(--tdim);line-height:1.65"></div>
+  </div>
+  <!-- EMA Lag Interactive Chart -->
+  <div class="chart-section" style="margin-top:.9rem">
+    <div class="chart-header">
+      <div><div class="ctit">📈 <span>EMA vs SMA — Comparativa de lag en tiempo real (ajusta el período)</span></div>
+      <div class="chart-subtitle">Mueve el slider para cambiar el período y observar cómo el lag varía. Con períodos cortos, la diferencia es dramática. Con períodos largos, las dos medias convergen.</div></div>
+      ${eb()}
+    </div>
+    ${cePanel([
+      ['📊 Qué muestra','Precio simulado (blanco punteado), EMA (dorada) y SMA (azul punteado) del mismo período. El área sombreada entre EMA y SMA muestra visualmente el lag eliminado por la ponderación exponencial.'],
+      ['🎯 Cómo leerla','Cuando el precio gira en los extremos, observa cuál indicador sigue antes al precio real. La EMA reacciona primero porque pondera los precios recientes con mayor peso. El gap visible entre ellas = lag eliminado.'],
+      ['💡 Lo más importante','En períodos cortos (5-15), la diferencia EMA vs SMA es significativa. En períodos largos (100-200), ambas convergen y la diferencia operativa es mínima. Para filtros de largo plazo, EMA200 y SMA200 dan señales casi idénticas.'],
+      ['🖱️ Interacción','Mueve el slider de período de 5 a 50. Observa cómo el área entre EMA y SMA (lag) crece con el período. En el período 5, la EMA prácticamente sigue al precio en tiempo real.']
+    ],'Mueve el slider a período 5 y observa la EMA casi pegada al precio. Luego muévelo a período 50 — la EMA se aleja y suaviza mucho más. Esa diferencia define tu sensibilidad vs. lag en el análisis.')}
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.75rem;flex-wrap:wrap">
+      <div class="wlbl">Período</div>
+      <input type="range" class="wslider" id="ema-period" min="5" max="50" step="1" value="20" oninput="rebuildClassic()" style="flex:1;max-width:260px">
+      <div class="wval" id="ema-period-v">20</div>
+    </div>
+    <div style="height:200px;position:relative"><canvas id="chart-classic"></canvas></div>
+  </div>
+</div>`,
+
+/* ════════════════════════════════════════════
+   MÓDULO IV — Simulador Animado de Flujo de Órdenes SMC
+════════════════════════════════════════════ */
+smc:`<div class="blk">
+  <div class="blk-lbl">Simulador de Flujo de Órdenes — BOS y CHoCH Interactivo</div>
+  <div class="chart-section">
+    <div class="chart-header">
+      <div><div class="ctit">🧠 <span>Order Flow SVG — Identifica BOS y CHoCH haciendo clic en los niveles</span></div>
+      <div class="chart-subtitle">Haz clic en los botones para revelar los elementos de microestructura paso a paso. El gráfico SVG anima el flujo de órdenes institucional en tiempo diferido.</div></div>
+      ${eb('? Cómo usar el simulador')}
+    </div>
+    ${cePanel([
+      ['📊 Qué muestra','Estructura de mercado SMC animada paso a paso: Higher Highs, Higher Lows, zonas de demanda (OB), Break of Structure (BOS) y Change of Character (CHoCH).'],
+      ['🎯 Cómo leerla','Lee de izquierda a derecha siguiendo los pivotes. HH = Higher High (máximo más alto). HL = Higher Low. El BOS ocurre cuando el precio cierra en cuerpo por encima del último HH. El CHoCH cuando rompe por debajo del último HL.'],
+      ['💡 Lo más importante','<strong>BOS = continuación de tendencia.</strong> CHoCH = primera alerta de reversión. La diferencia entre los dos determina si sigues el trade o esperas confirmación en la dirección contraria.'],
+      ['🖱️ Interacción','Haz clic en "Siguiente" para revelar los elementos uno a uno. Al llegar al CHoCH, el gráfico cambia de color para señalar el cambio de sesgo. Haz clic en cualquier zona coloreada para ver su explicación.']
+    ],'Haz clic en "Siguiente" hasta revelar el CHoCH. Luego haz clic sobre la zona roja del CHoCH para ver por qué invalida la estructura alcista previa. Después presiona "Reiniciar" y repasa la secuencia completa.')}
+    <!-- SMC SVG Chart -->
+    <div style="position:relative;background:#0A0C10;border:1px solid rgba(201,168,76,.12);border-radius:3px;overflow:hidden;padding:.5rem 0">
+      <svg id="smc-svg" width="100%" height="280" viewBox="0 0 800 280" preserveAspectRatio="xMidYMid meet" style="display:block"></svg>
+      <div id="smc-tooltip" style="display:none;position:absolute;background:rgba(13,13,13,.95);border:1px solid rgba(201,168,76,.4);padding:.5rem .75rem;font-family:'Orbitron',sans-serif;font-size:.54rem;pointer-events:none;z-index:10;color:var(--tgoldb);line-height:1.65;max-width:200px"></div>
+    </div>
+    <div style="display:flex;gap:.6rem;margin-top:.75rem;flex-wrap:wrap;align-items:center">
+      <button onclick="smcNext()" id="smc-next-btn" style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.08em;padding:.4rem 1.1rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700">Siguiente →</button>
+      <button onclick="smcReset()" style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.08em;padding:.4rem 1rem;border:1px solid rgba(201,168,76,.35);color:var(--tmuted);background:none;cursor:pointer">↺ Reiniciar</button>
+      <div id="smc-step-info" style="flex:1;font-family:'Orbitron',sans-serif;font-size:.54rem;color:var(--tmuted);letter-spacing:.06em;text-align:right"></div>
+    </div>
+  </div>
+  <!-- Wyckoff Radar -->
+  <div class="chart-section" style="margin-top:.9rem">
+    <div class="chart-header">
+      <div><div class="ctit">🕸️ <span>Radar de Wyckoff — 4 fases × 5 indicadores de confluencia</span></div>
+      <div class="chart-subtitle">Haz clic en los botones de fase para resaltar solo esa fase. El área del polígono representa la cantidad de señales confirmatorias disponibles para identificar esa fase.</div></div>
+      ${eb()}
+    </div>
+    ${cePanel([
+      ['📊 Qué muestra','Gráfica de radar (telaraña) con 5 ejes: Volumen, Volatilidad, Momentum, Estructura y Duración. Cada polígono es una fase del ciclo de Wyckoff. Mayor área = más señales identificables.'],
+      ['🎯 Cómo leerla','La <strong>Acumulación tiene el polígono más pequeño</strong> — pocas señales visibles, difícil de identificar en tiempo real. El Markup y Markdown son los más evidentes. Distribución y Acumulación tienen formas similares pero con momentum invertido.'],
+      ['💡 Lo más importante','El eje "Momentum" es el más diferenciador entre Acumulación (bajo) y Distribución (medio-bajo). Si el momentum todavía es negativo en un rango lateral, es Acumulación. Si era positivo antes, es Distribución.'],
+      ['🖱️ Interacción','Haz clic en los botones de fase para resaltarla individualmente. Compara Acumulación vs Distribución — tienen formas muy similares. Luego activa todas para ver la diferencia completa entre las 4 fases.']
+    ],'Haz clic en "Acumulación" y luego en "Distribución" alternadamente. Nota la similitud de sus polígonos — esto explica por qué los traders confunden estas dos fases y el desastre que genera operar en la dirección equivocada.')}
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem">
+      ${['Todas','Acumulación','Markup','Distribución','Markdown'].map(f=>`<button onclick="filterWyckoff('${f}')" class="wyckoff-btn" style="font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.07em;padding:.28rem .75rem;border:1px solid rgba(201,168,76,.2);color:var(--tmuted);background:none;cursor:pointer;transition:all .2s">${f}</button>`).join('')}
+    </div>
+    <div style="height:260px;position:relative"><canvas id="chart-smc"></canvas></div>
+  </div>
+</div>`,
+
+/* ════════════════════════════════════════════
+   MÓDULO V — Backtesting: Bubble Chart + Equity con Stats
+════════════════════════════════════════════ */
+auto:`<div class="blk">
+  <div class="blk-lbl">Mapa de Estrategias — Risk/Reward Bubble Chart</div>
+  <div class="chart-section">
+    <div class="chart-header">
+      <div><div class="ctit">💹 <span>Bubble Chart — Win Rate vs Profit Factor vs Drawdown (tamaño de burbuja)</span></div>
+      <div class="chart-subtitle">Cada burbuja es una estrategia. El eje X es el Win Rate, el eje Y el Profit Factor. El tamaño de la burbuja representa el drawdown máximo — burbujas pequeñas = bajo riesgo.</div></div>
+      ${eb('? Cómo leer el Bubble Chart')}
+    </div>
+    ${cePanel([
+      ['📊 Qué muestra','Espacio bidimensional donde cada estrategia ocupa una posición según Win Rate (X) y Profit Factor (Y). El tamaño de cada burbuja = drawdown máximo. Zona dorada = área ideal de estrategias profesionales.'],
+      ['🎯 Cómo leerla','<strong>Arriba-derecha</strong> = alto PF + alto WR = ideal pero raro. <strong>Arriba-izquierda</strong> = alto PF con bajo WR = estrategias de tendencia (pocas operaciones ganadoras pero muy grandes). <strong>Abajo-derecha</strong> = scalping con PF bajo.'],
+      ['💡 Lo más importante','La <strong>zona dorada</strong> (recuadro sombreado) es el área profesional: PF>1.5 y WR>45%. Las estrategias fuera de esa zona tienen expectativa matemática marginal o negativa a largo plazo con comisiones.'],
+      ['🖱️ Interacción','Pasa el cursor sobre cada burbuja para ver el nombre de la estrategia y sus métricas completas. Las burbujas más pequeñas son las más conservadoras en términos de drawdown máximo.']
+    ],'Identifica qué burbuja está más cerca de la esquina superior derecha del recuadro dorado. Esa es la estrategia con mejor balance entre Win Rate, Profit Factor y drawdown controlado. ¿Cuál estrategia es?')}
+    <div style="height:260px;position:relative"><canvas id="chart-auto"></canvas></div>
+  </div>
+  <!-- Alert Config Simulator -->
+  <div class="chart-section" style="margin-top:.9rem">
+    <div class="blk-lbl" style="margin-bottom:.75rem">Simulador de Configuración de Alertas</div>
+    <div style="background:#0A0E1A;border:1px solid rgba(74,158,255,.2);padding:1rem;font-family:'Rajdhani',sans-serif">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.9rem">
+        <div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;color:var(--blue);text-transform:uppercase;margin-bottom:.4rem">Condición de la alerta</div>
+          <select id="alert-cond" onchange="updateAlertPreview()" style="width:100%;background:var(--bpanel2);border:1px solid rgba(74,158,255,.25);color:var(--tdim);padding:.4rem .6rem;font-family:'Rajdhani',sans-serif;font-size:.88rem;cursor:pointer">
+            <option>Cruzando</option><option>Cruzando hacia arriba</option><option>Cruzando hacia abajo</option><option>Mayor que</option><option>Menor que</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;color:var(--blue);text-transform:uppercase;margin-bottom:.4rem">Frecuencia de disparo</div>
+          <select id="alert-freq" onchange="updateAlertPreview()" style="width:100%;background:var(--bpanel2);border:1px solid rgba(74,158,255,.25);color:var(--tdim);padding:.4rem .6rem;font-family:'Rajdhani',sans-serif;font-size:.88rem;cursor:pointer">
+            <option>Una vez por cierre de barra</option><option>Solo una vez</option><option>Cada cierre de barra</option><option>Cada minuto</option>
+          </select>
+        </div>
+      </div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;color:var(--blue);text-transform:uppercase;margin-bottom:.4rem">Mensaje de alerta generado</div>
+      <div id="alert-preview" style="background:rgba(0,0,0,.4);border:1px solid rgba(74,158,255,.15);padding:.65rem .85rem;font-size:.85rem;color:rgba(180,220,255,.8);line-height:1.7;min-height:60px"></div>
+      <div style="display:flex;gap:.5rem;margin-top:.65rem;flex-wrap:wrap">
+        <div style="font-family:'Orbitron',sans-serif;font-size:.5rem;padding:.25rem .6rem;border:1px solid rgba(74,158,255,.2);color:var(--blue)">📱 APP</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.5rem;padding:.25rem .6rem;border:1px solid rgba(74,158,255,.2);color:var(--blue)">📧 EMAIL</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.5rem;padding:.25rem .6rem;border:1px solid rgba(74,158,255,.2);color:var(--blue)">🔔 WEBHOOK</div>
+        <div id="alert-status" style="margin-left:auto;font-family:'Orbitron',sans-serif;font-size:.52rem;padding:.25rem .7rem;background:rgba(80,200,120,.1);border:1px solid rgba(80,200,120,.25);color:var(--green)">✓ CLOUD-BASED · 24/7</div>
+      </div>
+    </div>
+  </div>
+</div>`,
+
+/* ════════════════════════════════════════════
+   MÓDULO VI — Treemap de Screener + Terminal Pine Live
+════════════════════════════════════════════ */
+pine:`<div class="blk">
+  <div class="blk-lbl">Screener Visual — Treemap de Activos por Confluencia</div>
+  <div class="chart-section">
+    <div class="chart-header">
+      <div><div class="ctit">🗺️ <span>Treemap de mercado — Tamaño = Market Cap · Color = Señal del filtro institucional</span></div>
+      <div class="chart-subtitle">El tamaño de cada bloque representa el peso relativo del activo. El color muestra si cumple el filtro (dorado = setup activo, azul = tendencia sin retroceso, rojo = bajista). Haz clic en cualquier bloque.</div></div>
+      ${eb('? Cómo leer el Treemap')}
+    </div>
+    ${cePanel([
+      ['📊 Qué muestra','Mapa de mercado estilo TradingView donde cada bloque es un activo. Área del bloque = capitalización de mercado relativa. Color = estado del filtro de Descuento Institucional (precio>EMA200 + RSI<40 + Cambio%>0).'],
+      ['🎯 Cómo leerla','<strong>Dorado</strong> = las 3 condiciones del filtro se cumplen = setup activo. <strong>Azul</strong> = tendencia alcista pero sin retroceso técnico. <strong>Rojo</strong> = tendencia bajista. <strong>Gris</strong> = mercado lateral sin señal.'],
+      ['💡 Lo más importante','Los activos dorados son los candidatos para revisar en detalle. Si hay muchos activos dorados simultáneamente, el mercado está en corrección generalizada dentro de alcista macro — zona de acumulación masiva.'],
+      ['🖱️ Interacción','Haz clic en cualquier bloque para ver el estado exacto de sus indicadores. Los bloques parpadean cuando cambian de estado. Presiona "Actualizar Mercado" para simular un nuevo estado del mercado.']
+    ],'Haz clic en cada bloque dorado. Son los activos que cumplen el filtro institucional. Observa que no siempre son los más grandes (mayor cap) — el filtro es independiente del tamaño del activo.')}
+    <div id="treemap-container" style="width:100%;height:260px;position:relative;cursor:pointer"></div>
+    <div id="treemap-detail" style="display:none;margin-top:.6rem;padding:.65rem .85rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.18)"></div>
+    <div style="display:flex;gap:.6rem;margin-top:.6rem;flex-wrap:wrap;align-items:center">
+      <button onclick="refreshTreemap()" style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.08em;padding:.4rem 1rem;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.28);color:var(--gold);cursor:pointer">↺ Actualizar Mercado</button>
+      <div style="display:flex;gap:.5rem;align-items:center;font-size:.75rem;color:var(--tdim)">
+        <div style="width:10px;height:10px;background:rgba(240,192,64,.8);border-radius:2px"></div>Setup Activo
+        <div style="width:10px;height:10px;background:rgba(74,158,255,.6);border-radius:2px;margin-left:.5rem"></div>Tendencia sin retroceso
+        <div style="width:10px;height:10px;background:rgba(224,80,80,.55);border-radius:2px;margin-left:.5rem"></div>Bajista
+      </div>
+    </div>
+  </div>
+  <!-- Pine Terminal -->
+  <div class="chart-section" style="margin-top:.9rem">
+    <div class="blk-lbl" style="margin-bottom:.75rem">Terminal Pine Script v6 — Editor Interactivo</div>
+    <div style="background:#080C14;border:1px solid rgba(74,158,255,.22);border-radius:3px;overflow:hidden">
+      <!-- Terminal header -->
+      <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem .85rem;background:#0D1421;border-bottom:1px solid rgba(74,158,255,.12)">
+        <div style="width:9px;height:9px;border-radius:50%;background:#FF5F57"></div>
+        <div style="width:9px;height:9px;border-radius:50%;background:#FFBD2E"></div>
+        <div style="width:9px;height:9px;border-radius:50%;background:#28CA41"></div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.5rem;color:rgba(74,158,255,.6);letter-spacing:.08em;flex:1;text-align:center">PINE SCRIPT v6 · EDITOR</div>
+        <button onclick="compilePine()" style="font-family:'Orbitron',sans-serif;font-size:.48rem;letter-spacing:.07em;padding:.22rem .7rem;background:rgba(74,158,255,.15);border:1px solid rgba(74,158,255,.35);color:var(--blue);cursor:pointer">▶ COMPILAR</button>
+      </div>
+      <!-- Code area -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;min-height:200px">
+        <div style="border-right:1px solid rgba(74,158,255,.1);position:relative">
+          <div style="font-family:'Orbitron',sans-serif;font-size:.48rem;color:rgba(74,158,255,.4);padding:.4rem .85rem;border-bottom:1px solid rgba(74,158,255,.08)">CÓDIGO</div>
+          <textarea id="pine-editor" spellcheck="false" style="width:100%;height:180px;background:transparent;border:none;outline:none;resize:none;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:rgba(180,220,255,.85);padding:.6rem .85rem;line-height:1.7">//@version=6
+indicator("Filtro Estructural", overlay=true)
+
+int len = input.int(200, "EMA Longitud")
+string htf = input.timeframe("60", "HTF")
+
+emaLocal = ta.ema(close, len)
+plot(emaLocal, color=color.blue, linewidth=2)
+
+emaHtf = request.security(
+  syminfo.tickerid, htf,
+  ta.ema(close[1], len))
+
+bool alcista = close > emaHtf
+
+bgcolor(alcista
+  ? color.new(color.green, 95)
+  : color.new(color.red, 95))</textarea>
+        </div>
+        <div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:.48rem;color:rgba(74,158,255,.4);padding:.4rem .85rem;border-bottom:1px solid rgba(74,158,255,.08)">OUTPUT</div>
+          <div id="pine-output" style="padding:.6rem .85rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;line-height:1.7;color:rgba(180,220,255,.75);height:180px;overflow-y:auto">
+            <span style="color:rgba(74,158,255,.5)">// Presiona ▶ COMPILAR para ver el resultado</span>
+          </div>
+        </div>
+      </div>
+      <!-- Snippets -->
+      <div style="padding:.5rem .85rem;background:#0D1421;border-top:1px solid rgba(74,158,255,.12);display:flex;gap:.4rem;flex-wrap:wrap">
+        <div style="font-family:'Orbitron',sans-serif;font-size:.46rem;color:rgba(74,158,255,.4);align-self:center">SNIPPETS:</div>
+        ${[['BOS','bos = ta.crossover(close, ta.highest(high[1], 20))'],['EMA','ema50 = ta.ema(close, 50)'],['RSI','rsi = ta.rsi(close, 14)'],['Alert','alertcondition(bos, "BOS", "BOS detectado")']].map(([n,c])=>`<button onclick="insertSnippet(this)" data-code="${c}" style="font-family:'Orbitron',sans-serif;font-size:.48rem;padding:.2rem .55rem;background:rgba(74,158,255,.08);border:1px solid rgba(74,158,255,.2);color:var(--blue);cursor:pointer">${n}</button>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>`
+  };
+  return sections[type]||'';
+}
+
+/* ══════════════ PINE SECTION ══════════════ */
+function buildPineSection(type){
+  if(type!=='pine')return'';
+  return`<div class="blk">
+    <div class="blk-lbl">Código Pine Script v6 — Referencia Completa</div>
+    <div class="pine-box">
+      <div class="pine-tag">Pine Script v6 · Indicador No-Repintante · Compilar en TradingView Editor</div>
+      <pre class="pine-code">//@version=6
+indicator(<span class="s">"Filtro Estructural Ponderado - Taller Avanzado"</span>, overlay=<span class="k">true</span>)
+<span class="c">// ─── ENTRADAS ─────────────────────────────────</span>
+<span class="k">int</span>    longitudEma      = input.int(<span class="s">200</span>, title=<span class="s">"Longitud EMA Macro"</span>)
+<span class="k">string</span> temporalidadHtf = input.timeframe(<span class="s">"60"</span>, title=<span class="s">"Temporalidad HTF"</span>)
+<span class="c">// ─── CÁLCULO LOCAL + REMOTO ───────────────────</span>
+emaLocal = ta.ema(close, longitudEma)
+plot(emaLocal, color=color.blue, linewidth=<span class="s">2</span>, title=<span class="s">"EMA Local"</span>)
+emaHtf = request.security(syminfo.tickerid, temporalidadHtf,
+         ta.ema(close[<span class="s">1</span>], longitudEma), barmerge.gaps_off)
+<span class="c">// ─── LÓGICA + FONDO ───────────────────────────</span>
+<span class="k">bool</span> precioPorEncimaHtf = close &gt; emaHtf
+bgcolor(precioPorEncimaHtf ? color.new(color.green, <span class="s">95</span>) : color.new(color.red, <span class="s">95</span>))</pre>
+    </div>
+    <div class="alert-box"><strong>Pine Script v6</strong> (lanzado Mar 2025): evaluación lazy de booleanos, límite extendido de trades en Strategy Tester, y soporte de request.*() en loops y scopes locales.</div>
+  </div>`;
+}
+
+/* ══════════════ CHARTS ══════════════ */
+const G='#C9A84C',GB='#F0C040',GD='#8A6A20',R='#E05050',GR='#50C878',BL='#4A9EFF',DIM='rgba(255,255,255,0.42)';
+Chart.defaults.color=DIM;Chart.defaults.borderColor='rgba(201,168,76,0.1)';Chart.defaults.font.family='Rajdhani';
+function dc(id){if(charts[id]){try{charts[id].destroy();}catch(e){}}delete charts[id];}
+
+/* ─────────── initChart ─────────── */
+function initChart(type){
+  if(type==='arch'){initCandleChart();initGauges();}
+  if(type==='tools'){buildTools();updPS();}
+  if(type==='classic'){buildHeatmap();rebuildClassic();}
+  if(type==='smc'){smcReset();buildWyckoffRadar();}
+  if(type==='auto'){buildBubble();updateAlertPreview();}
+  if(type==='pine'){buildTreemap();updateAlertPreview();}
+}
+
+/* ═══════════════════════════════════
+   MÓDULO I — Animated Candle Chart
+═══════════════════════════════════ */
+let candleData=[];let candleInterval=null;
+const CANDLE_SEED=[62000,63500,61200,63200,63800,65200,63500,64900,64900,65500,63200,63600,62800,63900,62000,63500,63500,65000,63200,64700,64700,66100,64200,65800,65800,66500,64800,65200,65200,65800,64500,65600,65600,67000,65400,66800,66800,67500,65900,66100];
+function initCandleChart(){
+  candleData=[];
+  for(let i=0;i<CANDLE_SEED.length;i+=4){
+    candleData.push({o:CANDLE_SEED[i],h:CANDLE_SEED[i+1],l:CANDLE_SEED[i+2],c:CANDLE_SEED[i+3]});
+  }
+  drawCandleChart();
+  startTickerStrip();
+}
+function addCandle(){
+  const last=candleData[candleData.length-1];
+  const o=last.c;
+  const move=(Math.random()-.45)*800;
+  const c=Math.round(o+move);
+  const h=Math.round(Math.max(o,c)+(Math.random()*400));
+  const l=Math.round(Math.min(o,c)-(Math.random()*400));
+  candleData.push({o,h,l,c});
+  if(candleData.length>14)candleData.shift();
+  drawCandleChart();
+}
+function resetCandles(){candleData=[];initCandleChart();}
+function drawCandleChart(){
+  const svg=document.getElementById('candle-svg');if(!svg)return;
+  const W=svg.clientWidth||820;const H=260;
+  const prices=candleData.flatMap(c=>[c.h,c.l]);
+  const minP=Math.min(...prices)*0.999;const maxP=Math.max(...prices)*1.001;
+  const toY=p=>H*0.06+(H*0.88)*(1-(p-minP)/(maxP-minP));
+  const n=candleData.length;const cw=Math.max(8,Math.floor((W*0.88)/n));const pad=(W-cw*n)/2;
+  // Compute simple EMA for overlay
+  function emaArr(arr,k){const f=2/(k+1);let e=[arr[0].c];for(let i=1;i<arr.length;i++)e.push(arr[i].c*f+e[i-1]*(1-f));return e;}
+  const ema9=emaArr(candleData,3);
+  const bias=candleData[n-1].c>ema9[n-1];
+  // Background
+  let html=`<rect width="${W}" height="${H}" fill="${bias?'rgba(80,200,120,.03)':'rgba(224,80,80,.03)'}"/>`;
+  // Grid lines
+  for(let i=1;i<5;i++){const y=H*0.06+H*0.88*i/4;html+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="rgba(201,168,76,.06)" stroke-width=".5"/>`;}
+  // Price labels
+  for(let i=0;i<=4;i++){const p=minP+(maxP-minP)*i/4;const y=toY(p);html+=`<text x="${W-4}" y="${y+4}" font-family="Orbitron,sans-serif" font-size="8" fill="rgba(201,168,76,.45)" text-anchor="end">${Math.round(p).toLocaleString()}</text>`;}
+  // EMA line
+  const emaPoints=ema9.map((v,i)=>`${pad+i*cw+cw/2},${toY(v)}`).join(' ');
+  html+=`<polyline points="${emaPoints}" fill="none" stroke="rgba(74,158,255,.7)" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+  html+=`<text x="${pad+2}" y="${toY(ema9[0])-6}" font-family="Orbitron,sans-serif" font-size="7" fill="rgba(74,158,255,.6)">EMA</text>`;
+  // Candles
+  candleData.forEach((c,i)=>{
+    const x=pad+i*cw;const bull=c.c>=c.o;
+    const col=bull?'rgba(80,200,120,.88)':'rgba(224,80,80,.88)';
+    const bodyTop=toY(Math.max(c.o,c.c));const bodyH=Math.max(2,Math.abs(toY(c.o)-toY(c.c)));
+    const wickX=x+cw*0.48;
+    html+=`<g class="tv-candle-g" data-o="${c.o}" data-h="${c.h}" data-l="${c.l}" data-c="${c.c}" data-bull="${bull}" style="cursor:crosshair">
+      <line x1="${wickX}" y1="${toY(c.h)}" x2="${wickX}" y2="${toY(c.l)}" stroke="${col}" stroke-width="1.2"/>
+      <rect x="${x+cw*0.12}" y="${bodyTop}" width="${cw*0.72}" height="${bodyH}" fill="${col}" rx="1"/>
+      <rect x="${x}" y="${toY(c.h)}" width="${cw}" height="${toY(c.l)-toY(c.h)}" fill="transparent"/>
+    </g>`;
+  });
+  // Bias label
+  html+=`<rect x="6" y="6" width="100" height="18" rx="3" fill="${bias?'rgba(80,200,120,.15)':'rgba(224,80,80,.15)'}"/>
+  <text x="11" y="18" font-family="Orbitron,sans-serif" font-size="8" fill="${bias?'#50C878':'#E05050'}" font-weight="700">${bias?'▲ ALCISTA':'▼ BAJISTA'}</text>`;
+  svg.innerHTML=html;
+  // Hover tooltips
+  svg.querySelectorAll('.tv-candle-g').forEach(g=>{
+    g.addEventListener('mouseenter',e=>{
+      const t=document.getElementById('candle-tooltip');
+      const bull=g.dataset.bull==='true';
+      t.innerHTML=`<div style="color:${bull?'#50C878':'#E05050'};margin-bottom:3px">● ${bull?'ALCISTA':'BAJISTA'}</div>O: ${parseInt(g.dataset.o).toLocaleString()}<br>H: ${parseInt(g.dataset.h).toLocaleString()}<br>L: ${parseInt(g.dataset.l).toLocaleString()}<br>C: ${parseInt(g.dataset.c).toLocaleString()}`;
+      const rect=svg.getBoundingClientRect(),er=g.getBoundingClientRect();
+      t.style.display='block';
+      t.style.left=(er.left-rect.left+10)+'px';
+      t.style.top=(er.top-rect.top-10)+'px';
+    });
+    g.addEventListener('mouseleave',()=>{document.getElementById('candle-tooltip').style.display='none';});
+  });
+  // Update bias badge
+  const cb=document.getElementById('candle-bias');if(cb){
+    cb.textContent=bias?'▲ SESGO ALCISTA — EMA Institucional':'▼ SESGO BAJISTA — Precio bajo EMA';
+    cb.style.cssText=`font-family:'Orbitron',sans-serif;font-size:.52rem;padding:.3rem .8rem;letter-spacing:.07em;background:${bias?'rgba(80,200,120,.1)':'rgba(224,80,80,.1)'};border:1px solid ${bias?'rgba(80,200,120,.25)':'rgba(224,80,80,.25)'};color:${bias?'#50C878':'#E05050'}`;
+  }
+}
+function startTickerStrip(){
+  const strip=document.getElementById('ticker-strip');if(!strip)return;
+  const tickers=[['BTC/USDT','66,842','▲ +2.3%','#50C878'],['ETH/USDT','3,412','▲ +1.8%','#50C878'],['SOL/USDT','185','▼ -0.7%','#E05050'],['EUR/USD','1.0842','▲ +0.2%','#50C878'],['XAU/USD','2,385','▼ -0.4%','#E05050'],['SPX','5,248','▲ +0.9%','#50C878']];
+  strip.innerHTML=tickers.map(([sym,price,chg,col])=>`<div style="display:flex;gap:.4rem;align-items:center;padding:.2rem .6rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,.08);flex-shrink:0">
+    <span style="font-family:'Orbitron',sans-serif;font-size:.5rem;color:var(--tgold)">${sym}</span>
+    <span style="font-family:'Orbitron',sans-serif;font-size:.52rem;color:var(--tw)">${price}</span>
+    <span style="font-family:'Orbitron',sans-serif;font-size:.5rem;color:${col}">${chg}</span>
+  </div>`).join('');
+}
+function initGauges(){
+  setTimeout(()=>{
+    document.querySelectorAll('.gauge-arc').forEach(arc=>{
+      const val=parseInt(arc.dataset.val);
+      arc.setAttribute('stroke-dasharray',`${Math.round(val*1.508)} 150.8`);
+    });
+  },400);
+}
+
+/* ═══════════════════════════════════
+   MÓDULO II — Risk Gauge + Equity
+═══════════════════════════════════ */
+function updPS(){
+  const cap=parseInt(document.getElementById('ps-capital')?.value||10000);
+  const risk=parseFloat(document.getElementById('ps-risk')?.value||1);
+  const sl=parseInt(document.getElementById('ps-sl')?.value||50);
+  const dmg=cap*risk/100;
+  const size=dmg/sl;
+  document.getElementById('psv-cap').textContent='$'+cap.toLocaleString();
+  document.getElementById('psv-risk').textContent=risk.toFixed(1)+'%';
+  document.getElementById('psv-sl').textContent=sl+' pts';
+  document.getElementById('psv-dmg').textContent='$'+dmg.toFixed(0);
+  document.getElementById('psv-size').textContent=size.toFixed(2)+' lots';
+  document.getElementById('psv-gain').textContent='$'+(dmg*2).toFixed(0);
+  document.getElementById('psv-tp').textContent='+$'+(dmg*2).toFixed(0);
+  // Rotate needle: 0% riesgo = -90deg, 5% = +90deg
+  const angle=-90+(risk/5)*180;
+  const needle=document.getElementById('gauge-needle');
+  if(needle)needle.style.transform=`rotate(${angle}deg)`;
+  const gc=document.getElementById('gauge-center');
+  if(gc)gc.textContent=risk.toFixed(1)+'%';
+  const gl=document.getElementById('gauge-label');
+  if(gl){
+    if(risk<=1.5){gl.textContent='✓ GESTIÓN PROFESIONAL';gl.style.cssText='font-family:Orbitron,sans-serif;font-size:.58rem;letter-spacing:.1em;padding:.3rem .8rem;border-radius:2px;background:rgba(80,200,120,.1);border:1px solid rgba(80,200,120,.25);color:#50C878';}
+    else if(risk<=3){gl.textContent='⚠ ZONA DE PRECAUCIÓN';gl.style.cssText='font-family:Orbitron,sans-serif;font-size:.58rem;letter-spacing:.1em;padding:.3rem .8rem;border-radius:2px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#F59E0B';}
+    else{gl.textContent='✕ ZONA DE RUINA';gl.style.cssText='font-family:Orbitron,sans-serif;font-size:.58rem;letter-spacing:.1em;padding:.3rem .8rem;border-radius:2px;background:rgba(224,80,80,.1);border:1px solid rgba(224,80,80,.25);color:#E05050';}
+  }
+  buildTools();
+}
+function resimulateEquity(){buildTools();}
+function buildTools(){
+  dc('tools');const ctx=document.getElementById('chart-tools');if(!ctx)return;
+  const risk=parseFloat(document.getElementById('ps-risk')?.value||1)/100;
+  const winRate=0.55;const n=30;
+  let cap=10000;const data=[cap];const colors=[];
+  const ops=Array.from({length:n},()=>Math.random()<winRate);
+  ops.forEach(win=>{
+    const prev=cap;
+    cap=win?cap*(1+risk*2):cap*(1-risk);
+    data.push(Math.round(cap));
+    colors.push(win?'rgba(80,200,120,.7)':'rgba(224,80,80,.7)');
+  });
+  const maxDD=Math.round((1-Math.min(...data)/Math.max(...data.slice(0,data.indexOf(Math.min(...data))+1)))*100);
+  const finalPnl=Math.round(((cap-10000)/10000)*100);
+  charts.tools=new Chart(ctx,{type:'line',data:{
+    labels:['$0',...ops.map((_,i)=>`${i+1}`)],
+    datasets:[
+      {label:'Curva de Equity',data,borderColor:finalPnl>=0?GB:R,backgroundColor:finalPnl>=0?'rgba(240,192,64,.06)':'rgba(224,80,80,.06)',tension:.4,fill:true,pointRadius:4,pointHoverRadius:6,
+       pointBackgroundColor:[GB,...colors],pointBorderColor:'transparent'},
+      {label:'Capital inicial',data:Array(n+1).fill(10000),borderColor:'rgba(255,255,255,.2)',backgroundColor:'transparent',borderDash:[6,4],pointRadius:0,borderWidth:1}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{color:DIM,boxWidth:10}},tooltip:{callbacks:{label:c=>c.datasetIndex===0?`Capital: $${c.parsed.y.toLocaleString()}`:'Capital inicial: $10,000'}}},
+    scales:{x:{ticks:{color:DIM,font:{size:9},maxTicksLimit:10},grid:{color:'rgba(201,168,76,0.03)'}},y:{ticks:{color:DIM,callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(201,168,76,0.03)'}}}}});
+  // Stats
+  const statsEl=document.getElementById('equity-stats');
+  if(statsEl){
+    const statsData=[
+      ['Capital Final','$'+cap.toLocaleString(),cap>=10000?'g':'r'],
+      ['P&L Total',(finalPnl>=0?'+':'')+finalPnl+'%',finalPnl>=0?'g':'r'],
+      ['Max Drawdown','-'+maxDD+'%',maxDD<=15?'g':maxDD<=30?'':'r'],
+      ['Win Rate',ops.filter(Boolean).length+'/'+n,'']
+    ];
+    statsEl.innerHTML=statsData.map(([l,v,c])=>`<div class="wr"><div class="wr-l">${l}</div><div class="wr-v ${c}">${v}</div></div>`).join('');
+  }
+}
+
+/* ═══════════════════════════════════
+   MÓDULO III — Heatmap + EMA Chart
+═══════════════════════════════════ */
+const HEATMAP_ASSETS=['BTC/USDT','ETH/USDT','SOL/USDT','EUR/USD','XAU/USD','SPX','BNB/USDT','AAPL'];
+const HEATMAP_TFS=['1D','4H','1H','15M'];
+let heatmapData=[];
+function buildHeatmap(){
+  heatmapData=HEATMAP_ASSETS.map(a=>HEATMAP_TFS.map(()=>Math.floor(Math.random()*3)));
+  renderHeatmap();
+}
+function renderHeatmap(){
+  const con=document.getElementById('heatmap-container');if(!con)return;
+  const states=['🔴 BAJISTA','⚠️ MIXTO','🟢 ALCISTA'];
+  const colors=['rgba(224,80,80,.65)','rgba(245,158,11,.55)','rgba(80,200,120,.65)'];
+  const textC=['#E05050','#F59E0B','#50C878'];
+  let html=`<div style="display:grid;grid-template-columns:80px repeat(4,1fr);gap:3px">`;
+  html+=`<div></div>${HEATMAP_TFS.map(tf=>`<div style="font-family:'Orbitron',sans-serif;font-size:.5rem;color:var(--tmuted);text-align:center;padding:.3rem 0;letter-spacing:.08em">${tf}</div>`).join('')}`;
+  heatmapData.forEach((row,ri)=>{
+    html+=`<div style="font-family:'Orbitron',sans-serif;font-size:.5rem;color:var(--tgold);display:flex;align-items:center;padding-right:.4rem;letter-spacing:.04em">${HEATMAP_ASSETS[ri]}</div>`;
+    row.forEach((v,ci)=>{
+      html+=`<div onclick="showHeatmapDetail(${ri},${ci})" style="background:${colors[v]};padding:.45rem .2rem;text-align:center;cursor:pointer;transition:all .2s;font-family:'Orbitron',sans-serif;font-size:.48rem;color:${textC[v]};font-weight:700;letter-spacing:.04em;border:1.5px solid transparent" class="hm-cell" data-ri="${ri}" data-ci="${ci}">${v===2?'▲ BUY':v===0?'▼ SELL':'─'}</div>`;
+    });
+  });
+  html+=`</div>`;
+  con.innerHTML=html;
+}
+function showHeatmapDetail(ri,ci){
+  const asset=HEATMAP_ASSETS[ri];const tf=HEATMAP_TFS[ci];const v=heatmapData[ri][ci];
+  const ema50=Math.round(60000+Math.random()*5000);const ema200=Math.round(ema50*(0.92+Math.random()*0.05));
+  const price=Math.round(ema50*(v===2?1.02:v===0?0.97:1.01));
+  const d=document.getElementById('heatmap-detail');
+  d.style.display='block';
+  d.innerHTML=`<div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-start">
+    <div><div style="font-family:'Orbitron',sans-serif;font-size:.52rem;color:var(--gold);margin-bottom:.3rem">${asset} · ${tf}</div>
+    <div style="font-size:.85rem;color:var(--tdim)">Precio: <strong style="color:var(--tw)">${price.toLocaleString()}</strong> · EMA 50: <strong style="color:#4A9EFF">${ema50.toLocaleString()}</strong> · EMA 200: <strong style="color:#F59E0B">${ema200.toLocaleString()}</strong></div>
+    <div style="font-size:.83rem;color:var(--tdim);margin-top:.3rem">${v===2?'✅ Precio > EMA50 > EMA200 — Régimen alcista confirmado. Solo buscar compras en retrocesos.':v===0?'❌ Precio < EMA50 < EMA200 — Régimen bajista confirmado. Solo buscar ventas en rebotes.':'⚠️ Señales mixtas — EMA50 y EMA200 en conflicto. Evitar nuevas posiciones hasta claridad.'}</div></div>
+  </div>`;
+  document.querySelectorAll('.hm-cell').forEach(c=>c.style.border='1.5px solid transparent');
+  document.querySelector(`.hm-cell[data-ri="${ri}"][data-ci="${ci}"]`).style.border='1.5px solid var(--gold-b)';
+}
+function rebuildClassic(){
+  const period=parseInt(document.getElementById('ema-period')?.value||20);
+  const pv=document.getElementById('ema-period-v');if(pv)pv.textContent=period;
+  dc('classic');const ctx=document.getElementById('chart-classic');if(!ctx)return;
+  const price=[];let p=100;
+  for(let i=0;i<60;i++){p+=((Math.random()-.44)*3);price.push(Math.round(p*10)/10);}
+  const k=2/(period+1);function calcEMA(data){let e=[data[0]];for(let i=1;i<data.length;i++)e.push(data[i]*k+e[i-1]*(1-k));return e;}
+  function calcSMA(data){return data.map((_,i)=>i<period-1?null:data.slice(i-period+1,i+1).reduce((a,b)=>a+b,0)/period);}
+  const ema=calcEMA(price);const sma=calcSMA(price);
+  // Fill between EMA and SMA
+  charts.classic=new Chart(ctx,{type:'line',data:{
+    labels:Array.from({length:60},(_,i)=>`${i+1}`),
+    datasets:[
+      {label:'Precio',data:price,borderColor:'rgba(255,255,255,.4)',backgroundColor:'transparent',tension:.3,pointRadius:0,borderWidth:1,borderDash:[3,3]},
+      {label:`EMA ${period}`,data:ema,borderColor:GB,backgroundColor:'rgba(240,192,64,.08)',tension:.4,pointRadius:0,borderWidth:2.5,fill:'-1'},
+      {label:`SMA ${period}`,data:sma,borderColor:BL,backgroundColor:'transparent',tension:.4,pointRadius:0,borderWidth:2,borderDash:[5,3]}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:DIM,boxWidth:10}}},
+  scales:{x:{ticks:{display:false},grid:{display:false}},y:{ticks:{color:DIM},grid:{color:'rgba(201,168,76,0.04)'}}}}});
+}
+
+/* ═══════════════════════════════════
+   MÓDULO IV — SMC SVG Simulator
+═══════════════════════════════════ */
+let smcStep=0;
+const SMC_STEPS=[
+  {label:'Estructura inicial: HH y HL (Higher Highs y Higher Lows)',draw:drawSMCBase},
+  {label:'Zona de Demanda: Order Block (OB) de donde salió el impulso',draw:drawSMCOB},
+  {label:'BOS: El precio rompe en CUERPO el último HH — continuación confirmada',draw:drawSMCBOS},
+  {label:'Retroceso a zona de OB — recarga de liquidez institucional',draw:drawSMCRetrace},
+  {label:'CHoCH: Precio cierra en CUERPO bajo el último HL — cambio de carácter',draw:drawSMCChoch},
+];
+function smcReset(){smcStep=0;drawSMCBase();const si=document.getElementById('smc-step-info');if(si)si.textContent='Paso 1/5 — Presiona "Siguiente" para continuar';}
+function smcNext(){
+  smcStep=Math.min(smcStep+1,SMC_STEPS.length-1);
+  SMC_STEPS[smcStep].draw();
+  const si=document.getElementById('smc-step-info');
+  if(si)si.textContent=`Paso ${smcStep+1}/${SMC_STEPS.length}: ${SMC_STEPS[smcStep].label}`;
+  const btn=document.getElementById('smc-next-btn');
+  if(btn)btn.textContent=smcStep>=SMC_STEPS.length-1?'✓ Completo':'Siguiente →';
+}
+function getSMCsvg(){return document.getElementById('smc-svg');}
+// Price path: 10 pivots defining the SMC structure
+const P=[
+  [60,200],[140,100],[200,160],[290,60],[360,120],[440,30],[510,90],[580,170],[650,80],[740,200]
+];// [x,y] in viewBox 800x280
+function drawSMCBase(){
+  const svg=getSMCsvg();if(!svg)return;
+  let html=`<rect width="800" height="280" fill="rgba(10,14,26,.5)"/>`;
+  // Grid
+  for(let i=1;i<4;i++)html+=`<line x1="0" y1="${i*70}" x2="800" y2="${i*70}" stroke="rgba(201,168,76,.04)" stroke-width=".5"/>`;
+  // Price path (zigzag)
+  html+=`<polyline points="${P.map(p=>p.join(',')).join(' ')}" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+  // HH and HL labels
+  [[290,60,'HH1','#F0C040'],[440,30,'HH2','#F0C040'],[200,160,'HL1','#50C878'],[360,120,'HL2','#50C878']].forEach(([x,y,label,col])=>{
+    html+=`<circle cx="${x}" cy="${y}" r="5" fill="${col}" opacity=".8"/>
+    <text x="${x+8}" y="${y-8}" font-family="Orbitron,sans-serif" font-size="10" fill="${col}" font-weight="700">${label}</text>`;
+  });
+  // Title
+  html+=`<text x="10" y="20" font-family="Orbitron,sans-serif" font-size="9" fill="rgba(201,168,76,.6)" letter-spacing="2">ESTRUCTURA ALCISTA — HH + HL</text>`;
+  svg.innerHTML=html;attachSMCTooltips();
+}
+function drawSMCOB(){
+  drawSMCBase();
+  const svg=getSMCsvg();
+  // Order Block zone before HL2
+  let extra=`<rect x="310" y="100" width="55" height="50" fill="rgba(74,158,255,.12)" stroke="#4A9EFF" stroke-width="1.2" stroke-dasharray="4 2"/>
+  <text x="315" y="145" font-family="Orbitron,sans-serif" font-size="8" fill="#4A9EFF">OB · DEMANDA</text>`;
+  svg.innerHTML+=extra;
+}
+function drawSMCBOS(){
+  drawSMCOB();
+  const svg=getSMCsvg();
+  // BOS line at HH2 level (y=30) — price breaks it at x=440
+  let extra=`<line x1="440" y1="30" x2="800" y2="30" stroke="#50C878" stroke-width="1.2" stroke-dasharray="5 3" opacity=".7"/>
+  <rect x="455" y="10" width="55" height="16" rx="2" fill="rgba(80,200,120,.15)"/>
+  <text x="460" y="21" font-family="Orbitron,sans-serif" font-size="9" fill="#50C878" font-weight="700">BOS ↑</text>
+  <path d="M 510 90 L 440 30" stroke="rgba(80,200,120,.4)" stroke-width=".8" stroke-dasharray="3 2"/>`;
+  svg.innerHTML+=extra;
+}
+function drawSMCRetrace(){
+  drawSMCBOS();
+  const svg=getSMCsvg();
+  let extra=`<path d="M 510 90 Q 550 130 580 170" stroke="#F0C040" stroke-width="2" fill="none"/>
+  <circle cx="580" cy="170" r="6" fill="#F0C040" opacity=".85"/>
+  <rect x="555" y="175" width="90" height="16" rx="2" fill="rgba(240,192,64,.12)"/>
+  <text x="560" y="186" font-family="Orbitron,sans-serif" font-size="8" fill="#F0C040">RETRACE A OB</text>`;
+  svg.innerHTML+=extra;
+}
+function drawSMCChoch(){
+  drawSMCRetrace();
+  const svg=getSMCsvg();
+  // CHoCH — price breaks below last HL2 (y=120)
+  let extra=`<rect width="800" height="280" fill="rgba(224,80,80,.03)"/>
+  <line x1="580" y1="120" x2="800" y2="120" stroke="#E05050" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <rect x="655" y="100" width="90" height="18" rx="2" fill="rgba(224,80,80,.2)"/>
+  <text x="660" y="113" font-family="Orbitron,sans-serif" font-size="9" fill="#E05050" font-weight="700">CHoCH ↓</text>
+  <path d="M 580 170 L 650 80 L 740 200" stroke="#E05050" stroke-width="2" fill="none"/>
+  <text x="10" y="270" font-family="Orbitron,sans-serif" font-size="9" fill="rgba(224,80,80,.7)" letter-spacing="1">⚠ CAMBIO DE CARÁCTER — SESGO CAMBIA A BAJISTA</text>`;
+  svg.innerHTML+=extra;
+}
+function attachSMCTooltips(){
+  const svg=getSMCsvg();
+  svg.addEventListener('click',e=>{
+    const rect=svg.getBoundingClientRect();
+    const x=((e.clientX-rect.left)/rect.width)*800;const y=((e.clientY-rect.top)/rect.height)*280;
+    const tt=document.getElementById('smc-tooltip');if(!tt)return;
+    let msg='';
+    if(x>280&&x<310&&y<80)msg='HH2: Higher High — máximo estructural más alto. El BOS se confirma cuando el cuerpo de la vela cierra por encima de este nivel.';
+    else if(x>350&&x<380&&y>100)msg='HL2: Higher Low — mínimo estructural más alto. Si el precio cierra en cuerpo por debajo, se produce el CHoCH bajista.';
+    else if(x>310&&x<365&&y>90&&y<155)msg='Order Block (OB) de Demanda: zona de precio de donde salió el impulso alcista. Las instituciones dejan órdenes de compra pendientes aquí.';
+    else if(x>440&&x<520)msg='BOS (Break of Structure): el precio cerró en cuerpo por encima del último HH2 — confirma continuación alcista.';
+    else if(x>630&&y>100)msg='CHoCH (Change of Character): el precio cerró en cuerpo por debajo del último HL2 — primera señal de que las instituciones venden. Cambiar sesgo a neutral/bajista.';
+    if(msg){tt.textContent=msg;tt.style.display='block';tt.style.left=Math.min(e.clientX-rect.left+10,rect.width-220)+'px';tt.style.top=Math.max(e.clientY-rect.top-50,0)+'px';}
+    else tt.style.display='none';
+  });
+}
+
+/* ─── Wyckoff Radar ─── */
+let wyckoffActive='Todas';
+function buildWyckoffRadar(){
+  dc('smc');const ctx=document.getElementById('chart-smc');if(!ctx)return;
+  const labels=['Volumen','Volatilidad','Momentum','Estructura','Duración'];
+  const allDatasets=[
+    {label:'Acumulación',data:[30,20,15,60,80],borderColor:BL,backgroundColor:'rgba(74,158,255,.12)',pointBackgroundColor:BL,pointRadius:5},
+    {label:'Markup',data:[75,70,90,85,55],borderColor:GR,backgroundColor:'rgba(80,200,120,.1)',pointBackgroundColor:GR,pointRadius:5},
+    {label:'Distribución',data:[85,65,40,60,50],borderColor:R,backgroundColor:'rgba(224,80,80,.1)',pointBackgroundColor:R,pointRadius:5},
+    {label:'Markdown',data:[70,80,15,45,45],borderColor:'#A070FF',backgroundColor:'rgba(160,112,255,.1)',pointBackgroundColor:'#A070FF',pointRadius:5}
+  ];
+  const filtered=wyckoffActive==='Todas'?allDatasets:allDatasets.filter(d=>d.label===wyckoffActive);
+  charts.smc=new Chart(ctx,{type:'radar',data:{labels,datasets:filtered},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:DIM,boxWidth:10,font:{size:11}}}},
+  scales:{r:{ticks:{color:DIM,backdropColor:'transparent',stepSize:20},grid:{color:'rgba(201,168,76,0.12)'},pointLabels:{color:DIM,font:{size:12}},min:0,max:100}}}});
+}
+function filterWyckoff(phase){
+  wyckoffActive=phase;
+  document.querySelectorAll('.wyckoff-btn').forEach(b=>{b.style.borderColor=b.textContent===phase?'var(--gold)':'rgba(201,168,76,.2)';b.style.color=b.textContent===phase?'var(--gold)':'var(--tmuted)';});
+  buildWyckoffRadar();
+}
+
+/* ═══════════════════════════════════
+   MÓDULO V — Bubble Chart + Alert Simulator
+═══════════════════════════════════ */
+function buildBubble(){
+  dc('auto');const ctx=document.getElementById('chart-auto');if(!ctx)return;
+  // x=WinRate, y=ProfitFactor, r=Drawdown*2, label
+  const strats=[
+    {x:52,y:1.65,r:14,label:'EMA Cross',color:'rgba(74,158,255,.7)'},
+    {x:48,y:2.10,r:11,label:'SMC + BOS',color:'rgba(240,192,64,.8)'},
+    {x:57,y:1.80,r:16,label:'RSI Divergencia',color:'rgba(80,200,120,.7)'},
+    {x:68,y:1.25,r:22,label:'Scalping 5M',color:'rgba(224,80,80,.7)'},
+    {x:38,y:2.45,r:8,label:'Trend Following',color:'rgba(160,112,255,.75)'},
+    {x:72,y:0.95,r:28,label:'News Trading',color:'rgba(245,158,11,.65)'}
+  ];
+  charts.auto=new Chart(ctx,{type:'bubble',data:{datasets:strats.map(s=>({label:s.label,data:[{x:s.x,y:s.y,r:s.r}],backgroundColor:s.color,borderColor:s.color.replace('.7','1').replace('.8','1').replace('.65','1').replace('.75','1')}))},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{
+    legend:{labels:{color:DIM,boxWidth:8,font:{size:10}}},
+    tooltip:{callbacks:{label:c=>`${c.dataset.label}: WR=${c.parsed.x}% · PF=${c.parsed.y} · DD~${c.parsed._custom}%`}},
+    annotation:{annotations:{zone:{type:'box',xMin:45,xMax:75,yMin:1.5,yMax:2.5,backgroundColor:'rgba(201,168,76,.05)',borderColor:'rgba(201,168,76,.35)',borderWidth:1}}}
+  },
+  scales:{x:{title:{display:true,text:'Win Rate (%)',color:DIM,font:{size:11}},ticks:{color:DIM},grid:{color:'rgba(201,168,76,0.04)'},min:25,max:85},
+           y:{title:{display:true,text:'Profit Factor',color:DIM,font:{size:11}},ticks:{color:DIM},grid:{color:'rgba(201,168,76,0.04)'},min:0.5,max:3}}}});
+  // Draw professional zone manually with a canvas overlay
+  setTimeout(()=>{
+    const canvas=ctx;const c=canvas.getContext('2d');
+    // Zone label
+    const xScale=charts.auto.scales.x;const yScale=charts.auto.scales.y;
+    if(xScale&&yScale){
+      const x1=xScale.getPixelForValue(45);const x2=xScale.getPixelForValue(75);
+      const y1=yScale.getPixelForValue(2.5);const y2=yScale.getPixelForValue(1.5);
+      c.strokeStyle='rgba(201,168,76,.4)';c.lineWidth=1.5;c.setLineDash([5,3]);
+      c.strokeRect(x1,y1,x2-x1,y2-y1);
+      c.font='700 9px Orbitron,sans-serif';c.fillStyle='rgba(201,168,76,.55)';
+      c.fillText('ZONA PROFESIONAL',x1+4,y1+14);c.setLineDash([]);
+    }
+  },200);
+}
+function updateAlertPreview(){
+  const cond=document.getElementById('alert-cond')?.value||'Cruzando';
+  const freq=document.getElementById('alert-freq')?.value||'Una vez por cierre de barra';
+  const p=document.getElementById('alert-preview');if(!p)return;
+  p.innerHTML=`<span style="color:rgba(74,158,255,.6)">// Alerta configurada — TradingView Cloud</span>\n<span style="color:#F0C040">Condición:</span> Zona de Demanda → <span style="color:#50C878">${cond}</span>\n<span style="color:#F0C040">Frecuencia:</span> <span style="color:#50C878">${freq}</span>\n<span style="color:#F0C040">Mensaje:</span> <span style="color:rgba(255,255,255,.7)">"ALERTA INST: Precio ingresó a zona 4H.\nMonitorear CHoCH en 5M para gatillar posición."</span>`;
+}
+
+/* ═══════════════════════════════════
+   MÓDULO VI — Treemap + Pine Terminal
+═══════════════════════════════════ */
+const TREEMAP_ASSETS=[
+  {name:'BTC',size:100,group:0},{name:'ETH',size:55,group:1},{name:'BNB',size:22,group:2},
+  {name:'SOL',size:18,group:0},{name:'XRP',size:15,group:2},{name:'ADA',size:10,group:1},
+  {name:'AVAX',size:9,group:0},{name:'MATIC',size:8,group:1},{name:'LINK',size:7,group:2},
+  {name:'DOT',size:6,group:2},{name:'UNI',size:5,group:0},{name:'ATOM',size:4,group:1}
+];
+const TREE_COLORS=['rgba(240,192,64,.82)','rgba(74,158,255,.65)','rgba(224,80,80,.6)'];
+const TREE_LABELS=['Setup Activo ✓','Tendencia / Sin retroceso','Bajista'];
+function buildTreemap(){
+  const con=document.getElementById('treemap-container');if(!con)return;
+  const W=con.clientWidth||860;const H=260;
+  // Simple squarify-like layout
+  const total=TREEMAP_ASSETS.reduce((s,a)=>s+a.size,0);
+  let rects=[];let x=0,y=0,rowH=0,rowItems=[],rowTotal=0;
+  const ratio=W/H;
+  TREEMAP_ASSETS.forEach((asset,i)=>{
+    rowItems.push(asset);rowTotal+=asset.size;
+    rowH=rowTotal/total*H;
+    let rx=x;
+    rowItems.forEach(ri=>{
+      const rw=(ri.size/rowTotal)*(W-x);
+      rects.push({...ri,rx:Math.round(rx),ry:Math.round(y),rw:Math.max(Math.round(rw)-2,2),rh:Math.max(Math.round(rowH)-2,2)});
+      rx+=rw;
+    });
+    if((rowTotal/total)*ratio>0.8||i===TREEMAP_ASSETS.length-1){
+      y+=rowH;x=0;rowItems=[];rowTotal=0;
+    }
+  });
+  // Render as SVG
+  let html=`<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">`;
+  rects.forEach(r=>{
+    const col=TREE_COLORS[r.group];
+    const fs=Math.min(13,Math.max(7,r.rw/4));
+    html+=`<g class="tree-cell" data-name="${r.name}" data-group="${r.group}" data-size="${r.size}" style="cursor:pointer">
+      <rect x="${r.rx}" y="${r.ry}" width="${r.rw}" height="${r.rh}" fill="${col}" rx="2" stroke="rgba(0,0,0,.5)" stroke-width=".8"/>
+      ${r.rw>30&&r.rh>18?`<text x="${r.rx+r.rw/2}" y="${r.ry+r.rh/2+fs*0.35}" font-family="Orbitron,sans-serif" font-size="${fs}" fill="rgba(0,0,0,.85)" text-anchor="middle" font-weight="700">${r.name}</text>`:''}
+      ${r.rw>40&&r.rh>32?`<text x="${r.rx+r.rw/2}" y="${r.ry+r.rh/2+fs}" font-family="Orbitron,sans-serif" font-size="${fs*0.75}" fill="rgba(0,0,0,.65)" text-anchor="middle">${r.group===0?'BUY':r.group===1?'WAIT':'SELL'}</text>`:''}
+    </g>`;
+  });
+  html+=`</svg>`;
+  con.innerHTML=html;
+  // Click handlers
+  con.querySelectorAll('.tree-cell').forEach(cell=>{
+    cell.addEventListener('click',()=>{
+      const d=document.getElementById('treemap-detail');if(!d)return;
+      const g=parseInt(cell.dataset.group);
+      const rsi=Math.round(25+Math.random()*20);const ema200diff=g===0?'+5.2%':g===1?'+2.1%':'-3.8%';
+      d.style.display='block';
+      d.innerHTML=`<div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <div style="font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:${TREE_COLORS[g].replace('.82','1').replace('.65','1').replace('.6','1')}">${cell.dataset.name}</div>
+        <div style="font-size:.84rem;color:var(--tdim)"><strong>Estado:</strong> ${TREE_LABELS[g]}</div>
+        <div style="font-size:.84rem;color:var(--tdim)"><strong>Precio vs EMA200:</strong> ${ema200diff} · <strong>RSI(14):</strong> ${rsi} · <strong>Cambio% hoy:</strong> ${g===0?'+1.8%':g===2?'-2.1%':'+0.4%'}</div>
+        <div style="font-size:.83rem;color:var(--tdim)">${g===0?'✅ Las 3 condiciones del filtro se cumplen — candidato para revisar en detalle.':g===1?'⏳ Tendencia alcista confirmada pero sin retroceso técnico — esperar RSI<40 para entrada.':'❌ Tendencia bajista activa — excluir del radar de compras hasta CHoCH confirmado.'}</div>
+      </div>`;
+    });
+  });
+}
+function refreshTreemap(){
+  TREEMAP_ASSETS.forEach(a=>a.group=Math.floor(Math.random()*3));
+  buildTreemap();
+  const d=document.getElementById('treemap-detail');if(d)d.style.display='none';
+}
+// Pine terminal
+function compilePine(){
+  const code=document.getElementById('pine-editor')?.value||'';
+  const out=document.getElementById('pine-output');if(!out)return;
+  out.innerHTML='';
+  const lines=code.split('\n');
+  let html='';
+  // Simple syntax colorizer for output simulation
+  const delay_log=[
+    {d:100,msg:`<span style="color:rgba(74,158,255,.6)">// Compilando Pine Script v6...</span>`},
+    {d:400,msg:`<span style="color:#50C878">✓ Sintaxis válida</span>`},
+    {d:700,msg:`<span style="color:#50C878">✓ Versión: Pine Script v6</span>`},
+    {d:1000,msg:`<span style="color:#50C878">✓ ${lines.filter(l=>l.trim()&&!l.trim().startsWith('//'))
+      .length} instrucciones compiladas</span>`},
+    {d:1300,msg:`<span style="color:#F0C040">→ indicator() detectado: overlay=true</span>`},
+    {d:1600,msg:`<span style="color:#F0C040">→ request.security() con close[1]: no-repainting ✓</span>`},
+    {d:1900,msg:`<span style="color:#F0C040">→ bgcolor() dinámico: sesgo visual activado ✓</span>`},
+    {d:2200,msg:`<span style="color:#50C878">✓ Compilación exitosa — Añadir al gráfico disponible</span>`},
+    {d:2500,msg:`<span style="color:rgba(80,200,120,.5)">// Resultado: fondo verde cuando precio > EMA HTF · fondo rojo cuando precio < EMA HTF</span>`}
+  ];
+  delay_log.forEach(item=>{
+    setTimeout(()=>{
+      if(!out)return;
+      out.innerHTML+=item.msg+'<br>';
+      out.scrollTop=out.scrollHeight;
+    },item.d);
+  });
+}
+function insertSnippet(btn){
+  const editor=document.getElementById('pine-editor');if(!editor)return;
+  const pos=editor.selectionStart;const code=editor.dataset.code;
+  editor.value=editor.value.slice(0,pos)+'\n'+code+editor.value.slice(pos);
+}
+
+/* ══════════════ HELPERS ══════════════ */
+function toggleExplain(id){
+  const b=document.getElementById('ce-'+id),btn=document.getElementById('ceb-'+id);
+  if(!b||!btn)return;
+  const open=b.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  btn.textContent=open?'✕ Cerrar explicación':'? Cómo leer esta gráfica';
+}
+function toggleStep(sid){
+  const b=document.getElementById('body-'+sid),a=document.getElementById('arr-'+sid);
+  if(!b)return;
+  const open=b.classList.toggle('open');
+  if(a)a.style.transform=open?'rotate(90deg)':'';
+}
+function markStep(modId,stepIdx){
+  if(!stepsDone[modId])stepsDone[modId]=new Set();
+  stepsDone[modId].add(stepIdx);
+  const steps=STEPS[MODULES[modId].chart]||[];
+  const dc=stepsDone[modId].size;
+  const pct=Math.round((dc/steps.length)*100);
+  const mpf=document.getElementById('mpf-'+modId),mpc=document.getElementById('mpc-'+modId);
+  if(mpf)mpf.style.width=pct+'%';
+  if(mpc)mpc.textContent=dc+'/'+steps.length;
+  const sid='s'+modId+'-'+stepIdx;
+  const card=document.getElementById('sc-'+sid);
+  const mkbtn=document.getElementById('btn-'+sid);
+  const num=document.getElementById('sn-'+sid);
+  if(card)card.classList.add('done-s');
+  if(mkbtn){mkbtn.textContent='✓ Completado';mkbtn.className='step-done-btn already';}
+  if(num){num.textContent='✓';num.style.cssText='background:var(--green);border-color:var(--green);color:#000';}
+}
+function openModule(id){
+  const m=MODULES[id];
+  document.getElementById('ci').innerHTML=moduleContent(m);
+  goScr('content');
+  setProgress(Math.round((done.size/TOTAL)*100),m.num+' — '+m.title);
+  setTimeout(function(){initChart(m.chart);},280);
+}
+function completeModule(id){ saveProgress();
+  done.add(id);
+  if(id<TOTAL-1)openModule(id+1);
+  else{renderMenu();goScr('menu');}
+}
+function restartApp(){
+  done.clear();stepsDone={};
+  Object.values(charts).forEach(function(ch){try{ch.destroy();}catch(e){}});
+  charts={};
+  quizState={started:false,level:0,score:0,answered:false,answers:[]};
+  goScr('hero');setProgress(0,'Bienvenida');
+}
+function showCert(){
+  document.getElementById('cert-mods').innerHTML=MODULES.map(function(m){return'<div class="cert-mod">'+m.num+'<br>'+m.title+'</div>';}).join('');
+  goScr('cert');setProgress(100,'¡Completado!');
+}
+
+/* ─── CARGAR PROGRESO AL INICIAR ─── */
+setTimeout(function(){
+  var hadProgress=loadProgress();
+  if(hadProgress){
+    var banner=document.getElementById('resume-banner');
+    var txt=document.getElementById('resume-text');
+    if(banner&&txt){
+      var last=getLastSaved();
+      var mods=done.size;
+      txt.textContent=mods+' módulo'+(mods!==1?'s':'')+' completado'+(mods!==1?'s':'')+(last?' · Última sesión: '+last.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'');
+      banner.style.display='flex';
+    }
+    renderMenu&&renderMenu();
+    goScr('menu');
+  }
+},150);
+
+
+/* ═══════════ PARTICLES ═══════════ */
+(function(){
+  const c=document.getElementById('cvs'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();addEventListener('resize',resize);
+  class P{constructor(){this.reset(true);}
+    reset(r){this.x=Math.random()*W;this.y=r?Math.random()*H:H+5;
+      this.vx=(Math.random()-.5)*.2;this.vy=-(Math.random()*.3+.07);
+      this.r=Math.random()*1.2+.28;this.a=Math.random()*.38+.08;this.da=(Math.random()-.5)*.0032;}
+    update(){this.x+=this.vx;this.y+=this.vy;this.a+=this.da;
+      if(this.a<.05)this.da=Math.abs(this.da);if(this.a>.62)this.da=-Math.abs(this.da);
+      if(this.y<-5||this.x<-10||this.x>W+10)this.reset(false);}
+    draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(201,168,76,${this.a})`;ctx.fill();}}
+  for(let i=0;i<80;i++)pts.push(new P());
+  function lines(){for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+    const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<95){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+      ctx.strokeStyle=`rgba(201,168,76,${.09*(1-d/95)})`;ctx.lineWidth=.3;ctx.stroke();}}}
+  function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw();});lines();requestAnimationFrame(loop);}
+  loop();
+})();
+</script>
+</body>
+</html>

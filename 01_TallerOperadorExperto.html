@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taller Operador Experto — Exchanges 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;--gold-b:#F0C040;--gold-dim:#8A6A20;--gold-glow:#FFD700;
+  --bcard:#0D0D0D;--bpanel:#111;--bpanel2:#161616;
+  --bg:rgba(201,168,76,0.22);--bgb:rgba(240,192,64,0.5);
+  --tgold:#C9A84C;--tgoldb:#F0C040;--tmuted:rgba(201,168,76,0.5);
+  --tw:rgba(255,255,255,0.93);--tdim:rgba(255,255,255,0.62);
+  --red:#E05050;--green:#50C878;--blue:#4A9EFF;--purple:#A070FF;
+  --bybit:#F7A600;--binance:#F0B90B;
+}
+html,body{width:100%;min-height:100vh;background:#000;overflow-x:hidden;font-family:'Rajdhani',sans-serif;color:var(--tw);line-height:1.65}
+#cvs{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.28}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(201,168,76,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.025) 1px,transparent 1px);
+  background-size:55px 55px}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ─ NAV ─ */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.8rem;
+  border-bottom:1px solid var(--bg);background:rgba(0,0,0,0.88);
+  backdrop-filter:blur(20px);position:sticky;top:0;z-index:200;gap:1rem;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:.75rem;cursor:pointer;flex-shrink:0}
+.logo-ring{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:glow 4s ease infinite}
+@keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 14px rgba(201,168,76,0.4)}}
+.logo-txt{font-family:'Orbitron',sans-serif;font-size:.6rem;color:var(--tgold);letter-spacing:.1em;text-transform:uppercase;line-height:1.4}
+.logo-txt b{display:block;font-size:.48rem;color:var(--tmuted);letter-spacing:.16em;font-weight:400}
+.nav-prog{flex:1;max-width:260px}
+.plbl{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:4px}
+.ptrack{height:2px;background:rgba(201,168,76,0.1);border-radius:2px}
+.pbar{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease}
+.nbadge{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.09em;padding:.28rem .75rem;border:1px solid var(--bgb);color:var(--tgoldb);text-transform:uppercase;background:rgba(201,168,76,0.06);white-space:nowrap}
+
+/* ─ SCREENS ─ */
+.scr{display:none;flex-direction:column;flex:1;animation:fup .5s ease both}
+.scr.on{display:flex}
+@keyframes fup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─ HERO ─ */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:2.5rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+.hero-deco{position:absolute;inset:0;pointer-events:none}
+.hdline{position:absolute;top:50%;left:50%;width:700px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.09),transparent);transform:translate(-50%,-50%) rotate(var(--r));animation:lf 7s ease infinite;animation-delay:var(--d)}
+@keyframes lf{0%,100%{opacity:0}50%{opacity:1}}
+.emblem{position:relative;width:180px;height:180px;margin:0 auto 1.8rem;flex-shrink:0}
+.er{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,0.15);animation:rp 4.5s ease infinite}
+.er:nth-child(1){inset:0}.er:nth-child(2){inset:-16px;animation-delay:.7s;border-color:rgba(201,168,76,0.08)}.er:nth-child(3){inset:-32px;animation-delay:1.4s;border-color:rgba(201,168,76,0.04)}
+@keyframes rp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.5}}
+.ecore{position:absolute;inset:12px;border-radius:50%;border:2px solid rgba(201,168,76,0.48);background:radial-gradient(circle at 35% 30%,rgba(201,168,76,0.14),rgba(0,0,0,0.88));display:flex;align-items:center;justify-content:center}
+.hero-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.22em;color:var(--gold);border:1px solid var(--bg);padding:.32rem 1rem;text-transform:uppercase;margin-bottom:1.5rem;display:inline-block;animation:bp 3s ease infinite}
+@keyframes bp{0%,100%{border-color:rgba(201,168,76,0.2)}50%{border-color:rgba(240,192,64,0.6);box-shadow:0 0 12px rgba(201,168,76,0.16)}}
+.hero h1{font-family:'Cinzel',serif;font-size:clamp(1.9rem,4.5vw,3.2rem);color:#fff;line-height:1.05;font-weight:700;margin-bottom:.4rem}
+.hero h1 span{color:var(--gold-b);display:block}
+.hero-sub{font-size:1rem;color:var(--tdim);letter-spacing:.04em;margin-bottom:1.8rem;max-width:500px;line-height:1.7;font-weight:300}
+.hero-sub strong{color:var(--tgold);font-weight:600}
+.hero-kpis{display:flex;gap:1.8rem;margin-bottom:2.2rem;flex-wrap:wrap;justify-content:center}
+.kpi{text-align:center}.kpi-n{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;color:var(--gold-b);line-height:1}
+.kpi-l{font-size:.62rem;letter-spacing:.11em;color:var(--tmuted);text-transform:uppercase;margin-top:.2rem}
+.ksep{width:1px;background:var(--bg);align-self:stretch}
+.btn-go{font-family:'Orbitron',sans-serif;font-size:.7rem;letter-spacing:.17em;padding:.9rem 2.2rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;border:none;cursor:pointer;font-weight:700;transition:all .3s;position:relative;overflow:hidden}
+.btn-go::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transform:translateX(-120%);transition:transform .5s}
+.btn-go:hover::after{transform:translateX(120%)}
+.btn-go:hover{box-shadow:0 0 26px rgba(201,168,76,0.4);transform:translateY(-2px)}
+
+/* ─ MENU ─ */
+.menu-wrap{padding:2rem 2rem 3rem;max-width:1060px;margin:0 auto;width:100%}
+.sec-hdr{border-left:3px solid var(--gold);padding-left:1rem;margin-bottom:1.8rem}
+.sec-hdr h2{font-family:'Cinzel',serif;font-size:1.4rem;color:#fff;font-weight:600}
+.sec-hdr p{font-size:.86rem;color:var(--tmuted);letter-spacing:.03em;margin-top:.22rem}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-bottom:1.4rem}
+@media(max-width:700px){.mgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.mgrid{grid-template-columns:1fr}}
+.mcard{background:var(--bcard);border:1px solid var(--bg);padding:1.2rem 1rem;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.55rem}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform .4s}
+.mcard:hover::before,.mcard.mdone::before{transform:scaleX(1)}
+.mcard:hover{border-color:rgba(240,192,64,0.42);background:#0f0f0f;transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.mcard.mdone{border-color:rgba(80,200,120,.22)}
+.mcard.mdone::before{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.mn{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.16em;color:var(--tmuted);text-transform:uppercase}
+.mico{width:40px;height:40px;border:1px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+.mtit{font-family:'Cinzel',serif;font-size:.87rem;color:var(--gold-b);font-weight:600;line-height:1.3}
+.mdesc{font-size:.8rem;color:var(--tdim);line-height:1.5}
+.mtag{font-size:.56rem;letter-spacing:.08em;padding:.16rem .5rem;border:1px solid var(--bg);color:var(--tmuted);text-transform:uppercase;font-family:'Orbitron',sans-serif;align-self:flex-start}
+.mchk{position:absolute;top:.65rem;right:.65rem;width:19px;height:19px;border-radius:50%;background:var(--green);display:none;align-items:center;justify-content:center}
+.mchk svg{width:10px;height:10px}
+.mcard.mdone .mchk{display:flex}
+.menu-btns{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem}
+.btn-s{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.1em;padding:.65rem 1.4rem;
+  border:1.5px solid rgba(201,168,76,.45);color:var(--tgoldb);text-transform:uppercase;
+  background:rgba(201,168,76,.08);cursor:pointer;transition:all .22s;font-weight:600}
+.btn-s:hover:not(:disabled){border-color:var(--gold-b);color:var(--gold-b);background:rgba(201,168,76,.15);box-shadow:0 0 14px rgba(201,168,76,.2)}
+.btn-s:disabled{opacity:.4;cursor:not-allowed}
+
+/* ─ CONTENT ─ */
+.cwrap{max-width:960px;margin:0 auto;padding:1.8rem 1.8rem;width:100%}
+.back{display:inline-flex;align-items:center;gap:.4rem;font-size:.6rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;cursor:pointer;border:none;background:none;font-family:'Orbitron',sans-serif;transition:color .2s;margin-bottom:1.6rem;padding:0}
+.back:hover{color:var(--gold)}
+.back svg{width:12px;height:12px}
+.phdr{display:flex;align-items:flex-start;gap:1.2rem;margin-bottom:1.8rem;padding-bottom:1.6rem;border-bottom:1px solid var(--bg)}
+.pico2{width:60px;height:60px;border:2px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.7rem;background:rgba(201,168,76,0.06)}
+.phnum{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.18em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.3rem}
+.phtit{font-family:'Cinzel',serif;font-size:1.65rem;color:#fff;font-weight:700;line-height:1.1;margin-bottom:.25rem}
+.phtit em{font-style:normal;color:var(--gold-b)}
+.phsub{font-size:.88rem;color:var(--tdim);letter-spacing:.03em;line-height:1.5}
+
+/* ─ BLOCKS ─ */
+.blk{margin-bottom:1.8rem}
+.blk-lbl{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:.42rem}
+.blk-lbl::after{content:'';flex:1;height:1px;background:var(--bg)}
+
+/* ─ EXCHANGE LINKS PANEL ─ */
+.exlinks{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1.2rem}
+@media(max-width:500px){.exlinks{grid-template-columns:1fr}}
+.exlink-card{display:flex;align-items:center;gap:.9rem;padding:.85rem 1rem;border:1.5px solid;text-decoration:none;transition:all .22s;position:relative;overflow:hidden}
+.exlink-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);transform:translateX(-100%);transition:transform .4s}
+.exlink-card:hover::before{transform:translateX(100%)}
+.exlink-card.binance{border-color:rgba(240,185,11,0.35);background:rgba(240,185,11,0.04)}
+.exlink-card.binance:hover{border-color:rgba(240,185,11,0.65);background:rgba(240,185,11,0.08);transform:translateY(-1px)}
+.exlink-card.bybit{border-color:rgba(247,166,0,0.35);background:rgba(247,166,0,0.04)}
+.exlink-card.bybit:hover{border-color:rgba(247,166,0,0.65);background:rgba(247,166,0,0.08);transform:translateY(-1px)}
+.exlink-logo{font-size:1.4rem;flex-shrink:0}
+.exlink-info{flex:1}
+.exlink-name{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.18rem}
+.exlink-card.binance .exlink-name{color:var(--binance)}
+.exlink-card.bybit .exlink-name{color:var(--bybit)}
+.exlink-desc{font-size:.82rem;color:var(--tdim);line-height:1.4}
+.exlink-arrow{font-size:.7rem;color:var(--tmuted);flex-shrink:0;font-family:'Orbitron',sans-serif}
+.exlink-tag{display:inline-block;font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.08em;padding:.15rem .5rem;margin-top:.2rem}
+.exlink-card.binance .exlink-tag{background:rgba(240,185,11,0.1);color:var(--binance);border:1px solid rgba(240,185,11,0.2)}
+.exlink-card.bybit .exlink-tag{background:rgba(247,166,0,0.1);color:var(--bybit);border:1px solid rgba(247,166,0,0.2)}
+
+/* ─ PLATFORM GUIDE TABS ─ */
+.ptabs{display:flex;gap:.45rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.ptab{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.09em;padding:.5rem 1.1rem;border:1.5px solid rgba(201,168,76,0.18);color:var(--tmuted);text-transform:uppercase;background:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.4rem}
+.ptab.active{border-color:var(--gold);color:var(--gold-b);background:rgba(201,168,76,0.06)}
+.ptab:hover:not(.active){border-color:rgba(201,168,76,0.4);color:var(--tgold)}
+.ptab-platform{display:none}
+.ptab-platform.on{display:block}
+
+/* ─ INTERACTIVE STEPS ─ */
+.steps-wrap{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1rem}
+.step-card{background:var(--bpanel2);border:1px solid rgba(201,168,76,0.1);border-left:3px solid var(--gold-dim);overflow:hidden;transition:border-color .25s}
+.step-card.done-s{border-left-color:var(--green)}
+.step-hdr{display:flex;align-items:center;gap:.85rem;padding:.82rem .95rem;cursor:pointer;user-select:none}
+.step-hdr:hover{background:rgba(201,168,76,0.04)}
+.step-num{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--gold);flex-shrink:0;transition:all .3s}
+.step-card.done-s .step-num{background:var(--green);border-color:var(--green);color:#000}
+.step-title{flex:1;font-size:.91rem;color:var(--tgoldb);font-weight:600}
+.step-arr{font-size:.62rem;color:var(--tmuted);transition:transform .28s;font-family:'Orbitron',sans-serif}
+.step-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1)}
+.step-body.open{max-height:1200px}
+.step-inner{padding:.2rem .95rem .95rem .95rem;padding-left:2.6rem}
+
+/* Step path (route) */
+.step-path{background:rgba(0,0,0,.45);border:1px solid rgba(201,168,76,0.18);padding:.65rem .95rem;margin-bottom:.8rem;font-size:.78rem;line-height:1.7;color:rgba(201,168,76,0.7);font-family:'Orbitron',sans-serif;letter-spacing:.04em}
+.step-path .path-sep{color:rgba(201,168,76,0.35);margin:0 .2rem}
+.step-path .path-active{color:var(--gold-b);font-weight:700}
+
+/* Step links row */
+.step-links{display:flex;gap:.55rem;margin-bottom:.8rem;flex-wrap:wrap}
+.step-link{display:inline-flex;align-items:center;gap:.4rem;font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.08em;padding:.38rem .85rem;text-decoration:none;text-transform:uppercase;transition:all .2s;font-weight:700}
+.step-link.bn{border:1px solid rgba(240,185,11,0.35);color:var(--binance);background:rgba(240,185,11,0.05)}
+.step-link.bn:hover{border-color:var(--binance);background:rgba(240,185,11,0.1)}
+.step-link.bb{border:1px solid rgba(247,166,0,0.35);color:var(--bybit);background:rgba(247,166,0,0.05)}
+.step-link.bb:hover{border-color:var(--bybit);background:rgba(247,166,0,0.1)}
+.step-link svg{width:11px;height:11px}
+
+/* Step desc + tips */
+.step-desc{font-size:.88rem;color:var(--tdim);line-height:1.7;margin-bottom:.75rem}
+.step-tips{display:flex;flex-direction:column;gap:.38rem;margin-bottom:.75rem}
+.step-tip{display:flex;align-items:flex-start;gap:.52rem;font-size:.85rem;color:var(--tdim);line-height:1.6;padding:.5rem .72rem;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.07)}
+.step-tip::before{content:'▸';color:var(--gold);flex-shrink:0;margin-top:.12rem;font-size:.7rem}
+.step-tip strong{color:var(--tgold)}
+.step-warn{display:flex;align-items:flex-start;gap:.55rem;padding:.6rem .78rem;background:rgba(224,80,80,0.06);border:1px solid rgba(224,80,80,0.18);border-left:3px solid var(--red);font-size:.85rem;color:rgba(255,200,200,.75);line-height:1.6;margin-bottom:.65rem}
+.step-done-btn{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.1em;padding:.48rem 1.1rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .22s}
+.step-done-btn:hover:not(.already){box-shadow:0 0 14px rgba(201,168,76,0.25);transform:translateY(-1px)}
+.step-done-btn.already{background:rgba(80,200,120,0.12);color:var(--green);border:1px solid rgba(80,200,120,0.26);box-shadow:none;transform:none;cursor:default}
+
+/* ─ MODULE PROGRESS ─ */
+.mod-progress{display:flex;align-items:center;gap:.85rem;margin-bottom:1.4rem;padding:.85rem 1rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,0.1)}
+.mp-lbl{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;min-width:75px}
+.mp-track{flex:1;height:2px;background:rgba(201,168,76,0.08);border-radius:2px}
+.mp-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease}
+.mp-count{font-family:'Orbitron',sans-serif;font-size:.63rem;color:var(--gold-b);font-weight:700;min-width:36px;text-align:right}
+
+/* ─ ACADEMIC BOX ─ */
+.academic-box{background:rgba(74,158,255,0.04);border:1px solid rgba(74,158,255,0.18);border-left:4px solid var(--blue);padding:1rem 1.2rem;margin-bottom:.9rem}
+.academic-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.13em;color:var(--blue);text-transform:uppercase;margin-bottom:.35rem;display:flex;align-items:center;gap:.38rem}
+.academic-tag::before{content:'📚';font-size:.8rem}
+.academic-box p{font-size:.91rem;color:rgba(180,210,255,.8);line-height:1.7}
+.academic-box strong{color:rgba(150,200,255,.92)}
+
+/* ─ CHART SECTION ─ */
+.chart-section{background:var(--bcard);border:1px solid var(--bg);padding:1.1rem;margin-bottom:1rem}
+.chart-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.7rem;gap:.8rem;flex-wrap:wrap}
+.chart-title-wrap{flex:1}
+.ctit{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.2rem;display:flex;align-items:center;gap:.42rem}
+.ctit span{color:var(--gold);font-size:.72rem}
+.chart-subtitle{font-size:.82rem;color:var(--tdim);line-height:1.5;max-width:540px}
+
+/* ─ CHART EXPLAIN TOGGLE ─ */
+.chart-explain-btn{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.09em;padding:.32rem .8rem;border:1px solid rgba(201,168,76,0.28);color:var(--tmuted);background:none;cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.chart-explain-btn:hover{border-color:var(--gold);color:var(--gold)}
+.chart-explain-btn.open{border-color:var(--gold-b);color:var(--gold-b);background:rgba(201,168,76,0.06)}
+.chart-explain{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.chart-explain.open{max-height:600px}
+.chart-explain-inner{border-top:1px solid rgba(201,168,76,0.1);padding:.8rem 0 .2rem}
+.ce-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.75rem}
+@media(max-width:520px){.ce-grid{grid-template-columns:1fr}}
+.ce-item{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:.65rem .8rem}
+.ce-item-lbl{font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:.3rem;display:flex;align-items:center;gap:.35rem}
+.ce-item-txt{font-size:.84rem;color:var(--tdim);line-height:1.6}
+.ce-item-txt strong{color:var(--tgold)}
+.ce-interaction{background:rgba(74,158,255,0.04);border:1px solid rgba(74,158,255,0.15);border-left:3px solid var(--blue);padding:.65rem .85rem;font-size:.84rem;color:rgba(180,210,255,.78);line-height:1.65}
+.ce-interaction strong{color:rgba(150,200,255,.92)}
+
+/* ─ INTERACTIVE QUIZ EMBEDDED IN CHART ─ */
+.chart-quiz{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);padding:.85rem;margin-top:.75rem}
+.chart-quiz-q{font-size:.88rem;color:var(--tgoldb);font-weight:600;margin-bottom:.65rem;line-height:1.45}
+.chart-quiz-opts{display:flex;flex-direction:column;gap:.38rem}
+.cq-opt{font-size:.84rem;color:var(--tdim);padding:.5rem .75rem;background:var(--bpanel2);border:1px solid rgba(201,168,76,0.09);cursor:pointer;transition:all .18s;text-align:left;display:flex;align-items:center;gap:.6rem}
+.cq-opt:hover:not(.cqlocked){border-color:rgba(201,168,76,0.35);background:rgba(201,168,76,0.04)}
+.cq-opt.cqok{border-color:var(--green);background:rgba(80,200,120,0.07);color:rgba(175,235,175,.9)}
+.cq-opt.cqbad{border-color:var(--red);background:rgba(224,80,80,0.07);color:rgba(255,190,200,.85)}
+.cq-opt.cqdim{opacity:.28;cursor:default}
+.cq-opt.cqlocked{cursor:default}
+.cq-k{font-family:'Orbitron',sans-serif;font-size:.58rem;width:20px;height:20px;border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s}
+.cq-opt.cqok .cq-k{background:var(--green);border-color:var(--green);color:#000}
+.cq-opt.cqbad .cq-k{background:var(--red);border-color:var(--red);color:#fff}
+.cq-fb{display:none;margin-top:.6rem;padding:.65rem .8rem;font-size:.84rem;line-height:1.65;border-radius:1px}
+.cq-fb.show{display:block;animation:fup .3s ease both}
+.cq-fb.ok{background:rgba(80,200,120,0.06);border:1px solid rgba(80,200,120,0.18);border-left:3px solid var(--green);color:rgba(175,235,175,.85)}
+.cq-fb.bad{background:rgba(224,80,80,0.06);border:1px solid rgba(224,80,80,0.18);border-left:3px solid var(--red);color:rgba(255,190,200,.85)}
+
+/* ─ WIDGET ─ */
+.wbox{background:var(--bcard);border:1px solid var(--bg);padding:1.1rem;margin-bottom:1rem}
+.wrow{display:flex;align-items:center;gap:.9rem;margin-bottom:.85rem;flex-wrap:wrap}
+.wlbl{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.09em;color:var(--tmuted);text-transform:uppercase;min-width:115px;line-height:1.4}
+.wslider{flex:1;min-width:110px;-webkit-appearance:none;height:3px;background:rgba(201,168,76,0.14);outline:none;border-radius:2px;cursor:pointer}
+.wslider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold-b);cursor:pointer;box-shadow:0 0 7px rgba(240,192,64,0.42)}
+.wval{font-family:'Orbitron',sans-serif;font-size:.7rem;color:var(--gold-b);min-width:60px;text-align:right;font-weight:700}
+.wres{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-top:.85rem}
+@media(max-width:480px){.wres{grid-template-columns:1fr 1fr}}
+.wr{background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12);padding:.72rem;text-align:center}
+.wr-l{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.08em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.38rem}
+.wr-v{font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:700;color:var(--gold-b)}
+.wr-v.g{color:var(--green)}.wr-v.r{color:var(--red)}
+.w-explain{border-top:1px solid rgba(201,168,76,0.08);margin-top:.85rem;padding-top:.75rem;font-size:.84rem;color:var(--tdim);line-height:1.65}
+.w-explain strong{color:var(--tgold)}
+
+/* ─ STAT GRID ─ */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1rem}
+@media(max-width:480px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--bpanel2);border:1px solid rgba(201,168,76,0.1);padding:.85rem;text-align:center}
+.stat-n{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:700;color:var(--gold-b);line-height:1}
+.stat-l{font-size:.7rem;color:var(--tmuted);margin-top:.18rem;letter-spacing:.04em}
+
+/* ─ COMPARISON TABLE ─ */
+.comp-tbl{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:.9rem;overflow-x:auto;display:block}
+.comp-tbl th{font-family:'Orbitron',sans-serif;font-size:.53rem;letter-spacing:.1em;color:var(--tmuted);text-transform:uppercase;padding:.5rem .7rem;border-bottom:1px solid var(--bg);text-align:left;font-weight:400;white-space:nowrap}
+.comp-tbl td{padding:.6rem .7rem;border-bottom:1px solid rgba(201,168,76,0.05);color:var(--tdim);vertical-align:top;line-height:1.45}
+.comp-tbl td:first-child{color:var(--gold-b);font-weight:600;white-space:nowrap}
+.comp-tbl tr:hover td{background:rgba(201,168,76,0.025)}
+.comp-tbl .good{color:var(--green)}.comp-tbl .bad{color:var(--red)}
+
+/* ─ RULE BOX ─ */
+.rule-box{background:rgba(201,168,76,0.04);border:1px solid var(--bg);border-left:4px solid var(--gold);padding:.9rem 1.1rem;margin-bottom:.9rem}
+.rule-tag{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.12em;color:var(--gold);text-transform:uppercase;margin-bottom:.3rem}
+.rule-box p{font-size:.96rem;color:var(--tgoldb);font-weight:500;line-height:1.65}
+
+/* ─ TIMELINE ─ */
+.timeline{display:flex;flex-direction:column;gap:0;margin-bottom:.9rem}
+.tl-item{display:flex;gap:.9rem;position:relative}
+.tl-item:not(:last-child)::before{content:'';position:absolute;left:13px;top:26px;bottom:0;width:1px;background:rgba(201,168,76,0.16)}
+.tl-dot{width:26px;height:26px;border-radius:50%;background:var(--bpanel2);border:2px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;color:var(--gold);flex-shrink:0;margin-top:.55rem}
+.tl-content{flex:1;padding:.55rem 0 1.1rem}
+.tl-title{font-family:'Cinzel',serif;font-size:.9rem;color:var(--tgoldb);font-weight:600;margin-bottom:.28rem}
+.tl-desc{font-size:.85rem;color:var(--tdim);line-height:1.62}
+
+/* ─ ALERT ─ */
+.alert-box{background:rgba(50,120,50,.07);border:1px solid rgba(80,180,80,.18);border-left:4px solid #50C050;padding:.85rem 1rem;font-size:.87rem;color:rgba(175,235,175,.75);line-height:1.6;margin-bottom:.9rem}
+.alert-box strong{color:#80D080}
+
+/* ─ FOOTER ─ */
+.pfooter{display:flex;justify-content:space-between;align-items:center;margin-top:1.8rem;padding-top:1.2rem;border-top:1px solid var(--bg);flex-wrap:wrap;gap:.75rem}
+.btn-next{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.7rem 1.7rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;text-transform:uppercase;border:none;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:.38rem;transition:all .3s}
+.btn-next:hover{box-shadow:0 0 20px rgba(201,168,76,.32);transform:translateY(-1px)}
+.btn-next svg{width:12px;height:12px}
+
+/* ─ QUIZ ─ */
+.quiz-wrap{max-width:760px;margin:0 auto;padding:1.8rem 1.8rem;width:100%}
+.quiz-hero{text-align:center;padding:1.8rem 1rem 2.2rem;border-bottom:1px solid var(--bg);margin-bottom:1.8rem}
+.quiz-hero h2{font-family:'Cinzel',serif;font-size:clamp(1.5rem,3.5vw,2.2rem);color:#fff;margin-bottom:.55rem}
+.quiz-hero p{font-size:.9rem;color:var(--tdim);line-height:1.7;max-width:480px;margin:0 auto 1.4rem}
+.quiz-meta{display:flex;gap:1.3rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.6rem}
+.qm-pill{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.09em;color:var(--tmuted);padding:.28rem .75rem;border:1px solid rgba(201,168,76,0.18)}
+.q-prog-wrap{margin-bottom:1.4rem}
+.q-prog-hdr{display:flex;justify-content:space-between;margin-bottom:.45rem}
+.q-prog-lbl{font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.q-prog-score{font-family:'Orbitron',sans-serif;font-size:.52rem;color:var(--tmuted)}
+.q-prog-score span{color:var(--gold-b);font-weight:700}
+.q-prog-track{height:2px;background:rgba(201,168,76,0.1);border-radius:2px;margin-bottom:.65rem}
+.q-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-b));border-radius:2px;transition:width .5s ease}
+.q-dots{display:flex;gap:3px}
+.qdot{width:20px;height:3px;border-radius:2px;background:rgba(201,168,76,0.12);transition:background .3s}
+.qdot.done{background:var(--green)}.qdot.active{background:var(--gold-b);box-shadow:0 0 6px rgba(240,192,64,0.4)}
+.q-card{background:var(--bcard);border:1px solid var(--bg);border-top:3px solid var(--gold);padding:1.4rem 1.2rem}
+.q-mod-tag{display:inline-flex;align-items:center;gap:.38rem;font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.12em;color:var(--gold-b);text-transform:uppercase;padding:.26rem .7rem;background:rgba(240,192,64,0.07);border:1px solid rgba(240,192,64,0.17);margin-bottom:.85rem}
+.q-title{font-family:'Cinzel',serif;font-size:1rem;color:#fff;margin-bottom:.85rem;line-height:1.35}
+.q-scenario{background:rgba(0,0,0,.35);border-left:3px solid var(--gold-dim);padding:.85rem 1.05rem;margin-bottom:1.1rem;font-size:.89rem;color:var(--tdim);line-height:1.75}
+.q-scenario strong{color:var(--tgold)}
+.q-opts{display:flex;flex-direction:column;gap:.5rem;margin-bottom.9rem}
+.q-opt{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem .9rem;background:var(--bpanel2);border:1.5px solid rgba(201,168,76,0.09);cursor:pointer;transition:all .18s;font-size:.88rem;color:var(--tdim);line-height:1.52;text-align:left;width:100%}
+.q-opt:hover:not(.qlocked){border-color:rgba(201,168,76,0.35);background:rgba(201,168,76,0.04);transform:translateX(2px)}
+.q-key{min-width:23px;height:23px;border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;color:var(--tmuted);flex-shrink:0;margin-top:.06rem;transition:all .18s}
+.q-opt.qcorrect{border-color:var(--green);background:rgba(80,200,120,0.07)}
+.q-opt.qcorrect .q-key{background:var(--green);border-color:var(--green);color:#000}
+.q-opt.qwrong{border-color:var(--red);background:rgba(224,80,80,0.07)}
+.q-opt.qwrong .q-key{background:var(--red);border-color:var(--red);color:#fff}
+.q-opt.qdim{opacity:.28;cursor:default}.q-opt.qlocked{cursor:default}
+.q-fb{display:none;gap:.85rem;align-items:flex-start;padding:.85rem .95rem;margin-bottom:.85rem;font-size:.87rem;line-height:1.7}
+.q-fb.show{display:flex;animation:fup .3s ease both}
+.q-fb.fc{background:rgba(80,200,120,0.06);border:1px solid rgba(80,200,120,0.18);border-left:3px solid var(--green);color:rgba(175,235,175,.85)}
+.q-fb.fw{background:rgba(224,80,80,0.06);border:1px solid rgba(224,80,80,0.18);border-left:3px solid var(--red);color:rgba(255,190,200,.85)}
+.q-fb strong{display:block;margin-bottom:.2rem;font-size:.91rem}
+.q-fb.fc strong{color:#80D890}.q-fb.fw strong{color:#FF7090}
+.q-nav{display:flex;justify-content:flex-end}
+.q-btn-next{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.11em;padding:.6rem 1.4rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .25s}
+.q-btn-next:hover:not(:disabled){box-shadow:0 0 16px rgba(201,168,76,.3);transform:translateY(-1px)}
+.q-btn-next:disabled{opacity:.26;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+/* ─ RESULT ─ */
+.result-hero{text-align:center;padding:2rem 1rem}
+.result-badge{width:110px;height:110px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1.3rem;font-size:3rem;background:radial-gradient(circle,rgba(201,168,76,0.12),transparent 70%);animation:rp 3s ease infinite}
+.result-score{font-family:'Orbitron',sans-serif;font-size:3.8rem;font-weight:700;background:linear-gradient(135deg,var(--gold-dim),var(--gold-b));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:.3rem}
+.result-stars{font-size:1.6rem;margin-bottom:1rem;letter-spacing:.28rem}
+.result-msg{font-size:.9rem;color:var(--tdim);line-height:1.75;max-width:440px;margin:.85rem auto 1.4rem;padding:.85rem .95rem;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.12)}
+.result-breakdown{background:var(--bcard);border:1px solid var(--bg);padding:1.1rem;max-width:580px;margin:0 auto 1.4rem}
+.rb-title{font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:.13em;color:var(--tmuted);text-transform:uppercase;margin-bottom:.9rem}
+.rb-row{display:flex;align-items:center;gap:.75rem;padding:.45rem 0;border-bottom:1px solid rgba(201,168,76,0.05)}
+.rb-row:last-child{border-bottom:none}
+.rb-mod{font-size:.8rem;color:var(--tdim);flex:1}
+.result-actions{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap}
+.btn-restart{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.68rem 1.6rem;background:linear-gradient(135deg,var(--gold-dim),var(--gold));color:#000;border:none;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .25s}
+.btn-restart:hover{box-shadow:0 0 20px rgba(201,168,76,.35);transform:translateY(-2px)}
+.btn-menu2{font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.11em;padding:.68rem 1.6rem;border:1px solid var(--bg);color:var(--tmuted);background:none;cursor:pointer;text-transform:uppercase;transition:all .22s}
+.btn-menu2:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ─ CERT ─ */
+.cert{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:2.5rem 1.5rem;text-align:center}
+.cert-badge{width:140px;height:140px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.6rem;position:relative;background:radial-gradient(circle,rgba(201,168,76,0.1),transparent 70%)}
+.cert-badge::before,.cert-badge::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,0.14);animation:rp 3.5s ease infinite}
+.cert-badge::before{inset:-13px}.cert-badge::after{inset:-26px;animation-delay:.6s}
+.cert-mods{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;max-width:460px;margin:0 auto 1.6rem}
+@media(max-width:480px){.cert-mods{grid-template-columns:repeat(2,1fr)}}
+.cert-mod{padding:.58rem;border:1px solid var(--bg);background:rgba(201,168,76,0.04);font-size:.6rem;color:var(--gold);letter-spacing:.06em;font-family:'Orbitron',sans-serif}
+
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
+@media(max-width:580px){.cwrap{padding:1.3rem .9rem}.quiz-wrap{padding:1.3rem .9rem}.step-inner{padding-left:1rem}.exlinks{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="cvs"></canvas>
+<div class="grid-bg"></div>
+<div class="app">
+
+<nav class="nav">
+  <div class="logo" onclick="goScr('hero')">
+    <div class="logo-ring">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C9A84C" stroke-width="1.4"/><path d="M8 12L12 6L16 12L12 18Z" stroke="#C9A84C" stroke-width="1.4" fill="rgba(201,168,76,.1)"/><path d="M10 12L12 9L14 12L12 15Z" fill="#C9A84C"/></svg>
+    </div>
+    <div class="logo-txt">Taller Operador Experto <b>Exchanges · 2026</b></div>
+  </div>
+  <div class="nav-prog">
+    <div class="plbl"><span>Progreso</span><span id="pct">0%</span></div>
+    <div class="ptrack"><div class="pbar" id="pbar" style="width:0%"></div></div>
+  </div>
+  <div class="nbadge" id="nbadge">Bienvenida</div>
+</nav>
+
+<!-- HERO -->
+<div class="scr on" id="scr-hero">
+  <div class="hero">
+    <div class="hero-deco">
+      <div class="hdline" style="--r:-20deg;--d:0s"></div>
+      <div class="hdline" style="--r:20deg;--d:2.5s"></div>
+      <div class="hdline" style="--r:0deg;--d:5s"></div>
+    </div>
+    <div class="hero-tag">Taller Práctico · Edición 2026</div>
+    <div class="emblem"><div class="er"></div><div class="er"></div><div class="er"></div>
+      <div class="ecore"><svg width="74" height="74" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="30" stroke="#C9A84C" stroke-width="1" stroke-dasharray="5 3" opacity=".4"/><circle cx="40" cy="40" r="20" stroke="#C9A84C" stroke-width="1.5" opacity=".75"/><path d="M26 40L40 20L54 40L40 60Z" stroke="#C9A84C" stroke-width="1.5" fill="rgba(201,168,76,.1)"/><path d="M33 40L40 30L47 40L40 50Z" fill="#C9A84C" opacity=".9"/><circle cx="40" cy="40" r="4" fill="#F0C040"/></svg></div>
+    </div>
+    <h1>TALLER <span>OPERADOR EXPERTO</span></h1>
+    <p class="hero-sub">6 módulos teórico-prácticos con acceso directo a <strong>Binance & Bybit</strong>. Configura tu cuenta mientras aprendes, interactúa con los gráficos y certifica tu conocimiento con 15 preguntas.</p>
+    <div class="hero-kpis">
+      <div class="kpi"><div class="kpi-n" id="kn1">0</div><div class="kpi-l">Módulos</div></div>
+      <div class="ksep"></div>
+      <div class="kpi"><div class="kpi-n" id="kn2">0</div><div class="kpi-l">Pasos config.</div></div>
+      <div class="ksep"></div>
+      <div class="kpi"><div class="kpi-n" id="kn3">0</div><div class="kpi-l">Preguntas</div></div>
+      <div class="ksep"></div>
+      <div class="kpi"><div class="kpi-n" id="kn4">0</div><div class="kpi-l">Gráficas</div></div>
+    </div>
+    <button class="btn-go" onclick="goScr('menu');renderMenu()">▶ &nbsp;INICIAR TALLER</button>
+    <div style="margin-top:1.2rem;display:flex;flex-direction:column;align-items:center;gap:.5rem">
+      <div style="font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:.12em;color:var(--tmuted);text-transform:uppercase">¿Aún no tienes cuenta en Bybit?</div>
+      <a href="https://partner.bybit.com/b/aff_7_152621" target="_blank" rel="noopener"
+         style="display:inline-flex;align-items:center;gap:.6rem;padding:.6rem 1.6rem;border:1.5px solid rgba(247,166,0,.6);background:rgba(247,166,0,.08);text-decoration:none;font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:.1em;color:#F7A600;text-transform:uppercase;font-weight:700;transition:all .25s"
+         onmouseover="this.style.background='rgba(247,166,0,.18)';this.style.borderColor='#F7A600'"
+         onmouseout="this.style.background='rgba(247,166,0,.08)';this.style.borderColor='rgba(247,166,0,.6)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#F7A600" stroke-width="1.5"/></svg>
+        Crear cuenta en Bybit — Link de Camilo
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div class="scr" id="scr-menu">
+  <div class="menu-wrap">
+    
+<!-- RESUME BANNER -->
+<div id="resume-banner" style="display:none;margin:-1rem -1.8rem 1.4rem;padding:.85rem 1.8rem;background:rgba(80,200,120,.07);border-bottom:1px solid rgba(80,200,120,.22);display:none;align-items:center;gap:.9rem;flex-wrap:wrap">
+  <span style="font-size:1.2rem">✅</span>
+  <div style="flex:1">
+    <div style="font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.09em;color:#50C878;text-transform:uppercase;margin-bottom:.15rem">Progreso guardado</div>
+    <div id="resume-text" style="font-size:.83rem;color:rgba(80,200,120,.75);line-height:1.4"></div>
+  </div>
+  <button onclick="clearProgress()" style="font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:.08em;padding:.3rem .75rem;border:1px solid rgba(224,80,80,.35);color:rgba(224,80,80,.7);background:none;cursor:pointer;text-transform:uppercase;flex-shrink:0">↺ Reiniciar</button>
+</div>
+<div class="sec-hdr">
+      <h2>Los 6 Módulos del Operador Experto</h2>
+      <p>Cada módulo incluye teoría académica, gráficas interactivas explicadas y pasos de configuración con acceso directo a Binance y Bybit.</p>
+    </div>
+    <div class="mgrid" id="mgrid"></div>
+    <div class="menu-btns">
+      <button class="btn-s" id="btn-quiz-access" onclick="openQuiz()" style="border-color:rgba(240,192,64,.7);color:var(--gold-b);background:rgba(201,168,76,.12)">🎯 Evaluación Final (15 preguntas)</button>
+      <button class="btn-s" onclick="clearProgress()" style="border-color:rgba(224,80,80,.35);color:rgba(224,80,80,.7);font-size:.52rem">↺ Reiniciar mi progreso</button>
+    </div>
+    <div style="margin-top:1.1rem;padding:1rem 1.1rem;border:1.5px solid rgba(247,166,0,.35);background:rgba(247,166,0,.05);display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+      <div style="flex:1;min-width:180px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:.1em;color:#F7A600;text-transform:uppercase;margin-bottom:.25rem">¿Aún no tienes cuenta en Bybit?</div>
+        <div style="font-size:.83rem;color:var(--tdim);line-height:1.5">Regístrate con el link de Camilo y apoya directamente el programa.</div>
+      </div>
+      <a href="https://partner.bybit.com/b/aff_7_152621" target="_blank" rel="noopener"
+         style="display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1.3rem;border:1.5px solid #F7A600;background:rgba(247,166,0,.12);text-decoration:none;font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:.09em;color:#F7A600;text-transform:uppercase;font-weight:700;flex-shrink:0;transition:all .22s"
+         onmouseover="this.style.background='rgba(247,166,0,.25)'"
+         onmouseout="this.style.background='rgba(247,166,0,.12)'">
+        🔗 Abrir Bybit
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="scr" id="scr-content"><div class="cwrap" id="ci"></div></div>
+
+<!-- QUIZ -->
+<div class="scr" id="scr-quiz"><div class="quiz-wrap" id="quiz-container"></div></div>
+
+<!-- RESULT -->
+<div class="scr" id="scr-result"><div class="quiz-wrap" id="result-container"></div></div>
+
+<!-- CERT -->
+<div class="scr" id="scr-cert">
+  <div class="cert">
+    <div class="cert-badge"><span style="font-size:2.8rem">🏆</span></div>
+    <div style="font-family:'Cinzel',serif;font-size:1.8rem;color:#fff;margin-bottom:.35rem">Taller <span style="color:var(--gold-b)">Completado</span></div>
+    <div style="font-size:.82rem;color:var(--tmuted);letter-spacing:.09em;margin-bottom:1.3rem">Operador Experto de Exchanges · 2026</div>
+    <div style="width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 1.3rem"></div>
+    <div class="cert-mods" id="cert-mods"></div>
+    <p style="font-size:.86rem;color:var(--tmuted);max-width:340px;line-height:1.72;margin-bottom:1.8rem">Has completado los 6 módulos. Aplica cada protocolo con disciplina para operar con criterio profesional.</p>
+    <button class="btn-go" onclick="restartApp()">↺ &nbsp;REINICIAR TALLER</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ═══════════ MODULES ═══════════ */
+const MODULES=[
+  {id:0,ico:'🛡️',num:'Módulo I',  title:'El Escudo Digital',      tag:'Seguridad',        desc:'KYC, 2FA, Anti-Phishing y Whitelist. Arquitectura de seguridad por capas.',chart:'security'},
+  {id:1,ico:'🤝',num:'Módulo II', title:'La Pasarela P2P',         tag:'Mercado P2P',      desc:'Información asimétrica, escrow, verificación de pago y señales de fraude.',chart:'p2p'},
+  {id:2,ico:'📈',num:'Módulo III',title:'Mercado Spot & DCA',      tag:'Trading Spot',     desc:'Tipos de órdenes, libro de mercado y estrategia de acumulación programada.',chart:'spot'},
+  {id:3,ico:'🔍',num:'Módulo IV', title:'Auditor de Cuenta',       tag:'Fees & CSV',       desc:'Costos ocultos, ROI real, exportación de historial y cumplimiento fiscal.',chart:'audit'},
+  {id:4,ico:'⚡',num:'Módulo V',  title:'Derivados & Riesgo',      tag:'Futuros Demo',     desc:'Apalancamiento, liquidación, margen cruzado vs. aislado y Stop Loss.',chart:'futures'},
+  {id:5,ico:'🌐',num:'Módulo VI', title:'Operador Integrado',      tag:'Protocolo Total',  desc:'Checklist profesional, auditoría mensual y reglas de oro del operador.',chart:'integration'}
+];
+
+/* ═══════════ EXCHANGE LINKS per step ═══════════ */
+const EXLINKS={
+  security:[
+    {bn:'https://www.binance.com/en/my/settings/profile',bb:'https://www.bybit.com/user/assets/kyc/index',bn_lbl:'KYC Binance',bb_lbl:'KYC Bybit',bn_tag:'Perfil → Verificación',bb_tag:'Avatar → Identidad'},
+    {bn:'https://www.binance.com/en/my/security/two-factor-auth',bb:'https://www.bybit.com/user/security/index',bn_lbl:'2FA Binance',bb_lbl:'2FA Bybit',bn_tag:'Seguridad → Google Auth',bb_tag:'Seguridad → 2FA'},
+    {bn:'https://www.binance.com/en/my/security/anti-phishing-code',bb:'https://www.bybit.com/user/security/index',bn_lbl:'Anti-Phishing Binance',bb_lbl:'Seguridad Bybit',bn_tag:'Seguridad → Anti-Phishing',bb_tag:'Avatar → Seguridad'},
+    {bn:'https://www.binance.com/en/my/security/address-management',bb:'https://www.bybit.com/user/assets/withdraw/index',bn_lbl:'Whitelist Binance',bb_lbl:'Retiros Bybit',bn_tag:'Seguridad → Gestión Direcciones',bb_tag:'Assets → Retiro → Whitelist'}
+  ],
+  p2p:[
+    {bn:'https://p2p.binance.com/trade/all-payments/USDT?fiat=COP',bb:'https://www.bybit.com/fiat/trade/otc/?actionType=0&token=USDT&fiat=COP',bn_lbl:'P2P Binance',bb_lbl:'P2P Bybit',bn_tag:'Comprar → P2P → USDT/COP',bb_tag:'Comprar → OTC → USDT'},
+    {bn:'https://p2p.binance.com/trade/all-payments/USDT?fiat=COP',bb:'https://www.bybit.com/fiat/trade/otc/?actionType=0&token=USDT&fiat=COP',bn_lbl:'Verificar Pago P2P',bb_lbl:'Verificar Pago P2P',bn_tag:'P2P → Mis Órdenes → Confirmar',bb_tag:'P2P → Mis Órdenes → Confirmar'},
+    {bn:'https://p2p.binance.com/trade/all-payments/USDT?fiat=COP',bb:'https://www.bybit.com/fiat/trade/otc/?actionType=0&token=USDT&fiat=COP',bn_lbl:'Disputa Binance',bb_lbl:'Disputa Bybit',bn_tag:'P2P → Apelar Orden',bb_tag:'P2P → Apelar Orden'},
+    {bn:'https://p2p.binance.com/trade/all-payments/USDT?fiat=COP',bb:'https://www.bybit.com/fiat/trade/otc/?actionType=0&token=USDT&fiat=COP',bn_lbl:'Filtros P2P Binance',bb_lbl:'Filtros P2P Bybit',bn_tag:'P2P → Filtros avanzados',bb_tag:'P2P → Filtrar comerciantes'}
+  ],
+  spot:[
+    {bn:'https://www.binance.com/en/trade/BTC_USDT',bb:'https://www.bybit.com/trade/spot/BTC/USDT',bn_lbl:'Spot BTC/USDT Binance',bb_lbl:'Spot BTC/USDT Bybit',bn_tag:'Mercados → Spot → BTC/USDT',bb_tag:'Spot → BTC/USDT'},
+    {bn:'https://www.binance.com/en/trade/BTC_USDT',bb:'https://www.bybit.com/trade/spot/BTC/USDT',bn_lbl:'DCA Binance',bb_lbl:'DCA Bybit',bn_tag:'Spot → Limit Order → Precio objetivo',bb_tag:'Spot → Limit → Precio objetivo'},
+    {bn:'https://www.binance.com/en/trade/BTC_USDT?layout=pro',bb:'https://www.bybit.com/trade/spot/BTC/USDT',bn_lbl:'Order Book Binance',bb_lbl:'Order Book Bybit',bn_tag:'Vista Pro → Libro de Órdenes',bb_tag:'Trading View → Depth Chart'},
+    {bn:'https://www.binance.com/en/my/trade-fee',bb:'https://www.bybit.com/fee/trading',bn_lbl:'Tarifas Binance',bb_lbl:'Tarifas Bybit',bn_tag:'Perfil → Tarifas de Trading',bb_tag:'Ayuda → Tarifas y Límites'}
+  ],
+  audit:[
+    {bn:'https://www.binance.com/en/my/orders/trade/spot',bb:'https://www.bybit.com/user/assets/order/spotOrder/closed',bn_lbl:'Historial Binance',bb_lbl:'Historial Bybit',bn_tag:'Billetera → Historial Transacciones',bb_tag:'Assets → Transaction History'},
+    {bn:'https://www.binance.com/en/my/orders/trade/spot',bb:'https://www.bybit.com/user/assets/order/spotOrder/closed',bn_lbl:'ROI Binance',bb_lbl:'ROI Bybit',bn_tag:'Historial → Exportar CSV',bb_tag:'Transaction History → Export'},
+    {bn:'https://koinly.io',bb:'https://koinly.io',bn_lbl:'Koinly (Fiscal)',bb_lbl:'Koinly (Fiscal)',bn_tag:'koinly.io → API Binance',bb_tag:'koinly.io → API Bybit'}
+  ],
+  futures:[
+    {bn:'https://testnet.binancefuture.com',bb:'https://www.bybit.com/trade/usdt/BTCUSDT?type=linear&tradeMode=1',bn_lbl:'Demo Futuros Binance',bb_lbl:'Demo Futuros Bybit',bn_tag:'futures.binance.com → Demo Trading',bb_tag:'Derivados → Futuros → Modo Demo'},
+    {bn:'https://www.binance.com/en/futures/BTCUSDT',bb:'https://www.bybit.com/trade/usdt/BTCUSDT?type=linear',bn_lbl:'Futuros Binance',bb_lbl:'Futuros Bybit',bn_tag:'Futuros → Selector de Margen',bb_tag:'Panel → Isolated/Cross Margin'},
+    {bn:'https://www.binance.com/en/futures/BTCUSDT',bb:'https://www.bybit.com/trade/usdt/BTCUSDT?type=linear',bn_lbl:'Stop Loss Binance',bb_lbl:'Stop Loss Bybit',bn_tag:'Futuros → TP/SL al abrir posición',bb_tag:'Panel → TP/SL → Confirmar SL'},
+    {bn:'https://www.binance.com/en/futures/BTCUSDT',bb:'https://www.bybit.com/trade/usdt/BTCUSDT?type=linear',bn_lbl:'Position Sizing Binance',bb_lbl:'Position Sizing Bybit',bn_tag:'Futuros → Campo Cantidad → Calcular',bb_tag:'Derivados → Orden → Qty'}
+  ],
+  integration:[
+    {bn:'https://www.binance.com/en/activity/checklist',bb:'https://www.bybit.com/en/security-guidance',bn_lbl:'Checklist Binance',bb_lbl:'Guía Seguridad Bybit',bn_tag:'Centro de Seguridad Binance',bb_tag:'Centro de Seguridad Bybit'},
+    {bn:'https://www.binance.com/en/my/orders/trade/spot',bb:'https://www.bybit.com/user/assets/order/spotOrder/closed',bn_lbl:'Auditoría Binance',bb_lbl:'Auditoría Bybit',bn_tag:'Historial → Exportar mes',bb_tag:'Transaction History → Export'},
+    {bn:'https://www.binance.com/en/support/faq/cryptocurrency-trading',bb:'https://learn.bybit.com',bn_lbl:'Soporte Binance',bb_lbl:'Academy Bybit',bn_tag:'Binance Academy → Guías',bb_tag:'Bybit Learn → Cursos'}
+  ]
+};
+
+/* ═══════════ STEPS DATA ═══════════ */
+const STEPS={
+  security:[
+    {title:'Paso 1 — Crear cuenta y completar KYC',
+     path:['Registro',['Perfil','Perfil'],'Verificación de identidad','Subir documento + selfie','Aprobación (24h)'],
+     desc:'El KYC (Know Your Customer) no es un trámite opcional. Bajo normativas GAFI, es el único mecanismo legal que valida la propiedad real de tus fondos ante disputas o bloqueos preventivos.',
+     tips:['<strong>Binance — Verificación Estándar:</strong> Avatar → Identificación → Sube tu DNI/Pasaporte por ambos lados + selfie sosteniendo el documento. Límite sin KYC: $2,000/día.',
+           '<strong>Bybit — KYC Nivel 2:</strong> Avatar → Verificación de identidad → Estándar. Desbloquea retiros hasta $1,000,000/día y acceso a futuros.',
+           '<strong>Consejo clave:</strong> Guarda el screenshot de confirmación "KYC Aprobado" — es tu evidencia ante cualquier disputa futura con el soporte.',
+           '<strong>Tiempo real:</strong> KYC automático tarda 5-30 minutos. Manual (foto rechazada) puede tardar 24-48h hábiles.'],
+     warn:'Sin KYC completo, el exchange puede congelar retiros sin previo aviso durante auditorías de cumplimiento anti-lavado (AML). No es sanción — es protocolo legal.'},
+    {title:'Paso 2 — Activar Google Authenticator (2FA)',
+     path:['Perfil / Avatar','Seguridad','Autenticación de 2 Pasos','Google Authenticator','Escanear QR','Guardar código respaldo (PAPEL)'],
+     desc:'El 2FA convierte tu teléfono en una segunda llave de la cuenta. Sin él, una contraseña robada da acceso total. Con él, el atacante también necesita posesión física de tu dispositivo.',
+     tips:['<strong>Descarga Google Authenticator:</strong> disponible en iOS y Android — no uses otras apps de terceros desconocidas para este propósito.',
+           '<strong>Código de respaldo (16 caracteres):</strong> escríbelo en papel físico y guárdalo en un lugar seguro separado del teléfono. Sin él, cambiar de teléfono requiere proceso de recuperación de 7-30 días.',
+           '<strong>NUNCA uses 2FA por SMS:</strong> los ataques SIM-Swap secuestran tu número en minutos. Google Auth requiere posesión física del dispositivo.',
+           '<strong>Contraseña de la cuenta:</strong> mínimo 16 caracteres mixtos. Usa Bitwarden (gratuito y open source) para gestionarlas de forma segura.'],
+     warn:'El 82% de las brechas de seguridad son de ingeniería social (phishing + contraseñas reutilizadas). El 2FA con app de autenticación bloquea el 99.9% de ataques automatizados.'},
+    {title:'Paso 3 — Configurar Código Anti-Phishing',
+     path:['Perfil','Seguridad','Código Anti-Phishing','Crear código 4-8 caracteres','Guardar'],
+     desc:'Este código aparece en TODOS los emails legítimos del exchange. Si recibes un email sin ese código exacto, es una falsificación — sin excepción. Es el detector de fraude más sencillo y efectivo.',
+     tips:['<strong>Crea algo memorable:</strong> ejemplo "BTC2026" o las iniciales de tu nombre + año — no lo uses en ningún otro servicio.',
+           '<strong>Verificación inmediata:</strong> el próximo email legítimo que recibas del exchange ya debe incluir tu código visible en el encabezado.',
+           '<strong>Cambio periódico:</strong> cambia el código cada 6 meses desde Seguridad → Código Anti-Phishing → Modificar.',
+           '<strong>Si ves el código en un email:</strong> email real de Binance/Bybit. Si NO ves el código: PHISHING — no hagas clic en ningún link.'],
+     warn:'Sin Anti-Phishing, no puedes distinguir visualmente un email falso de uno genuino. Los atacantes clonan el diseño exacto de los emails oficiales en minutos.'},
+    {title:'Paso 4 — Activar Lista Blanca de Retiros',
+     path:['Seguridad','Gestión de direcciones / Whitelist','Añadir dirección','Confirmar: email + 2FA','Esperar 24-48h activación'],
+     desc:'La Whitelist restringe los retiros únicamente a direcciones que hayas pre-aprobado. Aunque un atacante obtenga tu usuario + contraseña + código 2FA, no podrá retirar a ninguna dirección nueva.',
+     tips:['<strong>Pre-aprueba tus propias wallets:</strong> hardware wallet, MetaMask personal, otra cuenta propia.',
+           '<strong>Periodo de espera (24-48h):</strong> es deliberado — si hay un acceso no autorizado, tienes tiempo de detectarlo y bloquear la cuenta antes de que puedan agregar nuevas direcciones.',
+           '<strong>Desactivar temporalmente:</strong> si necesitas retirar a nueva dirección urgente, la desactivación también requiere email + 2FA + espera.',
+           '<strong>Bybit — Withdrawal Address Book:</strong> Assets → Retiro → Gestionar direcciones → Agregar con confirmación doble.'],
+     warn:'Con Whitelist activa, incluso el acceso total a la cuenta (contraseña + 2FA) no permite retirar a direcciones no pre-aprobadas. Es la capa de protección más efectiva contra el robo de fondos.'}
+  ],
+  p2p:[
+    {title:'Paso 1 — Configurar filtros de comerciante seguro',
+     path:['Comprar Cripto','P2P Trading','USDT','Filtros avanzados','Completado >95%','Órdenes >500','Verificado'],
+     desc:'El Mercado P2P sufre información asimétrica crítica: no sabes si tu contraparte es honesta. Los filtros estadísticos reducen este riesgo exponencialmente — son tu primera defensa.',
+     tips:['<strong>Tasa de completado >95%:</strong> reduce en un 89% la probabilidad de caer en "cuentas puente" (cuentas bancarias robadas para triangular dinero ilícito).',
+           '<strong>Número de órdenes >500:</strong> el historial largo demuestra trayectoria real — una nueva cuenta con 100% de completado puede ser fraudulenta (pocas órdenes = no representativo estadísticamente).',
+           '<strong>Badge de verificación del exchange:</strong> el exchange verificó la identidad del comerciante — no garantiza honestidad pero añade responsabilidad legal.',
+           '<strong>Lee los términos del anunciante:</strong> busca señales de alerta — "no reembolsos", "solo efectivo", "sin disputas" — son banderas rojas.'],
+     warn:'Las "cuentas puente" son cuentas bancarias robadas usadas para triangular dinero ilícito. Operar con ellas puede involucrar tu cuenta bancaria en investigaciones policiales sin que seas culpable.'},
+    {title:'Paso 2 — Protocolo de verificación de pago real',
+     path:['Orden P2P activa','Comprador marca "Pagado"','Abrir app del banco (NO screenshot)','Verificar saldo DISPONIBLE','Si coincide: liberar USDT'],
+     desc:'La regla cardinal del P2P es inquebrantable: el único pago real es el saldo disponible verificado en tu institución bancaria. Todo lo demás puede ser falsificado.',
+     tips:['<strong>Saldo DISPONIBLE vs. RETENIDO:</strong> el saldo "en canje", "retenido" o "pendiente" NO constituye pago — la transacción P2P solo está respaldada cuando el monto está en saldo disponible.',
+           '<strong>Tiempo de acreditación:</strong> transferencias entre bancos diferentes pueden tardar hasta 2 horas en LatAm. Espera y verifica antes de liberar.',
+           '<strong>Monto exacto al peso:</strong> si acordaste $200,000 COP y recibes $199,999 COP, es señal de alerta — no liberes sin confirmar el origen.',
+           '<strong>PDF de comprobante:</strong> puede falsificarse en 5 minutos con cualquier editor. Nunca es evidencia de pago — solo el banco confirma.'],
+     warn:'Una vez que liberas el USDT en P2P, la transacción es IRREVERSIBLE. No existe "deshacer", no existe soporte que lo pueda revertir. El sistema de Escrow solo protege mientras no has liberado.'},
+    {title:'Paso 3 — Usar el mecanismo de Disputa (Escrow)',
+     path:['P2P → Mis Órdenes','Seleccionar orden activa','Botón "Apelar" (NO cancelar)','Subir evidencia bancaria','Esperar mediador (24-48h)'],
+     desc:'El Escrow retiene el cripto hasta que ambas partes confirmen. Si hay conflicto, el equipo de mediación del exchange revisa las evidencias y decide. Es tu red de seguridad legal — pero solo funciona si la usas correctamente.',
+     tips:['<strong>Abre disputa ANTES de que expire el temporizador:</strong> no canceles tú primero — quien cancela pierde la protección del Escrow automáticamente.',
+           '<strong>Evidencias válidas para mediación:</strong> screenshots del banco con timestamp visible, historial del chat DENTRO de la plataforma (el chat de WhatsApp no es evidencia válida).',
+           '<strong>Comunicación solo dentro de la plataforma:</strong> si el comprador te pide continuar por WhatsApp o Telegram, es señal de fraude — quiere eliminar evidencia.',
+           '<strong>Tiempo de resolución:</strong> Binance y Bybit resuelven el 90% de disputas en 24-48h hábiles si tienes evidencia sólida del banco.'],
+     warn:'Comunicarte fuera de la plataforma invalida las evidencias en una disputa. El equipo de mediación solo revisa el chat interno — lo que ocurra en WhatsApp no existe para ellos legalmente.'},
+    {title:'Paso 4 — Identificar señales de fraude en tiempo real',
+     path:['Durante la operación','Identificar patrones','Urgencia ficticia → Disputa inmediata','Solicitud externa → Rechazar','Comprobante sin banco → NO liberar'],
+     desc:'Los estafadores P2P usan manipulación psicológica basada en urgencia ficticia. El Sesgo de Reciprocidad Presionada nos hace ceder para evitar conflictos. Reconocer las señales es la defensa definitiva.',
+     tips:['<strong>Señal 1 — Urgencia temporal:</strong> "mi sistema bancario cae en 5 minutos", "tengo una emergencia" — nunca son razones técnicas reales, siempre son presión psicológica.',
+           '<strong>Señal 2 — Solicitud de datos fuera de plataforma:</strong> "dame tu WhatsApp", "enviarte el comprobante en alta resolución por email" — quiere eliminar la evidencia del chat.',
+           '<strong>Señal 3 — Errores lingüísticos marcados:</strong> traducción automática deficiente, tono agresivo o extremadamente servil, cambios bruscos de actitud.',
+           '<strong>Señal 4 — Comprobante con errores tipográficos:</strong> nombres mal escritos, monto con decimales raros, logos pixelados o colores incorrectos del banco.'],
+     warn:'El ser humano cede ante la presión social para evitar conflictos — es un mecanismo evolutivo. Los estafadores profesionales estudian y explotan exactamente este sesgo cognitivo (Reciprocidad Presionada).'}
+  ],
+  spot:[
+    {title:'¿Qué es el DCA? — La estrategia de compra inteligente para novatos',
+     path:['Concepto base','No requiere acción en el exchange todavía','Lee y comprende antes de ejecutar'],
+     desc:'DCA significa <strong>Dollar Cost Averaging</strong> — en español: "promedio del costo en dólares". La idea es muy simple: <strong>en lugar de comprar todo de un golpe, compras poco a poco en fechas fijas</strong>, sin importar si el precio está arriba o abajo. Así nunca compras todo en el peor momento.',
+     tips:['<strong>Ejemplo real:</strong> tienes $400. En lugar de comprar $400 de BTC hoy, compras $100 cada semana durante 4 semanas. Si la semana 2 el precio baja, compras más BTC con esos mismos $100. Si sube, compras menos. Al final, tu precio promedio es mejor que si hubieras apostado todo el primer día.',
+           '<strong>¿Por qué funciona?</strong> Porque nadie sabe cuándo el precio está en su punto más bajo. El DCA elimina la necesidad de adivinar — solo sigues el plan y listo.',
+           '<strong>¿Con cuánto se puede hacer?</strong> Con cualquier monto. Puedes empezar con $20 a la semana. Lo importante es la constancia, no la cantidad.',
+           '<strong>La trampa más común:</strong> cuando el precio baja mucho, el miedo te hace querer pausar. Ese es exactamente el momento en que más BTC obtienes por tu dinero. El DCA funciona solo si lo sigues sin importar lo que haga el mercado.'],
+     warn:'El DCA no garantiza ganancias — garantiza que compras a un precio promedio razonable y que no cometes el error más caro: poner todo el dinero en el peor momento. Es una estrategia de largo plazo (mínimo 6-12 meses).'},
+    {title:'Paso 1 — Conocer los tipos de órdenes en Spot',
+     path:['Mercados','Spot','Par BTC/USDT','Panel de trading (derecha)','Seleccionar tipo de orden','Cantidad → Confirmar'],
+     desc:'La diferencia entre Market y Limit no es solo de precio — define tu rol en el mercado (Taker vs. Maker) y el costo real de cada operación. Entenderlos es la base de cualquier estrategia.',
+     tips:['<strong>Orden MARKET:</strong> compra/vende al instante al mejor precio disponible. Más cara (Taker fee ~0.1%). Usa solo cuando la velocidad es crítica (salida de emergencia).',
+           '<strong>Orden LIMIT:</strong> tú defines el precio exacto — la orden espera en el libro hasta que el mercado llegue. Más barata (Maker fee ~0.09%). Ideal para DCA y entradas planificadas.',
+           '<strong>Orden STOP-LIMIT:</strong> precio de activación (Stop) + precio de ejecución (Limit). Úsala como Stop Loss en Spot o para entradas con confirmación de nivel.',
+           '<strong>Slippage:</strong> con órdenes Market en pares de bajo volumen, el precio de ejecución puede ser 2-5% peor que el visible en pantalla. Siempre revisa el libro antes.'],
+     warn:'Una Orden Market en un par con poco volumen puede ejecutarse a un precio significativamente diferente al que ves. Este deslizamiento de precio (slippage) es costo real que erosiona la estrategia.'},
+    {title:'Paso 2 — Implementar estrategia DCA con órdenes Limit',
+     path:['Spot → BTC/USDT','Panel derecho','Tipo: LIMIT','Precio: objetivo de tu DCA','Cantidad: monto de tu plan','Comprar BTC → Confirmar'],
+     desc:'Dollar Cost Averaging (DCA) reduce la varianza del precio medio de compra y elimina el riesgo del Market Timing. Implementarlo con órdenes Limit garantiza el precio exacto y menor comisión.',
+     tips:['<strong>Define tu calendario DCA:</strong> ejemplo — comprar $100 de BTC cada 15 días, precio objetivo: precio actual −5%. La Limit Order espera automáticamente.',
+           '<strong>Binance — Orden recurrente:</strong> algunos pares permiten configurar DCA automático desde "Comprar Cripto → DCA". Para precisión total, usa Limit manual.',
+           '<strong>Bybit — Smart DCA:</strong> disponible en Trading → DCA → configurar precio objetivo, cantidad y frecuencia.',
+           '<strong>Registro del DCA:</strong> anota fecha, precio y cantidad en una hoja de cálculo — es tu precio base oficial para el cálculo fiscal posterior.'],
+     warn:'Cuando el precio baja mucho, el instinto te va a decir "para, espera a que suba". Eso es exactamente lo contrario a lo que debes hacer con DCA. Cuando baja, cada $100 te compra MÁS BTC que antes. Si paras cuando baja, pierdes la mejor parte de la estrategia.'},
+    {title:'Paso 3 — Leer el Libro de Órdenes (Order Book)',
+     path:['Interfaz de Trading Spot','Panel central / izquierdo','Libro de Órdenes (Order Book)','Bid (compra) = rojo','Ask (venta) = verde','Spread = diferencia entre ambos'],
+     desc:'El libro de órdenes revela la intención real del mercado en tiempo real. Grandes órdenes Limit de compra acumuladas = soporte fuerte. Grandes ventas acumuladas = resistencia. Es el radar a corto plazo.',
+     tips:['<strong>Bid (rojo):</strong> precios donde hay compradores esperando — el más alto es el "Best Bid" (mejor oferta de compra activa).',
+           '<strong>Ask (verde):</strong> precios donde hay vendedores esperando — el más bajo es el "Best Ask" (mejor oferta de venta activa).',
+           '<strong>Spread:</strong> diferencia entre Best Bid y Best Ask. En BTC/USDT suele ser $0.10-1.00 (muy bueno). En altcoins pequeñas puede ser 2-5% (riesgo de slippage).',
+           '<strong>Iceberg orders:</strong> algunas órdenes grandes se ocultan parcialmente para no revelar la posición total. Un libro que parece liviano puede tener profundidad real.'],
+     warn:'Un libro de órdenes muy vacío (pocas entradas, spread amplio) indica poca liquidez. Ejecutar una orden Market en esas condiciones puede resultar en slippage de 3-10% o más.'},
+    {title:'Paso 4 — Revisar tarifas y optimizar comisiones',
+     path:['Perfil / Avatar','Tarifas / Fee Schedule','Ver tu nivel VIP actual','Activar pago con BNB/Bybit Token','Calcular fee acumulado mensual'],
+     desc:'Las comisiones erosionan el rendimiento compuesto de forma invisible. En trading frecuente representan la diferencia entre rentabilidad real y pérdida neta. Optimizarlas es rentabilidad pura.',
+     tips:['<strong>Binance — Pagar fees con BNB:</strong> Perfil → Dashboard → activar "Usar BNB para pagar comisiones" → 25% de descuento inmediato. Mantén BNB suficiente en la Spot Wallet.',
+           '<strong>Bybit — Coupon & Rewards:</strong> My Rewards → Fee Discount Coupons. Bybit distribuye cupones de descuento en eventos y promociones periódicas.',
+           '<strong>Cálculo real:</strong> 10 trades/semana de $500 con fee 0.1% = $5/semana = $260/año. Con BNB (-25%) = $195/año. Son $65 de ahorro solo por activar una opción.',
+           '<strong>Nivel VIP:</strong> a partir de $1M/mes en volumen Spot empiezan los descuentos VIP en Binance. Antes de eso, la optimización es BNB + Limit Orders.'],
+     warn:'Michael Jensen demostró que portafolios aparentemente ganadores resultan deficitarios en términos netos por no auditar los friction costs. La comisión del 0.1% parece pequeña — acumulada en un año puede superar $500 en volumen moderado.'}
+  ],
+  audit:[
+    {title:'Paso 1 — Exportar historial de operaciones (CSV)',
+     path:['Billetera / Assets','Historial de Transacciones','Filtrar: Spot / Futuros','Seleccionar rango de fechas','Exportar → Descargar CSV'],
+     desc:'El historial en CSV es el único documento oficial e inmutable con precio, cantidad, fee y timestamp de cada operación. Es el insumo esencial para Koinly y cualquier declaración fiscal.',
+     tips:['<strong>Binance:</strong> Cartera (Wallet) → Historial de Transacciones → Exportar Datos → CSV. Incluye todos los campos relevantes: precio, cantidad, fee, par.',
+           '<strong>Bybit:</strong> Assets → Transaction History → botón Export en la esquina superior derecha → CSV del período seleccionado.',
+           '<strong>Frecuencia recomendada:</strong> descarga mensual el último día de cada mes. Crea una carpeta por año con un archivo por mes — facilita enormemente la temporada fiscal.',
+           '<strong>Campos clave del CSV:</strong> Date/Time, Symbol, Side (Buy/Sell), Price, Qty, Fee, Fee Currency — estos 7 campos son los que necesita Koinly.'],
+     warn:'Sin el CSV histórico, no puedes demostrar tu precio de compra (base de costo) ante la autoridad fiscal. La carga de la prueba recae sobre ti — el exchange no la provee automáticamente.'},
+    {title:'Paso 2 — Calcular ROI neto real (con todos los costos)',
+     path:['Precio venta','−','Precio compra','−','Fee de compra','−','Fee de venta','=','Ganancia neta real'],
+     desc:'La Contabilidad Mental nos hace ver las ganancias brutas y olvidar los costos. El ROI real incluye todos los friction costs sin excepción: trading fee (in), trading fee (out) y gas/red si hubo retiro.',
+     tips:['<strong>Fórmula exacta:</strong> Ganancia neta = Precio venta × (1−fee%) − Precio compra × (1+fee%)',
+           '<strong>Ejemplo real:</strong> compras BTC a $60,000 (fee $60) y vendes a $65,000 (fee $65). Ganancia bruta: $5,000. Ganancia neta: $5,000 − $125 = $4,875. ROI real: 8.12% (no 8.33%).',
+           '<strong>Funding rate (futuros):</strong> se cobra cada 8 horas si tienes posiciones abiertas. En posiciones largas de días puede sumar cientos de dólares que no aparecen en el P&L bruto.',
+           '<strong>Comisiones de red en retiros:</strong> USDT-TRC20: $1-2. USDT-ERC20: $10-50. USDT-BEP20: $0.30-0.80. Elige siempre la red más barata para el mismo destino.'],
+     warn:'Los inversores que no auditan sus friction costs sobreestiman sistemáticamente su rentabilidad en un promedio del 15-20%. Creer que ganas cuando en realidad las comisiones te erosionan es uno de los errores más frecuentes.'},
+    {title:'Paso 3 — Configurar Koinly para tracking fiscal automático',
+     path:['koinly.io → Crear cuenta','Agregar Wallet → Exchange','Binance o Bybit → API Key (solo lectura)','Sincronizar → Revisar transacciones','Generar reporte fiscal'],
+     desc:'Koinly sincroniza automáticamente mediante API de solo lectura — sin capacidad de trading ni retiro. Al final del año genera el reporte fiscal exacto según la normativa de tu país.',
+     tips:['<strong>Crear API Key de solo lectura en Binance:</strong> Gestión API → Crear → desmarcar todos los permisos excepto "Lectura" → Copiar las dos claves → Pegar en Koinly.',
+           '<strong>Crear API Key en Bybit:</strong> Avatar → API Management → Create New Key → seleccionar solo "Read-Only" → copiar Key + Secret.',
+           '<strong>Eventos registrados automáticamente:</strong> compra, venta, swap, staking rewards, airdrops, interés por préstamo — todos los eventos gravables según DIAN, SUNAT, SAT.',
+           '<strong>Plan gratuito:</strong> Koinly permite hasta 10,000 transacciones/año en su plan de pago. Para declarar impuestos necesitas el plan pagado (~$49/año). Mucho menos que una multa fiscal.'],
+     warn:'En Colombia (DIAN) y la mayoría de LatAm, cada venta o swap de cripto es un evento gravable. Sin Koinly o herramienta similar, calcular impuestos manualmente en cientos de transacciones es prácticamente imposible.'}
+  ],
+  futures:[
+    {title:'Paso 1 — Activar cuenta Demo de Futuros',
+     path:['Derivados','Futuros Perpetuos','Botón "Modo Demo" (esquina superior)','Recibir $100,000 USDT virtuales','Practicar gestión de riesgo'],
+     desc:'La cuenta demo es la única forma ética de aprender futuros sin riesgo real. Bybit asigna $100k virtuales. Las condiciones son idénticas al mercado real — precios, fees y mecánica de liquidación.',
+     tips:['<strong>Binance Futuros Demo:</strong> ve a testnet.binancefuture.com → registra una cuenta separada → deposita USDT de prueba del faucet.',
+           '<strong>Bybit Demo Mode:</strong> en la pantalla de trading de futuros, botón "Demo Trading" en la esquina superior derecha → activa inmediatamente con $100,000 USDT virtuales.',
+           '<strong>Objetivo correcto de la demo:</strong> NO es ganar dinero virtual — es practicar el protocolo: definir SL antes de entrar, respetar el position sizing, auditar cada operación.',
+           '<strong>Tiempo mínimo en demo:</strong> 30 días antes de operar futuros con capital real. Si pierdes consistentemente en demo, eso te dice algo importante antes de arriesgar dinero real.'],
+     warn:'El Overconfidence Bias hace que quienes ganan en demo durante un mercado alcista crean que tienen habilidad real. Las ganancias en demo en un mercado que sube solo prueban que compraste long — no que sabes gestionar riesgo.'},
+    {title:'Paso 2 — Elegir margen: Aislado vs. Cruzado',
+     path:['Panel de Futuros','Junto al par (arriba izquierda)','Selector de Margen','AISLADO → definir cantidad','NO usar Cruzado en aprendizaje'],
+     desc:'Esta es la decisión de riesgo más importante al operar futuros. El Margen Cruzado usa TODO tu saldo de cuenta como colateral. El Aislado solo el asignado a esa posición. La diferencia puede ser la pérdida total.',
+     tips:['<strong>Margen AISLADO (obligatorio para principiantes):</strong> solo puedes perder el margen asignado a esa posición — el resto del portafolio de futuros está completamente protegido.',
+           '<strong>Margen CRUZADO (solo expertos):</strong> el sistema usa TODO el saldo disponible como colateral. Una posición mala puede arrastrar fondos de otras posiciones activas.',
+           '<strong>Cambio en tiempo real:</strong> puedes cambiar de Cruzado a Aislado SOLO cuando no tienes ninguna posición abierta en ese par.',
+           '<strong>Verificación visual:</strong> Binance muestra "Cross" o "Isolated" junto al nombre del par. Bybit lo muestra en el selector junto a la palanca de apalancamiento.'],
+     warn:'Con Margen Cruzado, un error en UNA posición puede arrastrar el capital destinado a OTRAS posiciones. Es el error de configuración más costoso en futuros para operadores novatos.'},
+    {title:'Paso 3 — Colocar Stop Loss como primera acción',
+     path:['Abrir posición (Long/Short)','Campo "Stop Loss" (TP/SL)','Ingresar precio de SL (antes del precio de liquidación)','Confirmar SL junto con la entrada','NUNCA abrir sin SL activo'],
+     desc:'El Stop Loss es el único mecanismo que garantiza la preservación de capital frente a Margin Calls. No es opcional — es el cinturón de seguridad. Ninguna posición apalancada debe existir sin él.',
+     tips:['<strong>Cálculo del SL:</strong> con 10x apalancamiento, liquidación está ~10% en contra. Coloca tu SL antes de ese nivel (por ejemplo −7%) para cerrar la posición con pérdida controlada antes de la liquidación total.',
+           '<strong>SL ANTES de entrar:</strong> define el precio de Stop Loss antes de abrir la posición. Las emociones distorsionan el criterio cuando ya hay capital en juego — la mente busca justificar no cortar la pérdida.',
+           '<strong>Trailing Stop (avanzado):</strong> mueve el SL automáticamente siguiendo el precio favorable — protege ganancias sin cerrar prematuramente en movimientos normales.',
+           '<strong>Binance — TP/SL al confirmar:</strong> en el panel de confirmación de la orden hay campos para TP y SL. Completa ambos antes de confirmar.',
+           '<strong>Bybit — TP/SL en tiempo real:</strong> botón "TP/SL" en la posición abierta permite modificar en cualquier momento.'],
+     warn:'Matemática inquebrantable: 20x apalancamiento = liquidación con movimiento del 5% (20×5%=100% de pérdida del margen). Sin SL, basta una vela de alta volatilidad para liquidar la posición completa en segundos.'},
+    {title:'Paso 4 — Calcular tamaño de posición (Position Sizing)',
+     path:['Definir % riesgo máximo (1-2% del capital)','Capital × % riesgo = pérdida máxima permitida','Pérdida máx / (Entrada − SL) = Cantidad de contratos','Ingresar cantidad en el panel','Verificar margen requerido'],
+     desc:'El Position Sizing es la disciplina que separa al trader profesional del apostador. Define cuánto capital arriesgas por operación — independientemente del apalancamiento elegido.',
+     tips:['<strong>Regla del 1-2%:</strong> nunca arriesgues más del 1-2% del capital total en una sola posición. Con $1,000 en futuros, la pérdida máxima permitida por trade es $10-20.',
+           '<strong>Ejemplo práctico:</strong> capital $1,000 → riesgo máximo 2% = $20. Entrada BTC $64,000, SL en $62,800 (diferencia $1,200). Posición = $20 / $1,200 = 0.0167 BTC.',
+           '<strong>Apalancamiento ≠ Riesgo:</strong> puedes usar 10x con posición pequeña (bajo riesgo real) o 2x con posición enorme (alto riesgo). El riesgo real lo define el tamaño, no el leverage.',
+           '<strong>Calculadoras online:</strong> bybit.com/en/trade/spot/BTC/USDT tiene calculadora de P&L y liquidación integrada en el panel.'],
+     warn:'El Riesgo de Cola en futuros cripto incluye "wicks" de liquidez que alcanzan niveles extremos en milisegundos durante manipulaciones de mercado. Un SL amplio correctamente calculado previene esas liquidaciones por volatilidad normal.'}
+  ],
+  integration:[
+    {title:'Paso 1 — Checklist de 10 puntos pre-operación',
+     path:['Antes de cualquier trade','Verificar los 10 puntos','Sin checklist completo','No ejecutar la orden'],
+     desc:'El checklist pre-operación es la herramienta de gestión de riesgo más poderosa y más ignorada. Los pilotos no despegan sin checklist. Los cirujanos no operan sin protocolo. Los traders profesionales tampoco.',
+     tips:['<strong>1. Seguridad:</strong> 2FA activo, Anti-Phishing configurado, sesión en red segura.',
+           '<strong>2. Plan documentado:</strong> entrada, Stop Loss y Take Profit escritos ANTES de tocar el botón.',
+           '<strong>3. Position sizing:</strong> riesgo máximo 1-2% del capital calculado explícitamente.',
+           '<strong>4. Contexto de mercado:</strong> tendencia actual, eventos macroeconómicos del día, volumen inusual.',
+           '<strong>5. Registro activado:</strong> Koinly sincronizado, CSV del mes descargado.'],
+     warn:'La urgencia artificial ("esta oportunidad desaparece en 2 minutos") es el catalizador más común de decisiones irracionales costosas. Si sientes urgencia, actívala como señal de alerta, no de oportunidad.'},
+    {title:'Paso 2 — Protocolo de auditoría mensual',
+     path:['Último día del mes','Exportar CSV completo','Calcular ROI neto real','Actualizar Koinly','Analizar errores','Archivar en carpeta del mes'],
+     desc:'La auditoría mensual convierte la operación casual en gestión profesional. Revela patrones de error, optimiza costos y mantiene el registro fiscal actualizado sin trabajo de último momento.',
+     tips:['<strong>Métricas a calcular cada mes:</strong> ROI neto, total de fees pagados, ratio win/loss, mayor pérdida individual y si violó el checklist.',
+           '<strong>Análisis de desviaciones:</strong> ¿qué operaciones violaron el protocolo? ¿Cuánto costaron esas violaciones en dinero real? Esta pregunta es la que más enseña.',
+           '<strong>Ajuste de estrategia:</strong> si más del 60% de los trades del mes fueron perdedores, pausa y analiza antes de continuar operando.',
+           '<strong>Archivo organizado:</strong> carpeta "2026" > subcarpetas "Enero", "Febrero", etc. Dentro de cada una: CSV del exchange + registro de Koinly + hoja de análisis.'],
+     warn:'El exchange no te envía un resumen mensual de tu rentabilidad real. Sin auditoría propia, puedes creer que estás ganando cuando las comisiones, el slippage y los errores de protocolo te están erosionando.'},
+    {title:'Paso 3 — Las 5 reglas de oro permanentes',
+     path:['Protocolo permanente','Aplican en cada operación','Sin excepciones','Sin importar el contexto emocional'],
+     desc:'Estas 5 reglas no son sugerencias — son el código de conducta del operador profesional. Cada violación tiene un costo estadísticamente probado. La consistencia en seguirlas es la única ventaja competitiva real.',
+     tips:['<strong>Regla 1:</strong> Nunca liberes en P2P sin confirmar el saldo disponible en la app del banco.',
+           '<strong>Regla 2:</strong> Ninguna posición apalancada sin Stop Loss activo — sin excepciones, sin importar qué tan "segura" parezca la operación.',
+           '<strong>Regla 3:</strong> Descarga el CSV mensualmente y calcula el ROI neto real, no el bruto.',
+           '<strong>Regla 4:</strong> Las órdenes Limit planificadas (DCA) superan estadísticamente al Market impulsivo — sigue el plan aunque el mercado suba.',
+           '<strong>Regla 5:</strong> Si sientes urgencia de decidir en este momento, espera 10 minutos y reevalúa con el checklist.'],
+     warn:'La diferencia entre un operador profesional y un apostador no es el capital ni la suerte — es la consistencia en seguir un protocolo definido incluso cuando las emociones dicen exactamente lo contrario.'}
+  ]
+};
+
+/* ═══════════ CHART MINI-QUIZZES ═══════════ */
+const CHARTQUIZ={
+  security:{q:'¿Cuál capa de seguridad bloquea el 99.9% de ataques automatizados aun si el atacante tiene tu contraseña?',
+    opts:['Contraseña fuerte (>16 caracteres)','Google Authenticator (2FA con app)','Verificación KYC completa','Email de confirmación'],
+    correct:1,fb_ok:'Exacto. El 2FA con app de autenticación requiere posesión física del dispositivo. Aunque tengan tu contraseña, sin el teléfono no pueden generar el código de 6 dígitos válido por 30 segundos.',
+    fb_bad:'Incorrecto. La contraseña sola no bloquea accesos si es robada en una filtración. El KYC verifica identidad pero no bloquea logins. El 2FA con app es la única capa que requiere posesión física del dispositivo.'},
+  p2p:{q:'El comprador te envía un PDF oficial del banco pero el saldo no aparece en tu app bancaria (20 min después). ¿Qué haces ANTES de que expire el temporizador?',
+    opts:['Liberar el USDT porque el PDF tiene sello oficial del banco','Esperar otros 30 min por si es un delay bancario técnico','Abrir disputa en la plataforma AHORA, sin cancelar la orden, con screenshot del banco','Cancelar la orden para protegerte de posible fraude'],
+    correct:2,fb_ok:'Correcto. Abrir disputa (no cancelar) activa la protección del Escrow y preserva tu tiempo legal. El PDF puede ser falsificado; el screenshot del banco mostrando "sin ingreso" es evidencia real. La disputa se resuelve a tu favor si tienes esa evidencia.',
+    fb_bad:'Incorrecto. Cancelar la orden anula la protección del Escrow. Esperar más tiempo reduce las evidencias disponibles. El PDF bancario se falsifica en minutos. La única acción correcta es abrir disputa con evidencia bancaria real inmediatamente.'},
+  spot:{q:'BTC está a $63,200. Tu análisis dice soporte fuerte en $58,500. Quieres comprar 0.01 BTC si llega ahí. Sin monitorear. ¿Qué orden usas?',
+    opts:['Orden Market ahora a $63,200 para asegurar la posición','Orden Limit en $58,500 — queda activa automáticamente','Orden Stop-Market en $58,500 — se activa cuando el precio baja','No hacer nada y revisar manualmente cada hora'],
+    correct:1,fb_ok:'Perfecto. La Limit Order a $58,500 queda activa en el libro de órdenes y se ejecuta exactamente al precio objetivo si el mercado llega. Pagas Maker fee (más barato), no requieres monitoreo y respetas tu análisis sin impulso emocional.',
+    fb_bad:'Incorrecto. Market compra a $63,200 ignorando tu análisis. Stop-Market activa una compra de mercado cuando el precio baja — en cripto con alta volatilidad puede ejecutarse a $57,800 o peor. Solo la Limit Order garantiza el precio exacto.'},
+  audit:{q:'Cerras un trade: compraste BTC a $60,000 (fee 0.1%) y vendiste a $65,000 (fee 0.1%). ¿Cuál es tu ganancia NETA real?',
+    opts:['$5,000 — la ganancia bruta es la real','$4,875 — restando fee de compra ($60) y fee de venta ($65)','$4,935 — restando solo el fee de salida','$5,000 menos el fee de red del retiro'],
+    correct:1,fb_ok:'Exacto. Fee de compra: $60,000 × 0.1% = $60. Fee de venta: $65,000 × 0.1% = $65. Total fees: $125. Ganancia neta: $5,000 − $125 = $4,875. ROI real: 8.12% (no 8.33%). En 100 operaciones similares son $12,500 solo en comisiones.',
+    fb_bad:'Incorrecto. Ambos fees son costos reales de la operación. El fee de compra aumenta el costo base efectivo; el fee de venta reduce el ingreso neto. Ignorar alguno sobreestima el ROI — y lo hace en cada operación.'},
+  futures:{q:'Tienes posición Long BTC con 10x apalancamiento y Margen Aislado de $500. Sin Stop Loss. BTC cae 9.5%. ¿Cuál es el riesgo inmediato?',
+    opts:['Ninguno — con Aislado solo puedes perder el margen ($500) y el mercado se recuperará','Riesgo alto — con 10x el precio de liquidación está ~10% abajo (~$57,600). Estás a $50 del precio de liquidación sin ningún mecanismo de salida automático','Riesgo moderado — el sistema cierra automáticamente a −8% para proteger parte del margen','Sin riesgo con Aislado — la liquidación nunca llega al 100%'],
+    correct:1,fb_ok:'Correcto. Con 10x la liquidación está a ~10% en contra del precio de entrada. Si entraste a $64,000, liquidación ~$57,600. Con BTC a $57,800 estás a ~$200 del precio de liquidación total. Sin SL, cualquier vela bajista puede liquidar los $500 en segundos.',
+    fb_bad:'Incorrecto. Con Margen Aislado puedes perder TODO el margen asignado ($500) si el precio alcanza el nivel de liquidación. Eso es exactamente lo que está a punto de ocurrir. El mercado no "se recuperará" si toca liquidación — la posición se cierra automáticamente con pérdida total.'},
+  integration:{q:'Es fin de mes. Tuviste 12 trades, 7 ganadores (ROI bruto +15%) y 5 perdedores (ROI bruto −8%). ¿Qué debes calcular primero en tu auditoría?',
+    opts:['El ROI bruto total sumando ganancias y pérdidas','El ROI neto real descontando todas las comisiones de los 12 trades, más el funding rate si tuviste futuros','Solo las pérdidas — para entender qué salió mal','El ratio win/loss (7/5) para evaluar la estrategia'],
+    correct:1,fb_ok:'Correcto. El ROI bruto puede ser positivo pero el neto negativo si los fees superaron las ganancias en trades pequeños. El ROI neto (descontando todos los costos) es el único número que tiene significado real para evaluar si la estrategia es rentable.',
+    fb_bad:'Incorrecto. El ROI bruto puede ser engañoso — muchas estrategias parecen ganadoras en bruto y son perdedoras en neto. El ratio win/loss tampoco dice nada sin el tamaño de cada ganancia/pérdida. El único número que importa es el ROI neto después de todos los costos.'}
+};
+
+/* ═══════════ ACADEMIC ═══════════ */
+const ACADEMIC={
+  security:{t:'Riesgo Operacional — Kahneman (Sistemas 1 y 2) + Nudge Theory (Thaler)',d:'El 82% de las brechas de seguridad se originan en el factor humano, no en vulnerabilidades técnicas. Richard Thaler (Nobel) demostró que configurar herramientas de seguridad activa el Sistema 2 (pensamiento analítico) en lugar del Sistema 1 (automático), previniendo clics por inercia en links fraudulentos. <strong>KYC:</strong> bajo normativas GAFI, es el único mecanismo legal que valida la propiedad real de los fondos ante disputas.'},
+  p2p:{t:'Información Asimétrica — George Akerlof (Nobel) + Teoría de Juegos',d:'Los mercados P2P sufren información asimétrica crítica: la contraparte conoce su honestidad, tú no. Akerlof demostró que sin un tercero de confianza, el mercado colapsa (<em>El Mercado de los Limones</em>). Los exchanges resuelven esto con el mecanismo de <strong>Escrow</strong> (depósito en garantía) aplicando Teoría de Juegos: ambas partes tienen incentivos para cumplir porque el incumplidor pierde la disputa.'},
+  spot:{t:'¿Por qué el DCA funciona? La matemática detrás de la estrategia',d:'Imagina que tienes $400 y BTC está a $40,000. Si compras todo hoy y mañana baja a $20,000, perdiste la mitad. Pero si compras $100 por semana durante 4 semanas: semana 1 a $40,000, semana 2 a $35,000, semana 3 a $25,000, semana 4 a $20,000 — tu precio promedio es $30,000, no $40,000. <strong>Compraste más barato sin necesidad de adivinar el fondo.</strong> Esta es la magia del DCA: no necesitas ser experto, solo consistente.'},
+  audit:{t:'Microestructura de Mercado — Michael Jensen (Costos de Transacción)',d:'Jensen demostró que muchos portafolios aparentemente ganadores resultan deficitarios en términos netos por no auditar sus friction costs. La <strong>Contabilidad Mental</strong> (sesgo cognitivo documentado) nos hace ver ganancias brutas y olvidar comisiones, slippage y fees de red. El ROI real = ganancia bruta − TODOS los costos operativos, sin excepción.'},
+  futures:{t:'Sesgo de Exceso de Confianza (Overconfidence Bias) + Ruina Estadística',d:'Estudios del Journal of Banking & Finance sobre traders minoristas de derivados cripto confirman el Overconfidence Bias: los operadores confunden rachas de suerte en mercados alcistas con habilidad técnica, subestimando el Riesgo de Cola. La asimetría matemática del apalancamiento es estricta: <strong>20x = liquidación con movimiento del 5%</strong> (20×5%=100% de pérdida del margen). No hay negociación posible con las matemáticas.'},
+  integration:{t:'Arquitectura de Decisión y Protocolo Disciplinado (Behavioral Finance)',d:'La diferencia entre un gestor profesional y un apostador no reside en el capital ni en la suerte — reside en la <strong>consistencia de seguir un protocolo definido</strong> incluso cuando las emociones señalan en dirección opuesta. La urgencia artificial activa el Sistema 1 (automático/impulsivo) de Kahneman, anulando el razonamiento analítico. El checklist es la herramienta que fuerza la activación del Sistema 2.'}
+};
+
+/* ═══════════ QUIZ 15 PREGUNTAS ═══════════ */
+const QUIZ=[
+  {mod:'Módulo I · Seguridad',title:'El Código Anti-Phishing en Acción',
+   scenario:`<strong>Situación:</strong> Recibes un email de "soporte@binance-security.net" con tu nombre completo, el logo oficial de Binance y el asunto "Acción urgente requerida". Tu cuenta tiene código Anti-Phishing configurado como "BTC2026". El email NO muestra ese código. ¿Qué haces?`,
+   opts:['Abrir el enlace porque tiene tu nombre real, lo que demuestra autenticidad.',
+         'El email es phishing porque no incluye tu código Anti-Phishing. Acceder a Binance escribiendo la URL manualmente y verificar si hay alerta real.',
+         'Responder solicitando que incluyan el código antes de actuar.',
+         'Reenviar al soporte de Binance para que confirmen si es real.'],
+   correct:1,ok:'Correcto. La ausencia del código Anti-Phishing es señal definitiva de phishing — independientemente de tu nombre real (obtenible de filtraciones de datos). El correo legítimo siempre incluye el código configurado.',
+   fail:'Error: los atacantes obtienen nombres de filtraciones de datos públicas. Solo el Anti-Phishing code — que ellos desconocen — valida un email. Sin ese código: phishing confirmado.'},
+  {mod:'Módulo I · Seguridad',title:'Código de Respaldo del 2FA',
+   scenario:`<strong>Situación:</strong> Cambias de teléfono y al instalar Google Authenticator en el nuevo dispositivo los códigos de tu exchange no aparecen. Tampoco tienes el código de respaldo de 16 caracteres anotado. ¿Cuál es la consecuencia real?`,
+   opts:['Sin problema — el soporte desactiva el 2FA solo con tu contraseña y correo.',
+         'El código de respaldo debió guardarse en papel al configurar 2FA. Sin él, la recuperación requiere verificación de identidad completa que tarda 7-30 días hábiles.',
+         'Bastaba con backup de la app de Google en la nube.',
+         'Los exchanges tienen SMS de recuperación que no requieren el código de respaldo.'],
+   correct:1,ok:'Exacto. Sin el código de respaldo, el proceso de recuperación exige verificación de identidad completa (foto con documento en mano) que puede tomar semanas. El papel físico es la única copia realmente segura.',
+   fail:'Incorrecto. Los backups en nube pueden estar desactivados. El SMS 2FA es vulnerable a SIM-Swap. El soporte requiere proceso completo de verificación de identidad para desactivar 2FA — protocolos anti-fraude lo exigen.'},
+  {mod:'Módulo I · Seguridad',title:'Whitelist de Retiros — Protección Real',
+   scenario:`<strong>Situación:</strong> Tienes Whitelist activa con solo tu hardware wallet aprobada. Un atacante obtiene tu contraseña + código 2FA activo (válido por 30 segundos). ¿Puede retirar tus fondos a su wallet?`,
+   opts:['Sí — con contraseña + 2FA tiene acceso total incluyendo retiros.',
+         'Sí, pero solo si llega en esos 30 segundos antes de que expire el código.',
+         'No. Agregar su wallet a la Whitelist requiere confirmación por email + 2FA + espera de 24-48h. No puede retirar a ninguna dirección no pre-aprobada.',
+         'No puede hacer nada — el 2FA invalida sesiones sospechosas automáticamente.'],
+   correct:2,ok:'Correcto. La Whitelist es independiente del 2FA. Agregar una nueva dirección requiere email + 2FA + 24-48h de espera. Ese tiempo te permite detectar el acceso no autorizado y bloquear la cuenta.',
+   fail:'Incorrecto. Con contraseña + 2FA el atacante puede iniciar sesión y ver balances, pero NO puede retirar a direcciones no pre-aprobadas. La Whitelist bloquea cualquier retiro a nueva dirección durante 24-48h.'},
+  {mod:'Módulo II · P2P',title:'El Comprobante PDF Falso',
+   scenario:`<strong>Situación:</strong> Vendes 500 USDT en P2P. El comprador marca "pagado" y envía un PDF con membrete bancario oficial. Han pasado 20 minutos y el saldo no aparece en tu banco. El temporizador tiene 8 minutos restantes. ¿Qué haces?`,
+   opts:['Liberar el USDT porque el PDF tiene sello oficial del banco.',
+         'Esperar otros 30 minutos por si es un delay técnico bancario.',
+         'NO liberar. Abrir DISPUTA (no cancelar) en la plataforma antes de que expire el temporizador, adjuntando screenshot del banco con el saldo sin cambios.',
+         'Cancelar la operación para protegerte del posible fraude.'],
+   correct:2,ok:'Correcto. Abrir disputa (NO cancelar) activa la protección del Escrow. El PDF puede falsificarse en minutos — el screenshot del banco mostrando ausencia de ingreso es evidencia real. El mediador resolverá a tu favor con esa evidencia.',
+   fail:'Error crítico: cancelar anula la protección del Escrow. Esperar más tiempo es arriesgar que expire el temporizador. El PDF no es evidencia de pago — solo el banco confirma. La única acción correcta es abrir disputa con evidencia bancaria.'},
+  {mod:'Módulo II · P2P',title:'Señales de Fraude en Tiempo Real',
+   scenario:`<strong>Situación:</strong> Durante una operación P2P el comprador dice: "Tengo un problema técnico con el sistema. ¿Puedes darme tu WhatsApp para coordinar mejor y enviarte el comprobante en alta resolución?" ¿Qué haces?`,
+   opts:['Compartir el número — si el comprobante en HD es real, facilita la verificación.',
+         'Rechazar firmemente. Responder SOLO dentro del chat de la plataforma. Cualquier solicitud de comunicación externa es señal de fraude.',
+         'Compartir el número pero acordar que toda comunicación importante quede en la app.',
+         'Pausar la operación y reportar al comprador como sospechoso.'],
+   correct:1,ok:'Correcto. Comunicarte fuera de la plataforma elimina toda evidencia legal del chat. El equipo de mediación solo revisa comunicaciones internas. La solicitud de canales externos es una señal clásica de intento de fraude.',
+   fail:'Incorrecto. No existe nivel seguro de comunicación externa. Cualquier dato compartido por WhatsApp es inválido como evidencia en una disputa. La solicitud de canal externo es la señal más clara de fraude documentada en P2P.'},
+  {mod:'Módulo II · P2P',title:'Filtros de Comerciante Seguro',
+   scenario:`<strong>Situación:</strong> Encuentras dos opciones en P2P: (A) 1,200 órdenes, 98.5% completado, precio $3,990/USDT, verificado. (B) 15 órdenes, 100% completado, precio $3,950/USDT, sin verificar. ¿Cuál eliges?`,
+   opts:['Opción B — el 100% de completado es perfecto y el precio es mejor.',
+         'Opción A — 15 órdenes con 100% no es estadísticamente representativo. Los estafadores crean cuentas nuevas regularmente. 1,200 órdenes con 98.5% es evidencia real de trayectoria legítima.',
+         'Ninguna — buscar un tercero con precio exactamente igual al mercado.',
+         'Opción B pero pidiendo que complete la verificación primero.'],
+   correct:1,ok:'Exacto. Un 100% con 15 órdenes no tiene significado estadístico. Los estafadores profesionales crean cuentas nuevas regularmente para reiniciar el historial. 1,200 órdenes con 98.5% es evidencia sólida e irreplicable fácilmente.',
+   fail:'Incorrecto. El 100% con pocas órdenes es una señal ambigua, no de confianza. Los estafadores evitan acumular historial creando cuentas nuevas. El precio ligeramente mejor no justifica el riesgo estadístico.'},
+  {mod:'Módulo III · Spot & DCA',title:'Orden Limit para DCA Automático',
+   scenario:`<strong>Situación:</strong> BTC está en $63,200. Tu plan DCA dice comprar 0.01 BTC si llega a $58,500. No puedes monitorear el mercado constantemente. ¿Qué tipo de orden colocas?`,
+   opts:['Orden Market ahora — asegurar la posición antes de que suba más.',
+         'Orden Limit en $58,500 — queda activa en el libro y se ejecuta exactamente al precio objetivo si el mercado llega.',
+         'Orden Stop-Market en $58,500 — se activa cuando el precio baja.',
+         'No colocar ninguna y revisar el precio manualmente varias veces al día.'],
+   correct:1,ok:'Correcto. La Limit Order a $58,500 automatiza tu estrategia DCA: queda activa por el tiempo configurado, ejecuta exactamente al precio objetivo, paga Maker fee (menor comisión) y no requiere tu presencia.',
+   fail:'Incorrecto. Market compra a $63,200 ignorando tu análisis. Stop-Market activa una compra de mercado al bajar — puede ejecutarse significativamente peor que $58,500 durante volatilidad. Solo la Limit garantiza el precio exacto.'},
+  {mod:'Módulo III · Spot & DCA',title:'DCA vs. FOMO Alcista',
+   scenario:`<strong>Situación:</strong> Tu plan DCA establece $200/semana en BTC. Esta semana BTC subió 15% y tu grupo dice "seguirá subiendo". Sientes el impulso de comprar $2,000 (10 semanas de DCA) ahora mismo. ¿Qué haces?`,
+   opts:['Comprar $2,000 — el momentum alcista históricamente continúa.',
+         'Seguir exactamente el plan: comprar $200 esta semana. El FOMO es la trampa que el DCA está diseñado para eliminar. Modificar el plan en euforia destruye su ventaja estadística.',
+         'Pausar el DCA esta semana para no comprar caro.',
+         'Comprar $400 (doble) como término medio entre el plan y el impulso.'],
+   correct:1,ok:'Exacto. El DCA es efectivo precisamente porque elimina la variable emocional. Modificarlo en momentos de euforia (comprando más) o miedo (pausando) destruye la ventaja estadística documentada en 90% de períodos.',
+   fail:'Incorrecto. Modificar el plan según el sentimiento del mercado reduce el rendimiento promedio. El FOMO alcista es tan destructivo como el pánico bajista. El poder del DCA está en su ejecución mecánica e incondicional.'},
+  {mod:'Módulo IV · Auditoría',title:'ROI Neto Real vs. ROI Bruto',
+   scenario:`<strong>Situación:</strong> Compraste 0.1 BTC a $60,000 + fee 0.1% ($60). Vendiste a $65,000 − fee 0.1% ($65). Tu ROI bruto es 8.33%. ¿Cuál es tu ROI neto real?`,
+   opts:['8.33% — el fee es insignificante y no cambia el análisis.',
+         '8.12% — ganancia bruta $5,000 menos fees totales $125 = $4,875 netos sobre $6,006 invertidos.',
+         '8.25% — solo se descuenta el fee de salida.',
+         '7.98% — incluyendo también el costo de oportunidad del capital.'],
+   correct:1,ok:'Correcto. Fee entrada: $60,000×0.1%=$60. Fee salida: $65,000×0.1%=$65. Total fees: $125. Ganancia neta: $5,000−$125=$4,875. ROI: $4,875/$6,006=8.12%. En 100 operaciones similares: $12,500 solo en comisiones.',
+   fail:'Incorrecto. Ambos fees son costos reales. El fee de entrada aumenta el costo base; el de salida reduce el ingreso neto. Ignorar alguno sobreestima el ROI — y lo hace en cada operación acumulando el error.'},
+  {mod:'Módulo IV · Auditoría',title:'Historial Fiscal Sin CSV',
+   scenario:`<strong>Situación:</strong> La DIAN te solicita justificar $15,000 en ingresos cripto del año anterior. No tienes el CSV exportado mensualmente. ¿Cuál es el problema fiscal real?`,
+   opts:['Ninguno — el exchange provee el historial completo cuando la autoridad lo solicita legalmente.',
+         'Sin CSV con el precio de compra, la DIAN calcula impuestos sobre el monto TOTAL recibido ($15,000) en lugar de la ganancia neta real. La carga de la prueba recae sobre el contribuyente, no el exchange.',
+         'Solo pierdes tiempo navegando la interfaz del exchange manualmente.',
+         'El exchange reporta directamente a la DIAN sin que debas intervenir.'],
+   correct:1,ok:'Exacto. Sin el precio de compra documentado, la autoridad puede calcular impuestos sobre el bruto. En Colombia y LatAm la carga de la prueba recae sobre el contribuyente. El CSV mensual es la evidencia que te permite demostrar el precio base.',
+   fail:'Incorrecto. Los exchanges de LatAm no reportan automáticamente a las autoridades locales. Sin CSV con precio base, no puedes probar tu costo de adquisición — y pagas impuestos sobre el monto bruto en lugar de la ganancia neta.'},
+  {mod:'Módulo V · Derivados',title:'Margen Cruzado en Caída',
+   scenario:`<strong>Situación:</strong> Cuenta de futuros con $1,000 USDT: $400 en Long ETH (20x, Margen Cruzado) y $600 disponibles. ETH cae 4.5%. Con 20x la liquidación ocurre a ~5% de caída. ¿Qué hace el sistema con los $600?`,
+   opts:['Los $600 no están en riesgo — Margen Aislado los protegería aunque estén en la misma cuenta.',
+         'Con Margen Cruzado, el sistema automáticamente usa los $600 disponibles para agregar margen a la Long, retrasando (pero no eliminando) la liquidación. Tus $600 están en riesgo directo.',
+         'El sistema cierra la posición al −90% para proteger el capital restante.',
+         'El Margen Cruzado solo usa fondos adicionales si el operador lo autoriza manualmente.'],
+   correct:1,ok:'Correcto. El Margen Cruzado usa TODO el saldo de la cuenta como colateral activo. Al acercarse la liquidación, el sistema agrega margen automáticamente de los fondos disponibles — exponiendo el portafolio completo a una sola posición mala.',
+   fail:'Incorrecto. Eso describe el Margen Aislado, no el Cruzado. El Margen Cruzado hace exactamente lo contrario: usa todo el capital disponible para evitar la liquidación, aumentando la exposición total del portafolio.'},
+  {mod:'Módulo V · Derivados',title:'Stop Loss — Matemática del Apalancamiento',
+   scenario:`<strong>Situación:</strong> Long BTC a $64,000 con 10x apalancamiento, Margen Aislado $200, sin Stop Loss. BTC cae a $57,800 (−9.7%). ¿Cuál es tu situación?`,
+   opts:['Seguro — con Aislado solo puedes perder los $200, y la liquidación exacta es a −10% ($57,600), todavía hay margen.',
+         'En riesgo crítico. Con 10x el precio de liquidación está ~$57,600. BTC a $57,800 significa que estás a ~$200 del precio de liquidación total, sin ningún mecanismo de salida automático.',
+         'Sin riesgo mientras el margen de mantenimiento no se active.',
+         'La liquidación solo ocurre si no hay fondos en la cuenta general, no en la de futuros.'],
+   correct:1,ok:'Correcto. Con 10x: precio liquidación ≈ $64,000 × 0.90 = $57,600 (ajustado por margen de mantenimiento ~0.5%). Con BTC en $57,800 estás a ~$200 del precio de liquidación. Cualquier vela bajista puede alcanzarlo.',
+   fail:'Incorrecto. La liquidación con 10x no ocurre exactamente a −10% — el margen de mantenimiento (~0.5%) ajusta levemente el precio. Con la posición a $57,800 y liquidación ~$57,600, el riesgo es inmediato. Un SL habría cerrado la posición semanas antes.'},
+  {mod:'Módulo V · Derivados',title:'10 Trades Ganadores Sin Stop Loss',
+   scenario:`<strong>Situación:</strong> Llevas 3 meses operando futuros sin Stop Loss, 10 trades ganadores, $3,200 de ganancia total. El mercado ha subido consistentemente. Decides continuar sin SL para no perder posiciones por "volatilidad temporal". ¿Cuál es el riesgo real?`,
+   opts:['Mínimo — 10 trades ganadores prueban que el análisis funciona.',
+         'Máximo. El Overconfidence Bias confunde un mercado alcista con habilidad propia. Sin SL, basta UN evento de cola (wick de liquidez, noticia macro) para perder los $3,200 + capital inicial en segundos.',
+         'Moderado — puedes compensar agregando capital cuando el mercado caiga.',
+         'Sin riesgo adicional — si el mercado sigue subiendo, el SL solo cierra posiciones prematuramente.'],
+   correct:1,ok:'Exacto. El Journal of Banking & Finance documenta que traders sin SL que sobreviven un ciclo alcista son los que más pierden en el primer ciclo bajista. 10 trades ganadores en un mercado que subió prueban que compraste long — no habilidad de gestión de riesgo.',
+   fail:'Incorrecto. 10 trades ganadores en un mercado alcista no demuestran habilidad de gestión de riesgo. Los mercados bajistas llegan sin aviso. UN evento de cola puede liquidar meses de ganancias acumuladas en segundos sin SL.'},
+  {mod:'Módulo VI · Integrado',title:'La Urgencia Artificial',
+   scenario:`<strong>Situación:</strong> Encuentras una plataforma DeFi con APY del 4,800% anual en staking. El programa cierra en 3 horas. Tienes $5,000 disponibles y sientes urgencia de no perderte la oportunidad. ¿Qué haces?`,
+   opts:['Invertir $1,000 (20%) — la diversificación mitiga el riesgo.',
+         'Invertir $500 rápidamente para no perder la oportunidad.',
+         'No invertir. La urgencia temporal ("cierra en 3h") + APY irreal (4,800%) son señales clásicas de scam o esquema Ponzi. Un APY sostenible no requiere presión de tiempo.',
+         'Buscar opiniones en Twitter antes de decidir.'],
+   correct:2,ok:'Correcto. Un APY del 4,800% anual = 13.1% diario — matemáticamente insostenible. Solo puede venir de nuevos inversores (Ponzi) o emisión inflacionaria (que devalúa el token). La urgencia temporal confirma que el diseño busca anular el razonamiento analítico.',
+   fail:'Incorrecto. El APY del 4,800% es la señal más clara. Ningún protocolo DeFi legítimo necesita presionar con temporizadores. La urgencia activa el Sistema 1 de Kahneman (impulsivo) anulando el Sistema 2 (analítico). Invertir cualquier monto aquí es perderlo.'},
+  {mod:'Módulo VI · Integrado',title:'Protocolo Completo Post-Trade',
+   scenario:`<strong>Situación:</strong> Cerraste tu primera semana operando: 4 trades Spot, 1 P2P de venta, 1 posición de futuros cerrada con ganancia. ¿Cuál es el protocolo correcto para cerrar la semana?`,
+   opts:['Calcular mentalmente la ganancia y anotarla en una libreta personal.',
+         'Tomar screenshot de la pantalla principal del exchange mostrando el balance final.',
+         'Exportar CSV del exchange → calcular ROI neto con todos los fees → cargar en Koinly → verificar que todas las transacciones quedaron registradas → archivar CSV en la carpeta del mes.',
+         'El registro es innecesario si la ganancia es pequeña — solo documentar operaciones grandes.'],
+   correct:2,ok:'Correcto. El protocolo completo es: CSV → ROI neto calculado → Koinly actualizado → archivo mensual. Cada paso tiene propósito: CSV = evidencia fiscal; ROI neto = rentabilidad real; Koinly = cumplimiento automático; archivo = protección ante auditorías.',
+   fail:'Incorrecto. Los cálculos mentales y screenshots no son registros válidos fiscalmente. Koinly requiere el CSV para calcular el precio base correctamente. Las "pequeñas" ganancias acumuladas representan miles de dólares al año — todos gravables.'}
+];
+
+/* ═══════════ STATE ═══════════ */
+let done=new Set(), stepsDone={}, quizState={started:false,level:0,score:0,answered:false,answers:[]}, charts={};
+
+/* ═══════ PERSISTENCIA localStorage ═══════ */
+const SAVE_KEY='principia_operador_v2';
+function saveProgress(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      done:[...done],
+      stepsDone:Object.fromEntries(Object.entries(stepsDone).map(([k,v])=>[k,[...v]])),
+      quizScore:quizState.score,
+      quizLevel:quizState.level,
+      quizAnswers:quizState.answers
+    }));
+  }catch(e){}
+}
+function loadProgress(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(d.done)done=new Set(d.done);
+    if(d.stepsDone)stepsDone=Object.fromEntries(Object.entries(d.stepsDone).map(([k,v])=>[k,new Set(v)]));
+    if(d.quizScore!=null)quizState.score=d.quizScore;
+    if(d.quizLevel!=null)quizState.level=d.quizLevel;
+    if(d.quizAnswers)quizState.answers=d.quizAnswers;
+  }catch(e){}
+}
+
+function getLastSaved(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return null;
+    const data=JSON.parse(raw);
+    return data.savedAt?new Date(data.savedAt):null;
+  }catch(e){return null;}
+}
+function clearProgress(){
+  if(confirm('¿Seguro que quieres reiniciar todo tu progreso?')){
+    localStorage.removeItem(SAVE_KEY);
+    done=new Set();stepsDone={};
+    quizState={started:false,level:0,score:0,answered:false,answers:[]};
+    Object.values(charts).forEach(ch=>{try{ch.destroy();}catch(e){}});charts={};
+    goScr('hero');setProgress(0,'Bienvenida');
+  }
+}
+
+
+/* ═══════════ NAV ═══════════ */
+function goScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById('scr-'+id).classList.add('on');window.scrollTo(0,0);}
+function setProgress(pct,lbl){document.getElementById('pbar').style.width=pct+'%';document.getElementById('pct').textContent=pct+'%';document.getElementById('nbadge').textContent=lbl;}
+
+/* ═══════════ COUNTERS ═══════════ */
+function countUp(el,n,d=1100){let s=null;function f(ts){if(!s)s=ts;const p=Math.min((ts-s)/d,1);el.textContent=Math.round(p*n);if(p<1)requestAnimationFrame(f);else el.textContent=n;}requestAnimationFrame(f);}
+/* ─── LOAD SAVED PROGRESS ON START ─── */
+setTimeout(()=>{
+  const hadProgress = loadProgress();
+  if(hadProgress){
+    renderMenu();
+    const banner=document.getElementById('resume-banner');
+    const txt=document.getElementById('resume-text');
+    if(banner&&txt){
+      const last=getLastSaved();
+      const mods=done.size;
+      txt.textContent=mods+' módulo'+(mods!==1?'s':'')+' completado'+(mods!==1?'s':'')+(last?' · Última sesión: '+last.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'');
+      banner.style.display='flex';
+    }
+    goScr('menu');
+  }
+},100);
+
+setTimeout(()=>{countUp(document.getElementById('kn1'),6);countUp(document.getElementById('kn2'),22,1200);countUp(document.getElementById('kn3'),15,1400);countUp(document.getElementById('kn4'),6,1600);},350);
+
+/* ═══════════ MENU ═══════════ */
+function renderMenu(){
+  const g=document.getElementById('mgrid');g.innerHTML='';
+  MODULES.forEach(m=>{
+    const d=done.has(m.id),c=document.createElement('div');
+    c.className='mcard'+(d?' mdone':'');
+    c.innerHTML=`<div class="mn">${m.num}</div><div class="mico">${m.ico}</div><div class="mtit">${m.title}</div><div class="mdesc">${m.desc}</div><div class="mtag">${m.tag}</div><div class="mchk"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="1.5"/></svg></div>`;
+    c.onclick=()=>openModule(m.id);g.appendChild(c);
+  });
+  const pct=Math.round((done.size/6)*100);
+  setProgress(pct,done.size===0?'Selecciona un Módulo':`Módulo ${done.size}/6`);
+  const qb=document.getElementById('btn-quiz-access');
+  if(qb){qb.disabled=false;qb.style.borderColor='rgba(240,192,64,.7)';}
+  if(done.size===6)setTimeout(showCert,600);
+}
+
+/* ═══════════ EXCHANGE LINKS HTML ═══════════ */
+function exLinksHTML(chart,stepIdx){
+  const links=EXLINKS[chart]?.[stepIdx];
+  if(!links)return'';
+  return`<div class="step-links">
+    <a class="step-link bn" href="${links.bn}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      ${links.bn_lbl} <span style="opacity:.6;font-weight:400">— ${links.bn_tag}</span>
+    </a>
+    <a class="step-link bb" href="${links.bb}" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      ${links.bb_lbl} <span style="opacity:.6;font-weight:400">— ${links.bb_tag}</span>
+    </a>
+  </div>`;
+}
+
+/* ═══════════ MODULE CONTENT ═══════════ */
+function buildPathHTML(path){
+  return path.map((p,i)=>{
+    const isLast=i===path.length-1;
+    const text=Array.isArray(p)?`<span class="path-active">${p[0]}</span>`:p;
+    return text+(isLast?'':' <span class="path-sep">→</span> ');
+  }).join('');
+}
+
+function moduleContent(m){
+  const steps=STEPS[m.chart]||[];
+  if(!stepsDone[m.id])stepsDone[m.id]=new Set();
+  const dc=stepsDone[m.id].size;
+  const pct=Math.round((dc/steps.length)*100);
+  const ac=ACADEMIC[m.chart]||{t:'',d:''};
+  const cq=CHARTQUIZ[m.chart];
+  const cqid=`cq-${m.chart}`;
+
+  let stepsHTML=steps.map((s,i)=>{
+    const sid=`s${m.id}-${i}`;
+    const isDone=stepsDone[m.id].has(i);
+    const pathArr=Array.isArray(s.path)?s.path:[s.path];
+    return`<div class="step-card${isDone?' done-s':''}" id="sc-${sid}">
+      <div class="step-hdr" onclick="toggleStep('${sid}')">
+        <div class="step-num" id="sn-${sid}">${isDone?'✓':(i+1)}</div>
+        <div class="step-title">${s.title}</div>
+        <div class="step-arr" id="arr-${sid}">▸</div>
+      </div>
+      <div class="step-body" id="body-${sid}">
+        <div class="step-inner">
+          <div class="step-path">📍 ${buildPathHTML(pathArr)}</div>
+          ${exLinksHTML(m.chart,i)}
+          <div class="step-desc">${s.desc}</div>
+          <div class="step-tips">${s.tips.map(t=>`<div class="step-tip">${t}</div>`).join('')}</div>
+          ${s.warn?`<div class="step-warn"><span style="flex-shrink:0;margin-right:5px">⚠️</span>${s.warn}</div>`:''}
+          <button class="step-done-btn${isDone?' already':''}" onclick="markStep(${m.id},${i})" id="btn-${sid}">
+            ${isDone?'✓ Completado':'Marcar como visto ▸'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Chart quiz mini-widget
+  const cqHTML=cq?`<div class="chart-quiz">
+    <div class="chart-quiz-q">🎯 ${cq.q}</div>
+    <div class="chart-quiz-opts" id="${cqid}-opts">
+      ${cq.opts.map((o,i)=>`<button class="cq-opt" id="${cqid}-o${i}" onclick="answerCQ('${cqid}',${i},${cq.correct},'${cq.fb_ok.replace(/'/g,"\\'")}','${cq.fb_bad.replace(/'/g,"\\'")}')"><span class="cq-k">${['A','B','C','D'][i]}</span> ${o}</button>`).join('')}
+    </div>
+    <div class="cq-fb" id="${cqid}-fb"></div>
+  </div>`:'';
+
+  const chartSection=buildChartHTML(m.chart,cqHTML);
+
+  return`<button class="back" onclick="goScr('menu');renderMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Volver al menú</button>
+  <div class="phdr">
+    <div class="pico2">${m.ico}</div>
+    <div>
+      <div class="phnum">${m.num} · ${m.tag}</div>
+      <div class="phtit"><em>${m.title.split(' ')[0]}</em> ${m.title.split(' ').slice(1).join(' ')}</div>
+      <div class="phsub">${m.desc}</div>
+    </div>
+  </div>
+
+  <div class="blk">
+    <div class="blk-lbl">Marco Académico</div>
+    <div class="academic-box"><div class="academic-tag">${ac.t}</div><p>${ac.d}</p></div>
+  </div>
+
+  ${chartSection}
+
+  <div class="blk">
+    <div class="blk-lbl">Pasos de Configuración — Interactivos con Acceso Directo</div>
+    <div class="mod-progress">
+      <span class="mp-lbl">Progreso</span>
+      <div class="mp-track"><div class="mp-fill" id="mpf-${m.id}" style="width:${pct}%"></div></div>
+      <span class="mp-count" id="mpc-${m.id}">${dc}/${steps.length}</span>
+    </div>
+    <div class="steps-wrap">${stepsHTML}</div>
+  </div>
+
+  <div class="pfooter">
+    <span style="font-family:'Orbitron',sans-serif;font-size:.54rem;letter-spacing:.08em;color:var(--tmuted)">${m.num.toUpperCase()} DE 6 · ${m.tag.toUpperCase()}</span>
+    <button class="btn-next" onclick="completeModule(${m.id})">
+      Módulo completado
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+    </button>
+  </div>`;
+}
+
+/* ═══════════ CHART HTML BUILDERS ═══════════ */
+function explainBtn(id){return`<button class="chart-explain-btn" id="ceb-${id}" onclick="toggleExplain('${id}')">? Cómo leer esta gráfica</button>`;}
+function toggleExplain(id){
+  const b=document.getElementById('ce-'+id),btn=document.getElementById('ceb-'+id);
+  const open=b.classList.toggle('open');
+  btn.classList.toggle('open',open);
+  btn.textContent=open?'✕ Cerrar explicación':'? Cómo leer esta gráfica';
+}
+
+function buildChartHTML(type,cqHTML){
+  const charts_map={
+    security:`<div class="blk">
+      <div class="blk-lbl">Gráficas Interactivas del Módulo</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-n" style="color:var(--red)">82%</div><div class="stat-l">Brechas por factor humano</div></div>
+        <div class="stat-card"><div class="stat-n">99.9%</div><div class="stat-l">Ataques bloqueados con 2FA app</div></div>
+        <div class="stat-card"><div class="stat-n" style="color:var(--green)">24-48h</div><div class="stat-l">Ventana de protección Whitelist</div></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div class="chart-title-wrap">
+            <div class="ctit">🔐 <span>Nivel de Protección por Capa de Seguridad (%)</span></div>
+            <div class="chart-subtitle">Cada barra representa qué tan protegida está una cuenta según las capas activadas. Interactúa con las barras para ver el nivel de protección exacto.</div>
+          </div>
+          ${explainBtn('security')}
+        </div>
+        <div class="chart-explain" id="ce-security"><div class="chart-explain-inner">
+          <div class="ce-grid">
+            <div class="ce-item"><div class="ce-item-lbl">📊 Qué muestra</div><div class="ce-item-txt">Cada barra representa un escenario de seguridad. La altura indica el porcentaje de ataques que esa configuración bloquea. <strong>Verde = protección alta. Rojo = vulnerable.</strong></div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🎯 Cómo leerla</div><div class="ce-item-txt">Lee de izquierda a derecha como una escala de protección. "Stack completo" (barra más derecha) es el objetivo — combina todas las capas activadas simultáneamente.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">💡 Lo más importante</div><div class="ce-item-txt">El salto más grande es de "Solo contraseña" (25%) a "+ 2FA" (72%). <strong>Activar el 2FA es la acción de mayor impacto por tiempo invertido.</strong></div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🖱️ Interacción</div><div class="ce-item-txt">Pasa el cursor sobre cada barra para ver el nivel exacto de protección. Haz clic en las leyendas del gráfico para mostrar u ocultar series.</div></div>
+          </div>
+          <div class="ce-interaction"><strong>Prueba esto:</strong> Observa la diferencia entre "Solo contraseña" y "Stack completo". La diferencia de 74 puntos porcentuales representa la distancia entre una cuenta comprometible en minutos y una que requeriría semanas de ataque especializado.</div>
+        </div></div>
+        <canvas id="chart-security" height="190"></canvas>
+        ${cqHTML}
+      </div>
+      <div class="rule-box"><div class="rule-tag">Regla de Oro</div><p>"La seguridad perfecta no existe, pero la seguridad por capas convierte un ataque viable en un ataque imposible para el 99.9% de los atacantes."</p></div>
+    </div>`,
+
+    p2p:`<div class="blk">
+      <div class="blk-lbl">Gráficas Interactivas del Módulo</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-n" style="color:var(--green)">89%</div><div class="stat-l">Reducción de riesgo con >95% completado</div></div>
+        <div class="stat-card"><div class="stat-n" style="color:var(--red)">0</div><div class="stat-l">Posibilidad de revertir USDT liberado</div></div>
+        <div class="stat-card"><div class="stat-n">48h</div><div class="stat-l">Resolución máx. disputa con evidencia</div></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div class="chart-title-wrap">
+            <div class="ctit">📊 <span>Perfil de Riesgo: Comerciante Seguro vs. Riesgoso (Radar)</span></div>
+            <div class="chart-subtitle">Gráfica de radar que compara 5 indicadores de seguridad entre un comerciante confiable y uno potencialmente fraudulento. Arrastra para rotar.</div>
+          </div>
+          ${explainBtn('p2p')}
+        </div>
+        <div class="chart-explain" id="ce-p2p"><div class="chart-explain-inner">
+          <div class="ce-grid">
+            <div class="ce-item"><div class="ce-item-lbl">📊 Qué muestra</div><div class="ce-item-txt">Una gráfica de radar (araña) con 5 ejes. Cada eje es un indicador de seguridad del comerciante. <strong>El área verde grande = comerciante seguro. El área roja pequeña = comerciante riesgoso.</strong></div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🎯 Cómo leerla</div><div class="ce-item-txt">Cuanto más hacia afuera llega el polígono en cada eje, mejor es ese indicador. Un polígono verde grande y simétrico indica un comerciante equilibrado y confiable.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">💡 Lo más importante</div><div class="ce-item-txt">El eje "Completado >95%" y "Órdenes >500" son los más predictivos del riesgo real. <strong>Un comerciante riesgoso suele tener ambos muy bajos.</strong></div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🖱️ Interacción</div><div class="ce-item-txt">Pasa el cursor sobre los puntos del radar para ver el valor exacto de cada indicador. Haz clic en la leyenda (verde/rojo) para mostrar/ocultar cada perfil.</div></div>
+          </div>
+          <div class="ce-interaction"><strong>Prueba esto:</strong> Haz clic en "Comerciante Seguro" en la leyenda para ocultarlo y ver solo el riesgoso. Observa cuánto más pequeño es su polígono. Esa diferencia visual es la diferencia real en nivel de riesgo que asumes.</div>
+        </div></div>
+        <canvas id="chart-p2p" height="210"></canvas>
+        ${cqHTML}
+      </div>
+      <div class="rule-box"><div class="rule-tag">Regla de Oro</div><p>"Nunca liberes cripto sin verificar el saldo disponible en la app de tu banco. El PDF, el screenshot y la notificación bancaria pueden ser falsificados. El saldo real, no."</p></div>
+    </div>`,
+
+    spot:`<div class="blk">
+      <div class="blk-lbl">Gráficas Interactivas del Módulo</div>
+      <table class="comp-tbl"><thead><tr><th>Tipo</th><th>Precio</th><th>Velocidad</th><th>Fee</th><th>Mejor para</th></tr></thead><tbody>
+        <tr><td>Market</td><td class="bad">Variable (slippage)</td><td class="good">Inmediata</td><td class="bad">Taker 0.10%</td><td>Salida urgente</td></tr>
+        <tr><td>Limit</td><td class="good">Exacto (defines tú)</td><td>Cuando el mercado llega</td><td class="good">Maker 0.09%</td><td>DCA planificado</td></tr>
+        <tr><td>Stop-Limit</td><td class="good">Controlado</td><td>Al activarse el Stop</td><td class="good">Maker 0.09%</td><td>Stop Loss Spot</td></tr>
+      </tbody></table>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div class="chart-title-wrap">
+            <div class="ctit">📈 <span>DCA: Varianza del precio promedio según frecuencia de compra</span></div>
+            <div class="chart-subtitle">A mayor frecuencia de compra, menor varianza del precio promedio obtenido. La línea dorada muestra cómo baja el precio promedio al aumentar la frecuencia del DCA.</div>
+          </div>
+          ${explainBtn('spot')}
+        </div>
+        <div class="chart-explain" id="ce-spot"><div class="chart-explain-inner">
+          <div class="ce-grid">
+            <div class="ce-item"><div class="ce-item-lbl">📊 Qué muestra</div><div class="ce-item-txt">Dos líneas: <strong style="color:var(--red)">roja = varianza del precio promedio</strong> (riesgo de timing) y <strong style="color:var(--gold-b)">dorada = precio promedio estimado</strong>. Ambas disminuyen al aumentar la frecuencia de compra.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🎯 Cómo leerla</div><div class="ce-item-txt">El eje X es la frecuencia mensual (1×/mes a 30×/mes). El eje Y izquierdo (rojo) es el índice de varianza. El eje Y derecho (dorado) es el precio promedio. Cuanto más a la derecha, más frecuente el DCA.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">💡 Lo más importante</div><div class="ce-item-txt">La mayor caída de varianza ocurre entre 1× y 4× por mes. <strong>Pasar de comprar mensual a semanal reduce la varianza a casi la mitad</strong> sin costo adicional significativo.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🖱️ Interacción</div><div class="ce-item-txt">Pasa el cursor sobre cualquier punto de las líneas para ver los valores exactos de varianza y precio promedio en esa frecuencia. Ambas métricas se muestran simultáneamente en el tooltip.</div></div>
+          </div>
+          <div class="ce-interaction"><strong>Prueba esto:</strong> Coloca el cursor en "1×/mes" y luego en "4×/mes". Observa cómo la varianza cae de 100 a ~48 solo cuadruplicando la frecuencia. Ese es el poder del DCA semanal sobre el mensual.</div>
+        </div></div>
+        <canvas id="chart-spot" height="190"></canvas>
+        ${cqHTML}
+      </div>
+      <div class="wbox">
+        <div class="ctit">⚡ <span>Calculadora: Ahorro Anual con Órdenes Limit vs. Market</span></div>
+        <div class="wrow"><div class="wlbl">Capital mensual ($)</div><input type="range" class="wslider" id="dca-cap" min="100" max="5000" step="100" value="500" oninput="updDCA()"><div class="wval" id="dv-cap">$500</div></div>
+        <div class="wrow"><div class="wlbl">Trades por mes</div><input type="range" class="wslider" id="dca-trades" min="1" max="30" step="1" value="4" oninput="updDCA()"><div class="wval" id="dv-trades">4×/mes</div></div>
+        <div class="wres">
+          <div class="wr"><div class="wr-l">Fee Taker (Market) anual</div><div class="wr-v r" id="dv-taker">$600</div></div>
+          <div class="wr"><div class="wr-l">Fee Maker (Limit) anual</div><div class="wr-v g" id="dv-maker">$540</div></div>
+          <div class="wr"><div class="wr-l">Ahorro anual</div><div class="wr-v g" id="dv-save">$60</div></div>
+        </div>
+        <div class="w-explain">Usando órdenes <strong>Limit en lugar de Market</strong> ahorras el 10% en comisiones (0.09% vs. 0.10%). En capital alto o trading frecuente, ese 10% puede representar cientos de dólares anuales. Combínalo con el pago en BNB/Bybit Token para otro 25% de descuento adicional.</div>
+      </div>
+      <div class="rule-box"><div class="rule-tag">Regla de Oro</div><p>"El DCA mecánico con Limit Orders supera estadísticamente al timing activo en el 90% de los períodos. La clave: seguirlo sin modificarlo cuando el mercado sube (FOMO) ni cuando cae (pánico)."</p></div>
+    </div>`,
+
+    audit:`<div class="blk">
+      <div class="blk-lbl">Gráficas Interactivas del Módulo</div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div class="chart-title-wrap">
+            <div class="ctit">💰 <span>Erosión del rendimiento por comisiones — 12 meses</span></div>
+            <div class="chart-subtitle">Comparación entre ganancia bruta (visible en pantalla) y ganancia neta real (después de todos los fees) a lo largo del año.</div>
+          </div>
+          ${explainBtn('audit')}
+        </div>
+        <div class="chart-explain" id="ce-audit"><div class="chart-explain-inner">
+          <div class="ce-grid">
+            <div class="ce-item"><div class="ce-item-lbl">📊 Qué muestra</div><div class="ce-item-txt">Dos barras por mes: <strong style="color:var(--gold)">dorada = ganancia bruta</strong> y <strong style="color:var(--green)">verde = ganancia neta</strong> (después de comisiones). La diferencia entre ambas es el total de fees pagados ese mes.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🎯 Cómo leerla</div><div class="ce-item-txt">Cuanto mayor sea la diferencia entre la barra dorada y la verde, más comisiones pagaste ese mes. Esto suele aumentar cuando el volumen de trading aumenta.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">💡 Lo más importante</div><div class="ce-item-txt"><strong>La diferencia entre bruto y neto es constante y crece con el volumen.</strong> Los meses con más actividad (más barras altas) también tienen mayor erosión por fees.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🖱️ Interacción</div><div class="ce-item-txt">Pasa el cursor sobre las barras para ver el desglose exacto: ganancia bruta, ganancia neta y fees erosionados de ese mes específico.</div></div>
+          </div>
+          <div class="ce-interaction"><strong>Prueba esto:</strong> Pasa el cursor sobre cualquier mes y lee el tooltip. Verás "Fees erosionados: $X". Suma mentalmente esos valores del año completo — esa es la cifra real que pagaste en comisiones y que no aparece en ningún resumen automático del exchange.</div>
+        </div></div>
+        <canvas id="chart-audit" height="190"></canvas>
+        ${cqHTML}
+      </div>
+      <div class="wbox">
+        <div class="ctit">🧮 <span>Calculadora de ROI Neto Real</span></div>
+        <div class="wrow"><div class="wlbl">Precio compra ($)</div><input type="range" class="wslider" id="roi-buy" min="10000" max="100000" step="1000" value="60000" oninput="updROI()"><div class="wval" id="rv-buy">$60,000</div></div>
+        <div class="wrow"><div class="wlbl">Precio venta ($)</div><input type="range" class="wslider" id="roi-sell" min="10000" max="150000" step="1000" value="65000" oninput="updROI()"><div class="wval" id="rv-sell">$65,000</div></div>
+        <div class="wrow"><div class="wlbl">Fee % por operación</div><input type="range" class="wslider" id="roi-fee" min="0.05" max="0.5" step="0.01" value="0.1" oninput="updROI()"><div class="wval" id="rv-fee">0.10%</div></div>
+        <div class="wres">
+          <div class="wr"><div class="wr-l">ROI Bruto</div><div class="wr-v" id="rv-gross">8.33%</div></div>
+          <div class="wr"><div class="wr-l">Fees totales</div><div class="wr-v r" id="rv-ftotal">$125</div></div>
+          <div class="wr"><div class="wr-l">ROI Neto Real</div><div class="wr-v g" id="rv-net">8.12%</div></div>
+        </div>
+        <div class="w-explain">Mueve los sliders para explorar diferentes escenarios. Observa cómo el ROI bruto y el neto divergen cuando el fee aumenta o cuando la ganancia bruta es pequeña. <strong>Con fee del 0.5% (algunas plataformas), el impacto puede superar el 1% del capital en una sola operación.</strong></div>
+      </div>
+      <div class="rule-box"><div class="rule-tag">Regla de Oro</div><p>"El único ROI que importa es el neto. Descarga el CSV mensualmente, calcula los fees reales, y usa Koinly desde el primer trade — no desde el primero que suponga un problema fiscal."</p></div>
+    </div>`,
+
+    futures:`<div class="blk">
+      <div class="blk-lbl">Gráficas Interactivas del Módulo</div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-n" style="color:var(--red)">5%</div><div class="stat-l">Movimiento que liquida con 20x</div></div>
+        <div class="stat-card"><div class="stat-n" style="color:var(--gold-b)">10%</div><div class="stat-l">Movimiento que liquida con 10x</div></div>
+        <div class="stat-card"><div class="stat-n" style="color:var(--green)">50%</div><div class="stat-l">Movimiento que liquida con 2x</div></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div class="chart-title-wrap">
+            <div class="ctit">⚡ <span>Precio de Liquidación según Apalancamiento (entrada $64,000)</span></div>
+            <div class="chart-subtitle">Cada par de barras muestra el precio al que se liquida una posición Long (rojo) y Short (verde) para cada nivel de apalancamiento. Más alto el leverage = más cerca está la liquidación del precio de entrada.</div>
+          </div>
+          ${explainBtn('futures')}
+        </div>
+        <div class="chart-explain" id="ce-futures"><div class="chart-explain-inner">
+          <div class="ce-grid">
+            <div class="ce-item"><div class="ce-item-lbl">📊 Qué muestra</div><div class="ce-item-txt">Para cada nivel de apalancamiento (2x a 20x), dos barras: <strong style="color:var(--red)">roja = precio de liquidación Long</strong> y <strong style="color:var(--green)">verde = precio de liquidación Short</strong>. El precio de entrada es $64,000.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🎯 Cómo leerla</div><div class="ce-item-txt">Observa cómo la barra roja sube (se acerca a $64,000) al aumentar el apalancamiento. Con 20x, la liquidación Long está en ~$60,800 — solo $3,200 debajo del precio de entrada.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">💡 Lo más importante</div><div class="ce-item-txt"><strong>Con 20x, una caída del 5% liquida la posición completa.</strong> Con 2x, necesitas una caída del 50%. La diferencia es entre un evento "normal de mercado" y un evento "casi imposible".</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🖱️ Interacción</div><div class="ce-item-txt">Pasa el cursor sobre las barras para ver el precio exacto de liquidación. La calculadora interactiva debajo te permite modificar el precio de entrada y el apalancamiento para tu escenario específico.</div></div>
+          </div>
+          <div class="ce-interaction"><strong>Prueba esto:</strong> Compara las barras de 2x y 20x visualmente. ¿Cuánto espacio hay entre el precio de entrada ($64,000) y la liquidación Long en cada caso? Esa "zona de seguridad" es el espacio donde puedes equivocarte sin perder todo el margen.</div>
+        </div></div>
+        <canvas id="chart-futures" height="200"></canvas>
+        ${cqHTML}
+      </div>
+      <div class="wbox">
+        <div class="ctit">🎯 <span>Calculadora Interactiva de Liquidación</span></div>
+        <div class="wrow"><div class="wlbl">Precio entrada ($)</div><input type="range" class="wslider" id="f-entry" min="10000" max="100000" step="500" value="64000" oninput="updFutures()"><div class="wval" id="fv-entry">$64,000</div></div>
+        <div class="wrow"><div class="wlbl">Apalancamiento (x)</div><input type="range" class="wslider" id="f-lev" min="2" max="20" step="1" value="10" oninput="updFutures()"><div class="wval" id="fv-lev">10x</div></div>
+        <div class="wres">
+          <div class="wr"><div class="wr-l">Liq. Long (~)</div><div class="wr-v r" id="fv-ll">$57,600</div></div>
+          <div class="wr"><div class="wr-l">Liq. Short (~)</div><div class="wr-v r" id="fv-ls">$70,400</div></div>
+          <div class="wr"><div class="wr-l">Margen de seguridad</div><div class="wr-v" id="fv-mg">10%</div></div>
+        </div>
+        <div class="w-explain">Mueve el slider de apalancamiento y observa cómo los precios de liquidación se acercan al precio de entrada. <strong>Regla práctica:</strong> coloca tu Stop Loss al 70% del margen de seguridad disponible. Si el margen de seguridad es 10%, tu SL debería estar máximo a −7% del precio de entrada.</div>
+      </div>
+      <div class="rule-box"><div class="rule-tag">Regla de Oro</div><p>"Ninguna posición apalancada sin Stop Loss. El apalancamiento amplifica ganancias y pérdidas simétricamente — la única asimetría favorable es el SL bien colocado."</p></div>
+    </div>`,
+
+    integration:`<div class="blk">
+      <div class="blk-lbl">Protocolo Visual del Operador Integrado</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot">1</div><div class="tl-content"><div class="tl-title">Antes de operar — Checklist de seguridad</div><div class="tl-desc">2FA activo, Anti-Phishing configurado, sesión en red segura. Sin esta verificación, no ejecutar ninguna orden.</div></div></div>
+        <div class="tl-item"><div class="tl-dot">2</div><div class="tl-content"><div class="tl-title">Antes del trade — Plan documentado</div><div class="tl-desc">Entrada, Stop Loss y Take Profit escritos antes de abrir la posición. Las emociones no pueden modificar un plan escrito.</div></div></div>
+        <div class="tl-item"><div class="tl-dot">3</div><div class="tl-content"><div class="tl-title">Durante — Sin improvisación</div><div class="tl-desc">Seguir el plan. Si el mercado va en contra del análisis, el SL gestiona la salida. No mover el SL para "darle espacio".</div></div></div>
+        <div class="tl-item"><div class="tl-dot">4</div><div class="tl-content"><div class="tl-title">Post-trade — Registro inmediato</div><div class="tl-desc">Anotar resultado vs. plan. ¿Se siguió el protocolo? ¿Dónde se desvió? ¿Cuánto costó esa desviación?</div></div></div>
+        <div class="tl-item"><div class="tl-dot">5</div><div class="tl-content"><div class="tl-title">Fin de mes — Auditoría completa</div><div class="tl-desc">CSV exportado → ROI neto calculado → Koinly actualizado → métricas del mes analizadas → carpeta archivada.</div></div></div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div class="chart-title-wrap">
+            <div class="ctit">📋 <span>Impacto de Seguir el Protocolo: Comparativa de Rendimiento</span></div>
+            <div class="chart-subtitle">Simulación del impacto acumulado de seguir el protocolo de forma consistente vs. improvisar. El protocolo no garantiza ganancias — garantiza que los errores sean menores y recuperables.</div>
+          </div>
+          ${explainBtn('integration')}
+        </div>
+        <div class="chart-explain" id="ce-integration"><div class="chart-explain-inner">
+          <div class="ce-grid">
+            <div class="ce-item"><div class="ce-item-lbl">📊 Qué muestra</div><div class="ce-item-txt">Dos líneas de rendimiento acumulado durante 12 meses: <strong style="color:var(--green)">verde = operador con protocolo</strong> y <strong style="color:var(--red)">roja = operador sin protocolo</strong>. Ambos tienen los mismos trades y señales.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🎯 Cómo leerla</div><div class="ce-item-txt">El eje Y es el rendimiento acumulado (%). Ambas líneas empiezan en 0. Con el tiempo, la divergencia crece porque el operador sin protocolo acumula errores evitables (SL movidos, trades impulsivos, fees no auditados).</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">💡 Lo más importante</div><div class="ce-item-txt"><strong>La diferencia no viene de las señales correctas — ambos las tienen iguales.</strong> Viene de la gestión de los errores: el protocolo hace que los errores sean menores y más recuperables.</div></div>
+            <div class="ce-item"><div class="ce-item-lbl">🖱️ Interacción</div><div class="ce-item-txt">Pasa el cursor sobre cualquier mes para ver la diferencia de rendimiento exacta entre ambas líneas. Observa en qué meses divergen más (generalmente los de alta volatilidad, cuando las emociones dominan).</div></div>
+          </div>
+          <div class="ce-interaction"><strong>Prueba esto:</strong> Pasa el cursor sobre los meses 6 y 12. Observa cómo la brecha crece con el tiempo. El protocolo tiene un efecto compuesto: cada error evitado mejora el punto de partida del siguiente mes.</div>
+        </div></div>
+        <canvas id="chart-integration" height="190"></canvas>
+        ${cqHTML}
+      </div>
+      <div class="alert-box"><strong>Recuerda:</strong> La urgencia artificial es la trampa más costosa. Si sientes que "debes decidir ahora mismo", eso es la señal de esperar, no de actuar.</div>
+      <div class="rule-box"><div class="rule-tag">Regla de Oro Final</div><p>"Un operador que sigue su protocolo el 80% de las veces tiene mejores resultados que uno brillante que lo sigue el 40%. La consistencia es la ventaja competitiva real."</p></div>
+    </div>`
+  };
+  return charts_map[type]||'';
+}
+
+/* ═══════════ CHART MINI-QUIZ ═══════════ */
+function answerCQ(id,idx,correct,fb_ok,fb_bad){
+  const opts=document.querySelectorAll(`#${id}-opts .cq-opt`);
+  opts.forEach((o,i)=>{
+    o.classList.add('cqlocked');
+    if(i===correct)o.classList.add('cqok');
+    else if(i===idx&&idx!==correct)o.classList.add('cqbad');
+    else o.classList.add('cqdim');
+  });
+  const fb=document.getElementById(`${id}-fb`);
+  const isOk=idx===correct;
+  fb.className=`cq-fb show ${isOk?'ok':'bad'}`;
+  fb.innerHTML=`${isOk?'✅ ':'⛔ '}${isOk?fb_ok:fb_bad}`;
+}
+
+/* ═══════════ STEPS ═══════════ */
+function toggleStep(sid){
+  const b=document.getElementById('body-'+sid),a=document.getElementById('arr-'+sid);
+  const open=b.classList.toggle('open');
+  a.style.transform=open?'rotate(90deg)':'';
+}
+function markStep(modId,stepIdx){
+  if(!stepsDone[modId])stepsDone[modId]=new Set();
+  stepsDone[modId].add(stepIdx);
+  const steps=STEPS[MODULES[modId].chart]||[];
+  const dc=stepsDone[modId].size;
+  const pct=Math.round((dc/steps.length)*100);
+  const mpf=document.getElementById('mpf-'+modId),mpc=document.getElementById('mpc-'+modId);
+  if(mpf)mpf.style.width=pct+'%';
+  if(mpc)mpc.textContent=`${dc}/${steps.length}`;
+  const sid=`s${modId}-${stepIdx}`;
+  const card=document.getElementById('sc-'+sid);
+  const btn=document.getElementById('btn-'+sid);
+  const num=document.getElementById('sn-'+sid);
+  if(card){card.classList.add('done-s');}
+  if(btn){btn.textContent='✓ Completado';btn.className='step-done-btn already';} saveProgress();
+  if(num){num.textContent='✓';num.style.cssText='background:var(--green);border-color:var(--green);color:#000';}
+  saveProgress();
+}
+
+function openModule(id){
+  const m=MODULES[id];
+  document.getElementById('ci').innerHTML=moduleContent(m);
+  goScr('content');
+  setProgress(Math.round((done.size/6)*100),`${m.num} — ${m.title}`);
+  setTimeout(()=>initChart(m.chart),280);
+}
+function completeModule(id){ saveProgress();
+  done.add(id);
+  saveProgress();
+  const next=id<5?id+1:null;
+  if(next!==null)openModule(next);
+  else{renderMenu();goScr('menu');}
+}
+
+/* ═══ LOAD ON INIT ═══ */
+loadProgress();
+
+
+/* ═══════════ CHARTS ═══════════ */
+const G='#C9A84C',GB='#F0C040',GD='#8A6A20',R='#E05050',GR='#50C878',DIM='rgba(255,255,255,0.42)';
+Chart.defaults.color=DIM;Chart.defaults.borderColor='rgba(201,168,76,0.1)';Chart.defaults.font.family='Rajdhani';
+function dc(id){if(charts[id]){try{charts[id].destroy();}catch(e){}}delete charts[id];}
+
+function initChart(type){
+  if(type==='security')buildSecurity();
+  if(type==='p2p')buildP2P();
+  if(type==='spot'){buildSpot();updDCA();}
+  if(type==='audit'){buildAudit();updROI();}
+  if(type==='futures'){buildFutures();updFutures();}
+  if(type==='integration')buildIntegration();
+}
+function buildSecurity(){
+  dc('security');const ctx=document.getElementById('chart-security');if(!ctx)return;
+  charts.security=new Chart(ctx,{type:'bar',data:{
+    labels:['Sin protección','Solo contraseña','+ 2FA App','+ Anti-Phishing','+ Whitelist','Stack completo'],
+    datasets:[{label:'Nivel de protección (%)',
+      data:[5,25,72,85,94,99],
+      backgroundColor:['rgba(224,80,80,.75)','rgba(224,130,50,.65)','rgba(201,168,76,.55)','rgba(201,168,76,.7)','rgba(80,200,120,.65)','rgba(80,200,120,.88)'],
+      borderWidth:1,borderRadius:3}]},
+  options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Protección: ${c.parsed.y}%`,afterLabel:c=>{const labels=['Totalmente expuesta','Contraseña robada = cuenta perdida','Bloquea 99.9% de ataques automáticos','Detecta 100% de emails falsos','Retiros bloqueados a nuevas addresses','Máxima protección disponible'];return labels[c.dataIndex];}}}},
+  scales:{x:{ticks:{color:DIM,font:{size:9}},grid:{color:'rgba(201,168,76,0.05)'}},y:{ticks:{color:DIM,callback:v=>v+'%'},max:100,grid:{color:'rgba(201,168,76,0.05)'}}}}});
+}
+function buildP2P(){
+  dc('p2p');const ctx=document.getElementById('chart-p2p');if(!ctx)return;
+  charts.p2p=new Chart(ctx,{type:'radar',data:{
+    labels:['Completado >95%','KYC verificado','Órdenes >500','Cuenta antigua','Términos claros'],
+    datasets:[
+      {label:'Comerciante Seguro',data:[95,90,85,92,88],borderColor:GR,backgroundColor:'rgba(80,200,120,0.1)',pointBackgroundColor:GR,pointRadius:4},
+      {label:'Comerciante Riesgoso',data:[38,18,12,25,32],borderColor:R,backgroundColor:'rgba(224,80,80,0.08)',pointBackgroundColor:R,pointRadius:4}
+    ]},
+  options:{responsive:true,plugins:{legend:{labels:{color:DIM,boxWidth:12,font:{size:11}}}},
+  scales:{r:{ticks:{color:DIM,backdropColor:'transparent',stepSize:20},grid:{color:'rgba(201,168,76,0.1)'},pointLabels:{color:DIM,font:{size:11}},min:0,max:100}}}});
+}
+function buildSpot(){
+  dc('spot');const ctx=document.getElementById('chart-spot');if(!ctx)return;
+  const freq=['1×/mes','2×/mes','4×/mes','8×/mes','15×/mes','30×/mes'];
+  charts.spot=new Chart(ctx,{type:'line',data:{labels:freq,datasets:[
+    {label:'Varianza del precio promedio',data:[100,72,48,31,21,15],borderColor:R,backgroundColor:'rgba(224,80,80,0.08)',tension:.4,fill:true,yAxisID:'y',pointRadius:5,pointHoverRadius:7},
+    {label:'Precio promedio estimado ($)',data:[63200,62800,62100,61700,61400,61200],borderColor:GB,backgroundColor:'rgba(240,192,64,0.04)',tension:.4,fill:false,yAxisID:'y1',pointRadius:5,pointHoverRadius:7}
+  ]},
+  options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:DIM,boxWidth:12}}},
+  scales:{y:{ticks:{color:DIM},title:{display:true,text:'Varianza (índice, base 100)',color:R,font:{size:10}},grid:{color:'rgba(201,168,76,0.05)'}},
+           y1:{position:'right',ticks:{color:DIM,callback:v=>'$'+v.toLocaleString()},title:{display:true,text:'Precio promedio ($)',color:GB,font:{size:10}},grid:{display:false}}}}});
+}
+function buildAudit(){
+  dc('audit');const ctx=document.getElementById('chart-audit');if(!ctx)return;
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const bruto=[820,1150,940,1380,1050,1720,1300,870,1530,1150,1010,1820];
+  const fees=bruto.map((v,i)=>Math.round(v*0.025+i*2.5));
+  const neto=bruto.map((v,i)=>v-fees[i]);
+  charts.audit=new Chart(ctx,{type:'bar',data:{labels:months,datasets:[
+    {label:'Ganancia bruta ($)',data:bruto,backgroundColor:'rgba(201,168,76,0.55)',borderColor:G,borderWidth:1,borderRadius:2},
+    {label:'Ganancia neta (−fees)',data:neto,backgroundColor:'rgba(80,200,120,0.65)',borderColor:GR,borderWidth:1,borderRadius:2}
+  ]},
+  options:{responsive:true,plugins:{legend:{labels:{color:DIM,boxWidth:12}},tooltip:{callbacks:{afterBody:items=>{const i=items[0].dataIndex;return[`Fees erosionados: $${fees[i]}`];}}}},
+  scales:{x:{ticks:{color:DIM,font:{size:10}},grid:{color:'rgba(201,168,76,0.04)'}},y:{ticks:{color:DIM,callback:v=>'$'+v},grid:{color:'rgba(201,168,76,0.04)'}}}}});
+}
+function buildFutures(){
+  dc('futures');const ctx=document.getElementById('chart-futures');if(!ctx)return;
+  const levs=[2,3,5,7,10,15,20];
+  charts.futures=new Chart(ctx,{type:'bar',data:{labels:levs.map(l=>l+'x'),datasets:[
+    {label:'Precio Liq. Long ($)',data:levs.map(l=>Math.round(64000*(1-1/l))),backgroundColor:'rgba(224,80,80,0.65)',borderColor:R,borderWidth:1,borderRadius:2},
+    {label:'Precio Liq. Short ($)',data:levs.map(l=>Math.round(64000*(1+1/l))),backgroundColor:'rgba(80,200,120,0.55)',borderColor:GR,borderWidth:1,borderRadius:2}
+  ]},
+  options:{responsive:true,plugins:{legend:{labels:{color:DIM,boxWidth:12}},tooltip:{callbacks:{label:c=>`$${c.parsed.y.toLocaleString()}`,afterLabel:c=>{const lev=levs[c.dataIndex];const pct=(100/lev).toFixed(1);return c.datasetIndex===0?`Liquidación con caída del ${pct}%`:`Liquidación con subida del ${pct}%`;}}}},
+  scales:{x:{ticks:{color:DIM},grid:{color:'rgba(201,168,76,0.04)'}},y:{ticks:{color:DIM,callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(201,168,76,0.04)'}}}}});
+}
+function buildIntegration(){
+  dc('integration');const ctx=document.getElementById('chart-integration');if(!ctx)return;
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const conProtocolo=[2.1,4.8,7.2,9.1,12.3,14.8,17.2,19.5,22.8,25.1,27.4,31.2];
+  const sinProtocolo=[3.2,4.1,2.8,-1.2,4.8,3.2,-2.4,6.1,5.8,2.1,-3.8,8.4];
+  // Accumulate sin protocolo
+  const sinAcum=sinProtocolo.reduce((acc,v,i)=>{acc.push((acc[i-1]||0)+v);return acc;},[]);
+  charts.integration=new Chart(ctx,{type:'line',data:{labels:months,datasets:[
+    {label:'Con protocolo',data:conProtocolo,borderColor:GR,backgroundColor:'rgba(80,200,120,0.06)',tension:.4,fill:true,pointRadius:4,pointHoverRadius:6},
+    {label:'Sin protocolo',data:sinAcum,borderColor:R,backgroundColor:'rgba(224,80,80,0.06)',tension:.4,fill:true,pointRadius:4,pointHoverRadius:6}
+  ]},
+  options:{responsive:true,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:DIM,boxWidth:12}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`,afterBody:items=>{const diff=items[0].parsed.y-items[1].parsed.y;return[`Ventaja del protocolo: +${diff.toFixed(1)}%`];}}}},
+  scales:{x:{ticks:{color:DIM,font:{size:10}},grid:{color:'rgba(201,168,76,0.04)'}},y:{ticks:{color:DIM,callback:v=>v.toFixed(0)+'%'},grid:{color:'rgba(201,168,76,0.04)'}}}}});
+}
+
+/* ═══════════ WIDGET UPDATERS ═══════════ */
+function updDCA(){
+  const cap=parseInt(document.getElementById('dca-cap')?.value||500);
+  const trades=parseInt(document.getElementById('dca-trades')?.value||4);
+  document.getElementById('dv-cap').textContent='$'+cap.toLocaleString();
+  document.getElementById('dv-trades').textContent=trades+'×/mes';
+  const takerA=Math.round(cap*12*0.001);
+  const makerA=Math.round(cap*12*0.0009);
+  document.getElementById('dv-taker').textContent='$'+takerA.toLocaleString();
+  document.getElementById('dv-maker').textContent='$'+makerA.toLocaleString();
+  document.getElementById('dv-save').textContent='$'+(takerA-makerA).toLocaleString();
+}
+function updROI(){
+  const buy=parseInt(document.getElementById('roi-buy')?.value||60000);
+  const sell=parseInt(document.getElementById('roi-sell')?.value||65000);
+  const fee=parseFloat(document.getElementById('roi-fee')?.value||0.001);
+  document.getElementById('rv-buy').textContent='$'+buy.toLocaleString();
+  document.getElementById('rv-sell').textContent='$'+sell.toLocaleString();
+  document.getElementById('rv-fee').textContent=(fee*100).toFixed(2)+'%';
+  const fi=buy*fee,fo=sell*fee;
+  const gross=((sell-buy)/buy*100).toFixed(2);
+  const net=((sell-buy-fi-fo)/buy*100).toFixed(2);
+  document.getElementById('rv-gross').textContent=gross+'%';
+  document.getElementById('rv-ftotal').textContent='$'+(fi+fo).toFixed(0);
+  document.getElementById('rv-net').textContent=net+'%';
+}
+function updFutures(){
+  const entry=parseInt(document.getElementById('f-entry')?.value||64000);
+  const lev=parseInt(document.getElementById('f-lev')?.value||10);
+  document.getElementById('fv-entry').textContent='$'+entry.toLocaleString();
+  document.getElementById('fv-lev').textContent=lev+'x';
+  const m=1/lev;
+  document.getElementById('fv-ll').textContent='$'+Math.round(entry*(1-m)).toLocaleString();
+  document.getElementById('fv-ls').textContent='$'+Math.round(entry*(1+m)).toLocaleString();
+  document.getElementById('fv-mg').textContent=(m*100).toFixed(1)+'%';
+}
+
+/* ═══════════ QUIZ ENGINE ═══════════ */
+function openQuiz(){quizState={started:false,level:0,score:0,answered:false,answers:[]};renderQuizScreen();goScr('quiz');setProgress(Math.round((done.size/6)*100),'Evaluación Final');}
+function openQuizDirect(){quizState={started:false,level:0,score:0,answered:false,answers:[]};renderQuizScreen();goScr('quiz');setProgress(0,'Evaluación Final');}
+
+function renderQuizScreen(){
+  const c=document.getElementById('quiz-container');
+  if(!quizState.started){
+    c.innerHTML=`<div class="quiz-hero">
+      <div style="font-size:2.8rem;margin-bottom:.9rem">🎯</div>
+      <h2>Evaluación Final</h2>
+      <p>15 escenarios reales de los 6 módulos. Cada respuesta correcta suma 6.67 puntos. Necesitas 60+ para aprobar y 80+ para la calificación de Operador Experto.</p>
+      <div class="quiz-meta">
+        <span class="qm-pill">📋 15 PREGUNTAS</span><span class="qm-pill">🏆 100 PUNTOS</span>
+        <span class="qm-pill">🔒 6 MÓDULOS</span><span class="qm-pill">✅ 60 PTS para aprobar</span>
+      </div>
+      <button class="btn-go" onclick="startQuiz()">▶ INICIAR EVALUACIÓN</button>
+    </div>`;
+    return;
+  }
+  if(quizState.level>=QUIZ.length){showResult();return;}
+  renderQ();
+}
+function startQuiz(){quizState.started=true;quizState.level=0;quizState.score=0;quizState.answered=false;quizState.answers=[];renderQ();}
+function renderQ(){
+  const c=document.getElementById('quiz-container');
+  const q=QUIZ[quizState.level];
+  const total=QUIZ.length;
+  const pct=Math.round((quizState.level/total)*100);
+  const dots=Array.from({length:total},(_,i)=>`<div class="qdot${i<quizState.level?' done':i===quizState.level?' active':''}"></div>`).join('');
+  const opts=q.opts.map((o,i)=>`<button class="q-opt" id="qo-${i}" onclick="selectQ(${i})"><span class="q-key">${['A','B','C','D'][i]}</span><span>${o}</span></button>`).join('');
+  c.innerHTML=`<div class="q-prog-wrap">
+    <div class="q-prog-hdr"><span class="q-prog-lbl">Pregunta ${quizState.level+1} de ${total}</span><span class="q-prog-score">Puntaje: <span>${quizState.score.toFixed(0)}</span>/100</span></div>
+    <div class="q-prog-track"><div class="q-prog-fill" style="width:${pct}%"></div></div>
+    <div class="q-dots">${dots}</div>
+  </div>
+  <div class="q-card">
+    <div class="q-mod-tag">${q.mod}</div>
+    <div class="q-title">${q.title}</div>
+    <div class="q-scenario">${q.scenario}</div>
+    <div class="q-opts" id="qopts">${opts}</div>
+    <div class="q-fb" id="qfb"></div>
+    <div class="q-nav"><button class="q-btn-next" id="qnext" disabled onclick="nextQ()">${quizState.level<total-1?'Siguiente →':'Ver Resultados →'}</button></div>
+  </div>`;
+}
+function selectQ(idx){
+  if(quizState.answered)return;
+  quizState.answered=true;
+  const q=QUIZ[quizState.level];
+  const correct=idx===q.correct;
+  if(correct)quizState.score+=100/QUIZ.length;
+  quizState.answers.push({correct,idx,mod:q.mod});
+  document.querySelectorAll('.q-opt').forEach((b,i)=>{
+    b.classList.add('qlocked');
+    if(i===q.correct)b.classList.add('qcorrect');
+    else if(i===idx&&!correct)b.classList.add('qwrong');
+    else b.classList.add('qdim');
+  });
+  const fb=document.getElementById('qfb');
+  fb.className=`q-fb show ${correct?'fc':'fw'}`;
+  fb.innerHTML=`<span style="font-size:1.15rem;flex-shrink:0">${correct?'✅':'⛔'}</span><div><strong>${correct?'¡Correcto!':'Respuesta incorrecta'}</strong>${correct?q.ok:q.fail}</div>`;
+  document.getElementById('qnext').disabled=false;
+}
+function nextQ(){quizState.level++;quizState.answered=false;renderQuizScreen();}
+
+function showResult(){
+  goScr('result');
+  const s=quizState.score;
+  const correct=quizState.answers.filter(a=>a.correct).length;
+  const stars=s>=90?5:s>=80?4:s>=60?3:s>=40?2:1;
+  const starStr=Array.from({length:5},(_,i)=>i<stars?'⭐':'☆').join('');
+  let ico,title,msg,color;
+  if(s>=90){ico='🏆';title='Operador Élite';msg='Dominas los 6 módulos con criterio profesional. Tienes las herramientas conceptuales y operativas para gestionar capital digital con disciplina consistente.';color='var(--gold-b)';}
+  else if(s>=80){ico='🥇';title='Operador Experto';msg='Excelente desempeño. Tienes bases sólidas en todos los módulos. Revisa los errores específicos para cerrar brechas antes de operar con capital significativo.';color='var(--green)';}
+  else if(s>=60){ico='📈';title='Operador en Desarrollo';msg='Aprobado, pero con brechas de riesgo. Regresa a los módulos donde fallaste y repite los pasos de configuración. El conocimiento incompleto en exchanges es más peligroso que el desconocimiento total.';color='var(--gold)';}
+  else{ico='⚠️';title='Alerta de Riesgo Alto';msg='Necesitas repasar los módulos antes de operar con capital real. Los errores identificados corresponden a situaciones donde las pérdidas son irreversibles. El taller está diseñado para prevenirlas.';color='var(--red)';}
+  const modScores={};
+  quizState.answers.forEach((a,i)=>{
+    const mod=QUIZ[i].mod.split('·')[0].trim();
+    if(!modScores[mod])modScores[mod]={c:0,t:0};
+    modScores[mod].t++;
+    if(a.correct)modScores[mod].c++;
+  });
+  const breakdownHTML=Object.entries(modScores).map(([mod,sc])=>{
+    const ok=sc.c===sc.t,partial=sc.c>0&&sc.c<sc.t;
+    return`<div class="rb-row"><span style="font-size:1rem;flex-shrink:0">${ok?'✅':partial?'⚠️':'❌'}</span><span class="rb-mod">${mod}</span><span style="font-family:'Orbitron',sans-serif;font-size:.65rem;color:${ok?'var(--green)':partial?'var(--gold)':'var(--red)'};font-weight:700">${sc.c}/${sc.t}</span></div>`;
+  }).join('');
+  document.getElementById('result-container').innerHTML=`
+  <div class="result-hero">
+    <div class="result-badge">${ico}</div>
+    <div style="font-family:'Cinzel',serif;font-size:1.45rem;color:${color};margin-bottom:.3rem">${title}</div>
+    <div class="result-score">${s.toFixed(0)}/100</div>
+    <div class="result-stars">${starStr}</div>
+    <div style="font-family:'Orbitron',sans-serif;font-size:.62rem;color:var(--tmuted);margin-bottom:.75rem">${correct} de ${QUIZ.length} respuestas correctas</div>
+    <div class="result-msg">${msg}</div>
+  </div>
+  <div class="result-breakdown"><div class="rb-title">Desglose por Módulo</div>${breakdownHTML}</div>
+  <div class="result-actions">
+    <button class="btn-restart" onclick="retryQuiz()">↺ Repetir Evaluación</button>
+    <button class="btn-menu2" onclick="goScr('menu');renderMenu()">⬅ Volver al Menú</button>
+  </div>`;
+  setProgress(100,'Evaluación Completada');
+}
+function retryQuiz(){quizState={started:true,level:0,score:0,answered:false,answers:[]};renderQ();goScr('quiz');}
+
+/* ═══════════ CERT & RESTART ═══════════ */
+function showCert(){document.getElementById('cert-mods').innerHTML=MODULES.map(m=>`<div class="cert-mod">${m.num}<br>${m.title}</div>`).join('');goScr('cert');setProgress(100,'¡Completado!');}
+function restartApp(){done.clear();stepsDone={};Object.values(charts).forEach(ch=>{try{ch.destroy();}catch(e){}});charts={};quizState={started:false,level:0,score:0,answered:false,answers:[]};goScr('hero');setProgress(0,'Bienvenida');}
+
+/* ═══════════ PARTICLES ═══════════ */
+(function(){
+  const c=document.getElementById('cvs'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();addEventListener('resize',resize);
+  class P{constructor(){this.reset(true);}
+    reset(r){this.x=Math.random()*W;this.y=r?Math.random()*H:H+5;
+      this.vx=(Math.random()-.5)*.2;this.vy=-(Math.random()*.3+.07);
+      this.r=Math.random()*1.2+.28;this.a=Math.random()*.38+.08;this.da=(Math.random()-.5)*.0032;}
+    update(){this.x+=this.vx;this.y+=this.vy;this.a+=this.da;
+      if(this.a<.05)this.da=Math.abs(this.da);if(this.a>.62)this.da=-Math.abs(this.da);
+      if(this.y<-5||this.x<-10||this.x>W+10)this.reset(false);}
+    draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(201,168,76,${this.a})`;ctx.fill();}}
+  for(let i=0;i<80;i++)pts.push(new P());
+  function lines(){for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+    const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<95){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+      ctx.strokeStyle=`rgba(201,168,76,${.09*(1-d/95)})`;ctx.lineWidth=.3;ctx.stroke();}}}
+  function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw();});lines();requestAnimationFrame(loop);}
+  loop();
+})();
+</script>
+</body>
+</html>
